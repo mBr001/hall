@@ -15,9 +15,12 @@ INCLUDEPATH += /usr/local/include
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    polswitch.cpp
+    polswitch.cpp \
+    configui.cpp
 
 HEADERS  += mainwindow.h \
-    polswitch.h
+    polswitch.h \
+    configui.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    configui.ui
