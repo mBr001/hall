@@ -17,6 +17,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    static const char pol_pm[];
+    static const char pol_mp[];
 };
 
 #endif // MAINWINDOW_H
