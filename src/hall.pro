@@ -9,6 +9,9 @@ QT       += core gui
 TARGET = hall
 TEMPLATE = app
 
+LIBS += -L/usr/local/lib -lmsdp2xxx
+
+INCLUDEPATH += /usr/local/include
 
 SOURCES += main.cpp\
         mainwindow.cpp \
