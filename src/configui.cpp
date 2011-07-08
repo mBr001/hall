@@ -51,7 +51,7 @@ void ConfigUI::on_buttonBox_accepted()
     s = ui->fileNameLineEdit->text();
     QFile f(s);
     if (f.exists()) {
-        QString msg("File %1 already exists, owerwrite this file?");
+        QString msg("File \n\n%1\n\n already exists, relly owerwrite this file?");
 
         msg = msg.arg(s);
         if (QMessageBox::question(
@@ -74,7 +74,7 @@ void ConfigUI::on_fileNameToolButton_clicked()
 {
     QString fileName;
 
-    fileName = QFileDialog::getOpenFileName(
+    fileName = QFileDialog::getSaveFileName(
                 this, "File to save measured data.", QString(),
                 tr("CSV Files (*.csv);;All files (*)"));
     if (fileName.isEmpty())
