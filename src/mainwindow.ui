@@ -22,14 +22,18 @@
       </property>
       <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="0" colspan="2">
-        <widget class="QCheckBox" name="checkBox">
+        <widget class="QCheckBox" name="powerCheckBox">
          <property name="text">
           <string>Power</string>
          </property>
         </widget>
        </item>
        <item row="0" column="2">
-        <widget class="QSpinBox" name="spinBox"/>
+        <widget class="QSpinBox" name="currentSpinBox">
+         <property name="maximum">
+          <number>1000</number>
+         </property>
+        </widget>
        </item>
        <item row="0" column="3">
         <widget class="QLabel" name="label">
@@ -38,21 +42,21 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="2">
-        <widget class="QPushButton" name="pushButton">
-         <property name="text">
-          <string>Reverse</string>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="polarityLabel">
          <property name="text">
           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Cantarell'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; color:#ff0000;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; &lt;/span&gt;&lt;span style=&quot; font-weight:600; color:#0000ff;&quot;&gt;-&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2" colspan="2">
+        <widget class="QCheckBox" name="reverseCheckBox">
+         <property name="text">
+          <string>Reverse</string>
          </property>
         </widget>
        </item>
@@ -101,7 +105,7 @@ p, li { white-space: pre-wrap; }
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="0" column="0">
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QPushButton" name="measurePushButton">
          <property name="text">
           <string>Measure &gt;&gt;</string>
          </property>
@@ -110,24 +114,23 @@ p, li { white-space: pre-wrap; }
       </layout>
      </widget>
     </item>
-    <item row="7" column="0" colspan="2">
+    <item row="7" column="0" colspan="3">
      <widget class="QLineEdit" name="lineEdit">
       <property name="readOnly">
        <bool>true</bool>
       </property>
      </widget>
     </item>
-    <item row="7" column="2">
-     <widget class="QToolButton" name="toolButton">
-      <property name="text">
-       <string>...</string>
-      </property>
-     </widget>
-    </item>
     <item row="6" column="0">
-     <widget class="QCheckBox" name="checkBox_2">
+     <widget class="QCheckBox" name="autosaveCheckBox">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="text">
        <string>Auto save</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
