@@ -16,7 +16,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     currentTimer.setInterval(100);
     currentTimer.setSingleShot(true);
-    // ...
+    QObject::connect(&currentTimer, SIGNAL(timeout()), this,
+                     SLOT(updateCurrent()));
 }
 
 MainWindow::~MainWindow()
