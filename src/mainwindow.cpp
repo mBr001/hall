@@ -20,3 +20,13 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::on_closePushButton_clicked()
+{
+    ConfigUI configUI(this);
+
+    if (configUI.exec() != QDialog::Accepted) {
+        this->close();
+        return;
+    }
+}

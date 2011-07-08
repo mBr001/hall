@@ -15,6 +15,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private slots:
+
+    void on_closePushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     static const char pol_pm[];
