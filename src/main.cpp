@@ -5,6 +5,9 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setApplicationName("Hall");
+    a.setOrganizationDomain("www.vscht.cz");
+    a.setOrganizationName("VSCHT");
 
     ConfigUI *configUI = new ConfigUI();
 
