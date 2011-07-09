@@ -10,10 +10,12 @@ const char MainWindow::pol_mp[] =
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    configUI()
 {
     ui->setupUi(this);
-    configUI = new ConfigUI(this);
+
+    QObject::connect(&configUI, SIGNAL(accepted()), this, SLOT(show()));
 
     currentTimer.setInterval(500);
     currentTimer.setSingleShot(false);
@@ -23,33 +25,20 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    delete configUI;
     delete ui;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (currentTimer.isActive()) {
-        closeDevs();
+    if (configUI.isHidden() && configUI.result() == QDialog::Accepted) {
+        event->ignore();
+        hide();
+        configUI.show();
 
-        if (getConfig()) {
-            event->ignore();
-
-            return;
-        }
+        return;
     }
 
     QMainWindow::closeEvent(event);
-}
-
-void MainWindow::on_closePushButton_clicked()
-{
-    ConfigUI configUI(this);
-
-    if (configUI.exec() != QDialog::Accepted) {
-        this->close();
-        return;
-    }
 }
 
 bool MainWindow::openDevs()
@@ -100,6 +89,7 @@ sdp_err:
     sdp_close(&sdp);
 
 sdp_err0:
+    // TODO: lepší hlášení, součástí hlavní zprávy by měla být hlavička
     QMessageBox::critical(
         this, "Failed to open Manson SDP power supply.", sdp_strerror(err));
     statusBar()->showMessage(sdp_strerror(err));
@@ -163,26 +153,16 @@ void MainWindow::on_currentDoubleSpinBox_valueChanged(double)
 
 void MainWindow::show()
 {
-    QWidget::show();
+    if (!openDevs()) {
+        configUI.show();
 
-    if (getConfig())
         return;
+    }
 
-    close();
+    QWidget::show();
 }
 
-bool MainWindow::getConfig()
+void MainWindow::startApp()
 {
-    do {
-        if (configUI->exec() != QDialog::Accepted)
-            break;
-
-         if (!openDevs())
-             continue;
-
-        return true;
-    } while (true);
-
-    QApplication::exit(0);
-    return false;
+    configUI.show();
 }

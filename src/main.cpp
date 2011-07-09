@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     a.setOrganizationName("VSCHT");
 
     MainWindow w;
-    w.show();
+    w.startApp();
 
     return a.exec();
 }

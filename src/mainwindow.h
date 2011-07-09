@@ -19,12 +19,13 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void startApp();
+
 public slots:
     void closeEvent(QCloseEvent *event);
     void show();
 
 private slots:
-    void on_closePushButton_clicked();
     void on_currentDoubleSpinBox_valueChanged(double value);
     void on_currentTimer_timeout();
     void on_measurePushButton_clicked();
@@ -33,6 +34,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    /** Configuration dialog. */
+    ConfigUI configUI;
     /** HTML string to show colored "+ -". */
     static const char pol_pm[];
     /** HTML string to show colored "- +". */
@@ -46,8 +49,7 @@ private:
     static const float currentSlope = 0.001;
     /** Maximal value of current posilbe drain from power source. */
     float currentMax;
-    /** Configuration dialog. */
-    ConfigUI *configUI;
+
 
     /** Close all devices, eg. power supply, Agilent, switch, ... */
     void closeDevs();
