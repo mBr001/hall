@@ -16,8 +16,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     configUI = new ConfigUI(this);
 
-    currentTimer.setInterval(100);
-    currentTimer.setSingleShot(true);
+    currentTimer.setInterval(500);
+    currentTimer.setSingleShot(false);
     QObject::connect(&currentTimer, SIGNAL(timeout()), this,
                      SLOT(on_currentTimer_timeout()));
 }
