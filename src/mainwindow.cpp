@@ -30,8 +30,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (configUI->exec() == QDialog::Accepted) {
+    closeDevs();
+
+    if (getConfig()) {
         event->ignore();
+
         return;
     }
 
@@ -157,8 +160,25 @@ void MainWindow::on_currentDoubleSpinBox_valueChanged(double)
 
 void MainWindow::show()
 {
-    if (configUI->exec() != QDialog::Accepted)
+    QWidget::show();
+
+    if (getConfig())
         return;
 
-    QWidget::show();
+    close();
+}
+
+bool MainWindow::getConfig()
+{
+    do {
+        if (configUI->exec() != QDialog::Accepted)
+            break;
+
+         if (!openDevs())
+             continue;
+
+        return true;
+    } while (true);
+
+    return false;
 }

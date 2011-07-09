@@ -51,6 +51,10 @@ private:
 
     /** Close all devices, eg. power supply, Agilent, switch, ... */
     void closeDevs();
+    /** Show configration dialog.
+
+    @return true when user wants to measure, false otherwise. */
+    bool getConfig();
     /** Open all devices. */
     bool openDevs();
     /** One step of current change towards wanted value. */
