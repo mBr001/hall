@@ -13,7 +13,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
     configUI = new ConfigUI(this);
 
     currentTimer.setInterval(500);
@@ -30,15 +29,17 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    closeDevs();
+    if (currentTimer.isActive()) {
+        closeDevs();
 
-    if (getConfig()) {
-        event->ignore();
+        if (getConfig()) {
+            event->ignore();
 
-        return;
+            return;
+        }
     }
 
-    QMainWindow::close();
+    QMainWindow::closeEvent(event);
 }
 
 void MainWindow::on_closePushButton_clicked()
@@ -90,6 +91,8 @@ bool MainWindow::openDevs()
     ui->powerCheckBox->setChecked(lcd_info.output);
 
     /* TODO ... */
+
+    currentTimer.start();
 
     return true;
 
@@ -180,5 +183,6 @@ bool MainWindow::getConfig()
         return true;
     } while (true);
 
+    QApplication::exit(0);
     return false;
 }
