@@ -16,6 +16,7 @@ public:
     explicit ConfigUI(QWidget *parent = 0);
     ~ConfigUI();
 
+    /* Names of configuration options */
     static const char cfg_agilentPort[];
     static const char cfg_powerSupplyPort[];
     static const char cfg_switchPort[];
@@ -24,7 +25,6 @@ public:
 private slots:
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
-
     void on_fileNameToolButton_clicked();
 
 private:

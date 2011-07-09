@@ -1,6 +1,7 @@
+#include <QMessageBox>
+#include <QCloseEvent>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "configui.h"
 
 const char MainWindow::pol_pm[] =
         "<span style='font-weight:600;'><span style='color:#ff0000;'>+</span> <span style='color:#0000ff;'>-</span></span>";
@@ -9,20 +10,32 @@ const char MainWindow::pol_mp[] =
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    currentOld(0)
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    configUI = new ConfigUI(this);
 
     currentTimer.setInterval(100);
     currentTimer.setSingleShot(true);
     QObject::connect(&currentTimer, SIGNAL(timeout()), this,
-                     SLOT(updateCurrent()));
+                     SLOT(on_currentTimer_timeout()));
 }
 
 MainWindow::~MainWindow()
 {
+    delete configUI;
     delete ui;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if (configUI->exec() == QDialog::Accepted) {
+        event->ignore();
+        return;
+    }
+
+    QMainWindow::close();
 }
 
 void MainWindow::on_closePushButton_clicked()
@@ -38,27 +51,54 @@ void MainWindow::on_closePushButton_clicked()
 bool MainWindow::openDevs()
 {
     QString s;
+    int err;
 
     s = settings.value(ConfigUI::cfg_powerSupplyPort).toString();
-    if (sdp_open(&sdp, s.toLocal8Bit().constData(), 0) < 0)
-        return false;
+    err = sdp_open(&sdp, s.toLocal8Bit().constData(), 0);
+    if (err < 0)
+        goto sdp_err0;
 
-    sdp_va_t setpoint;
+    /* Set value limit in current input spin  box. */
+    sdp_va_t limits;
+    err = sdp_get_va_maximums(&sdp, &limits);
+    if (err < 0)
+        goto sdp_err;
+    ui->currentDoubleSpinBox->setMaximum(limits.curr);
 
-    if (sdp_get_va_setpoint(&sdp, &setpoint) < 0) {
-        sdp_close(&sdp);
-        return false;
-    }
-    currentOld = setpoint.curr;
+    /* Set current to actual value, avoiding anny jumps. */
+    sdp_va_data_t va_data;
+    err = sdp_get_va_data(&sdp, &va_data);
+    if (err < 0)
+        goto sdp_err;
+    err = sdp_set_curr(&sdp, va_data.curr);
+    if (err < 0)
+        goto sdp_err;
+    /* Set voltage to maximum, Hall is current driven. */
+    err = sdp_set_volt_limit(&sdp, va_data.volt);
+    if (err < 0)
+        goto sdp_err;
+    err = sdp_set_volt(&sdp, va_data.volt);
+    if (err < 0)
+        goto sdp_err;
 
     sdp_lcd_info_t lcd_info;
-    if (sdp_get_lcd_info(&sdp, &lcd_info) < 0) {
-        sdp_close(&sdp);
-        return false;
-    }
+    if (err < 0)
+        goto sdp_err;
     ui->powerCheckBox->setChecked(lcd_info.output);
 
+    /* TODO ... */
+
     return true;
+
+sdp_err:
+    sdp_close(&sdp);
+
+sdp_err0:
+    QMessageBox::critical(
+        this, "Failed to open Manson SDP power supply.", sdp_strerror(err));
+    statusBar()->showMessage(sdp_strerror(err));
+
+    return false;
 }
 
 void MainWindow::closeDevs()
@@ -70,30 +110,33 @@ void MainWindow::on_powerCheckBox_toggled(bool checked)
 {
     if (checked) {
         // FIXME
-        sdp_set_curr(&sdp, 0);
-        sdp_set_output(&sdp, true);
-        currentOld = 0;
+        // sdp_set_curr(&sdp, 0);
+        // sdp_set_output(&sdp, true);
     }
     currentTimer.start();
 }
 
 void MainWindow::on_measurePushButton_clicked()
 {
+    /* TODO */
+}
 
+void MainWindow::on_currentTimer_timeout()
+{
+    /* TODO */
 }
 
 void MainWindow::updateCurrent()
 {
     double current;
 
-    current = (double)ui->currentSpinBox->value() / 0.001;
+    current = ui->currentDoubleSpinBox->value();
     if (ui->reverseCheckBox->isChecked())
         current = -current;
 
     sdp_set_curr(&sdp, current);
 
-
-    // sdp_set_output(&sdp, checked);
+    /* TODO */
 }
 
 void MainWindow::on_reverseCheckBox_toggled(bool checked)
@@ -104,4 +147,18 @@ void MainWindow::on_reverseCheckBox_toggled(bool checked)
         ui->polarityLabel->setText(pol_pm);
 
     currentTimer.start();
+}
+
+void MainWindow::on_currentDoubleSpinBox_valueChanged(double)
+{
+    currentTimer.start();
+}
+
+
+void MainWindow::show()
+{
+    if (configUI->exec() != QDialog::Accepted)
+        return;
+
+    QWidget::show();
 }

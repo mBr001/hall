@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QSettings>
 #include <QTimer>
+#include "configui.h"
 #include <msdp2xxx.h>
 
 namespace Ui {
@@ -18,23 +19,41 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+    void closeEvent(QCloseEvent *event);
+    void show();
+
 private slots:
     void on_closePushButton_clicked();
-    void on_powerCheckBox_toggled(bool checked);
+    void on_currentDoubleSpinBox_valueChanged(double value);
+    void on_currentTimer_timeout();
     void on_measurePushButton_clicked();
+    void on_powerCheckBox_toggled(bool checked);
     void on_reverseCheckBox_toggled(bool checked);
 
 private:
     Ui::MainWindow *ui;
+    /** HTML string to show colored "+ -". */
     static const char pol_pm[];
+    /** HTML string to show colored "- +". */
     static const char pol_mp[];
+    /** Mansons SDP power supply driver. */
     sdp_t sdp;
     QSettings settings;
+    /** Timer used to adjust current trought magnet in specified time. */
     QTimer currentTimer;
-    double currentOld;
+    /** Slope of current change flowing trought magnet [A/sec]. */
+    static const float currentSlope = 0.001;
+    /** Maximal value of current posilbe drain from power source. */
+    float currentMax;
+    /** Configuration dialog. */
+    ConfigUI *configUI;
 
-    bool openDevs();
+    /** Close all devices, eg. power supply, Agilent, switch, ... */
     void closeDevs();
+    /** Open all devices. */
+    bool openDevs();
+    /** One step of current change towards wanted value. */
     void updateCurrent();
 };
 
