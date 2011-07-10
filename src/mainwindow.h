@@ -29,11 +29,14 @@ public slots:
     void show();
 
 private slots:
-    void on_currentDoubleSpinBox_valueChanged(double value);
+    void on_coilCurrDoubleSpinBox_valueChanged(double );
+    void on_coilPolCrossCheckBox_toggled(bool checked);
+    void on_coilPowerCheckBox_toggled(bool checked);
     void on_currentTimer_timeout();
     void on_measurePushButton_clicked();
-    void on_polarityCheckBox_toggled(bool checked);
-    void on_powerCheckBox_toggled(bool checked);
+    void on_sampleCurrDoubleSpinBox_valueChanged(double );
+    void on_samplePolCrossCheckBox_toggled(bool checked);
+    void on_samplePowerCheckBox_toggled(bool checked);
 
 private:
     Ui::MainWindow *ui;
@@ -53,7 +56,7 @@ private:
     /** Maximal value of current posilbe drain from power source. */
     float currentMax;
     /** Power polarity switch handler */
-    PowerSwitch powerSwitch;
+    PolaritySwitch powerSwitch;
 
 
     /** Close all devices, eg. power supply, Agilent, switch, ... */

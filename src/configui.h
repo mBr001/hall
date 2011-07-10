@@ -19,7 +19,7 @@ public:
     /* Names of configuration options */
     static const char cfg_agilentPort[];
     static const char cfg_powerSupplyPort[];
-    static const char cfg_switchPort[];
+    static const char cfg_polSwitchPort[];
     static const char cfg_fileName[];
 
 private slots:

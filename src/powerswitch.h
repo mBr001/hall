@@ -1,7 +1,7 @@
 #ifndef POLSWITCH_H
 #define POLSWITCH_H
 
-class PowerSwitch
+class PolaritySwitch
 {
 public:
     /** Power switch states. */
@@ -11,8 +11,8 @@ public:
         cross = 2,
     } state_t;
 
-    PowerSwitch();
-    ~PowerSwitch();
+    PolaritySwitch();
+    ~PolaritySwitch();
 
     /** Close power switch port if opened */
     void close();

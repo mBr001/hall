@@ -58,7 +58,7 @@ bool MainWindow::openDevs()
     err = sdp_get_va_maximums(&sdp, &limits);
     if (err < 0)
         goto sdp_err;
-    ui->currentDoubleSpinBox->setMaximum(limits.curr);
+    ui->coilCurrDoubleSpinBox->setMaximum(limits.curr);
 
     /* Set current to actual value, avoiding anny jumps. */
     sdp_va_data_t va_data;
@@ -79,17 +79,17 @@ bool MainWindow::openDevs()
     sdp_lcd_info_t lcd_info;
     if (err < 0)
         goto sdp_err;
-    ui->powerCheckBox->setChecked(lcd_info.output);
+    ui->coilPowerCheckBox->setChecked(lcd_info.output);
 
-    s = settings.value(ConfigUI::cfg_powerSupplyPort).toString();
+    s = settings.value(ConfigUI::cfg_polSwitchPort).toString();
     if (!powerSwitch.open(s.toLocal8Bit().constData())) {
         err = errno;
         goto mag_pwr_switch_err;
     }
 
     bool cross;
-    cross = powerSwitch.polarity() == PowerSwitch::cross;
-    ui->polarityCheckBox->setChecked(cross);
+    cross = powerSwitch.polarity() == PolaritySwitch::cross;
+    ui->coilPolCrossCheckBox->setChecked(cross);
 
     /* TODO ... */
 
@@ -129,7 +129,7 @@ void MainWindow::closeDevs()
     sdp_close(&sdp);
 }
 
-void MainWindow::on_powerCheckBox_toggled(bool checked)
+void MainWindow::on_coilPowerCheckBox_toggled(bool checked)
 {
     if (checked) {
         // FIXME
@@ -153,8 +153,8 @@ void MainWindow::updateCurrent()
 {
     double current;
 
-    current = ui->currentDoubleSpinBox->value();
-    if (ui->polarityCheckBox->isChecked())
+    current = ui->coilCurrDoubleSpinBox->value();
+    if (ui->coilPolCrossCheckBox->isChecked())
         current = -current;
 
     sdp_set_curr(&sdp, current);
@@ -162,20 +162,20 @@ void MainWindow::updateCurrent()
     /* TODO */
 }
 
-void MainWindow::on_polarityCheckBox_toggled(bool checked)
+void MainWindow::on_coilPolCrossCheckBox_toggled(bool checked)
 {
-    if (checked) {
-        powerSwitch.setPolarity(PowerSwitch::cross);
+    /*if (checked) {
+        powerSwitch.setPolarity(PolaritySwitch::cross);
         ui->polarityLabel->setText(pol_mp);
     } else {
-        powerSwitch.setPolarity(PowerSwitch::direct);
+        powerSwitch.setPolarity(PolaritySwitch::direct);
         ui->polarityLabel->setText(pol_pm);
-    }
+    }*/
 
     currentTimer.start();
 }
 
-void MainWindow::on_currentDoubleSpinBox_valueChanged(double)
+void MainWindow::on_coilCurrDoubleSpinBox_valueChanged(double )
 {
     currentTimer.start();
 }
@@ -195,4 +195,19 @@ void MainWindow::show()
 void MainWindow::startApp()
 {
     configUI.show();
+}
+
+void MainWindow::on_samplePowerCheckBox_toggled(bool )
+{
+
+}
+
+void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double )
+{
+
+}
+
+void MainWindow::on_samplePolCrossCheckBox_toggled(bool )
+{
+
 }
