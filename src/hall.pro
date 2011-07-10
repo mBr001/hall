@@ -16,11 +16,13 @@ INCLUDEPATH += /usr/local/include
 SOURCES += main.cpp\
         mainwindow.cpp \
     configui.cpp \
-    powpolwitch.cpp
+    powpolwitch.cpp \
+    ps6220hack.cpp
 
 HEADERS  += mainwindow.h \
     configui.h \
-    powpolswitch.h
+    powpolswitch.h \
+    ps6220hack.h
 
 FORMS    += mainwindow.ui \
     configui.ui
