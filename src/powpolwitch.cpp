@@ -8,7 +8,7 @@
 #include <signal.h>
 #include <errno.h>
 
-#include "powerswitch.h"
+#include "powpolswitch.h"
 
 
 PwrPolSwitch::PwrPolSwitch() :
