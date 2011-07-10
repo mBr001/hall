@@ -14,6 +14,8 @@ public:
     PowerSwitch();
     ~PowerSwitch();
 
+    /** Close power switch port if opened */
+    void close();
     /** Open LPT port connected to switch.
 
       @return true on success, false otherwise. */

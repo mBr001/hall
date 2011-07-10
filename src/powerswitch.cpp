@@ -11,9 +11,18 @@
 #include "powerswitch.h"
 
 
-
-PowerSwitch::PowerSwitch()
+PowerSwitch::PowerSwitch() :
+    fd(-1)
 {
+}
+
+void PowerSwitch::close()
+{
+    if (fd >= 0) {
+        ioctl(fd, PPRELEASE);
+        ::close(fd);
+        fd = -1;
+    }
 }
 
 bool PowerSwitch::open(const char *par_port)
@@ -21,6 +30,8 @@ bool PowerSwitch::open(const char *par_port)
     const int direction = 0x00;
     const int mode = IEEE1284_MODE_BYTE;
     int err;
+
+    close();
 
     fd = ::open(par_port, O_RDWR);
     if (fd < 0)
@@ -47,7 +58,7 @@ err:
 
 err1:
     err = errno;
-    close(fd);
+    ::close(fd);
     errno = err;
 
     return false;
@@ -63,10 +74,6 @@ bool PowerSwitch::setPolarity(state_t state)
 
 PowerSwitch::~PowerSwitch()
 {
-	int result;
-	result = ioctl(fd, PPRELEASE);
-	if (result < 0)
-		perror("~PolSwitch");
-	close(fd);
+    close();
 }
 
