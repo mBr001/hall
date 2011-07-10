@@ -32,8 +32,8 @@ private slots:
     void on_currentDoubleSpinBox_valueChanged(double value);
     void on_currentTimer_timeout();
     void on_measurePushButton_clicked();
+    void on_polarityCheckBox_toggled(bool checked);
     void on_powerCheckBox_toggled(bool checked);
-    void on_reverseCheckBox_toggled(bool checked);
 
 private:
     Ui::MainWindow *ui;
@@ -52,8 +52,8 @@ private:
     static const float currentSlope = 0.001;
     /** Maximal value of current posilbe drain from power source. */
     float currentMax;
-    /** Polarity switch handler */
-    PowerSwitch polSwitch;
+    /** Power polarity switch handler */
+    PowerSwitch powerSwitch;
 
 
     /** Close all devices, eg. power supply, Agilent, switch, ... */

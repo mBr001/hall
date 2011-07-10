@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <QMessageBox>
 #include <QCloseEvent>
 #include "mainwindow.h"
@@ -21,8 +22,6 @@ MainWindow::MainWindow(QWidget *parent) :
     currentTimer.setSingleShot(false);
     QObject::connect(&currentTimer, SIGNAL(timeout()), this,
                      SLOT(on_currentTimer_timeout()));
-
-    polSwitch.open("/dev/parport0");
 }
 
 MainWindow::~MainWindow()
@@ -45,6 +44,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 bool MainWindow::openDevs()
 {
+    QString err_text, err_title;
     QString s;
     int err;
 
@@ -81,22 +81,45 @@ bool MainWindow::openDevs()
         goto sdp_err;
     ui->powerCheckBox->setChecked(lcd_info.output);
 
+    s = settings.value(ConfigUI::cfg_powerSupplyPort).toString();
+    if (!powerSwitch.open(s.toLocal8Bit().constData())) {
+        err = errno;
+        goto mag_pwr_switch_err;
+    }
+
+    bool cross;
+    cross = powerSwitch.polarity() == PowerSwitch::cross;
+    ui->polarityCheckBox->setChecked(cross);
+
     /* TODO ... */
 
     currentTimer.start();
 
     return true;
 
+    // powerSwitch.close();
+
+mag_pwr_switch_err:
+    if (err_title.isEmpty()) {
+
+        err_title = QString::fromLocal8Bit(
+                    "Failed to open power supply switch");
+        err_text = QString::fromLocal8Bit(strerror(err));
+    }
+
 sdp_err:
     sdp_close(&sdp);
 
 sdp_err0:
-    QString errstr("Failed to open Manson SDP power supply:\n\n%1");
+    if (err_title.isEmpty()) {
+        err_title = QString::fromLocal8Bit(
+                    "Failed to open Manson SDP power supply");
+        err_text = QString::fromLocal8Bit(sdp_strerror(err));
+    }
 
-    errstr = errstr.arg(sdp_strerror(err));
-    QMessageBox::critical(this, "Failed to open Manson SDP power supply.",
-                          errstr);
-    statusBar()->showMessage(sdp_strerror(err));
+    err_text = QString("%1:\n\n%2").arg(err_title).arg(err_text);
+    QMessageBox::critical(this, err_title, err_text);
+    statusBar()->showMessage(err_title);
 
     return false;
 }
@@ -131,7 +154,7 @@ void MainWindow::updateCurrent()
     double current;
 
     current = ui->currentDoubleSpinBox->value();
-    if (ui->reverseCheckBox->isChecked())
+    if (ui->polarityCheckBox->isChecked())
         current = -current;
 
     sdp_set_curr(&sdp, current);
@@ -139,13 +162,13 @@ void MainWindow::updateCurrent()
     /* TODO */
 }
 
-void MainWindow::on_reverseCheckBox_toggled(bool checked)
+void MainWindow::on_polarityCheckBox_toggled(bool checked)
 {
     if (checked) {
-        polSwitch.setPolarity(PowerSwitch::cross);
+        powerSwitch.setPolarity(PowerSwitch::cross);
         ui->polarityLabel->setText(pol_mp);
     } else {
-        polSwitch.setPolarity(PowerSwitch::direct);
+        powerSwitch.setPolarity(PowerSwitch::direct);
         ui->polarityLabel->setText(pol_pm);
     }
 

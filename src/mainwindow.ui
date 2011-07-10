@@ -47,7 +47,7 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="1" column="2" colspan="2">
-        <widget class="QCheckBox" name="reverseCheckBox">
+        <widget class="QCheckBox" name="polarityCheckBox">
          <property name="text">
           <string>Reverse</string>
          </property>
