@@ -7,7 +7,7 @@
 #include <msdp2xxx.h>
 
 #include "configui.h"
-#include "powerswitch.h"
+#include "powpolswitch.h"
 
 
 namespace Ui {
@@ -51,12 +51,14 @@ private:
     QSettings settings;
     /** Timer used to adjust current trought magnet in specified time. */
     QTimer currentTimer;
+    /** Delay betwen current value update [ms]. Do not change! */
+    static const int currentDwell = 1000;
     /** Slope of current change flowing trought magnet [A/sec]. */
-    static const float currentSlope = 0.001;
+    static const float currentSlope = 0.01;
     /** Maximal value of current posilbe drain from power source. */
     float currentMax;
     /** Power polarity switch handler */
-    PolaritySwitch powerSwitch;
+    PwrPolSwitch pwrPolSwitch;
 
 
     /** Close all devices, eg. power supply, Agilent, switch, ... */

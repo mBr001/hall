@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <math.h>
 #include <QMessageBox>
 #include <QCloseEvent>
 #include "mainwindow.h"
@@ -18,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(&configUI, SIGNAL(accepted()), this, SLOT(show()));
 
-    currentTimer.setInterval(500);
+    currentTimer.setInterval(currentDwell);
     currentTimer.setSingleShot(false);
     QObject::connect(&currentTimer, SIGNAL(timeout()), this,
                      SLOT(on_currentTimer_timeout()));
@@ -32,7 +33,8 @@ MainWindow::~MainWindow()
 void MainWindow::closeDevs()
 {
     currentTimer.stop();
-    powerSwitch.close();
+    ui->sweppingLabel->setEnabled(false);
+    pwrPolSwitch.close();
     sdp_close(&sdp);
 }
 
@@ -52,35 +54,111 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::on_coilCurrDoubleSpinBox_valueChanged(double )
 {
-    //currentTimer.start();
+    ui->sweppingLabel->setEnabled(true);
 }
 
-void MainWindow::on_coilPolCrossCheckBox_toggled(bool)
+void MainWindow::on_coilPolCrossCheckBox_toggled(bool checked)
 {
-    /*if (checked) {
-        powerSwitch.setPolarity(PolaritySwitch::cross);
+    ui->sweppingLabel->setEnabled(true);
+
+    if (checked)
         ui->polarityLabel->setText(pol_mp);
-    } else {
-        powerSwitch.setPolarity(PolaritySwitch::direct);
+    else
         ui->polarityLabel->setText(pol_pm);
-    }*/
-
-    //currentTimer.start();
 }
 
-void MainWindow::on_coilPowerCheckBox_toggled(bool checked)
+void MainWindow::on_coilPowerCheckBox_toggled(bool)
 {
-    if (checked) {
-        // FIXME
-        // sdp_set_curr(&sdp, 0);
-        // sdp_set_output(&sdp, true);
-    }
-    //currentTimer.start();
+    ui->sweppingLabel->setEnabled(true);
 }
 
 void MainWindow::on_currentTimer_timeout()
 {
     sdp_va_data_t va_data;
+
+    // tweak coil current
+    while (ui->sweppingLabel->isEnabled()) {
+        /** Curent trought coil */
+        double wantI, procI;
+        /** Coil power state, on/off */
+        bool wantCoilPower, procCoilPower;
+        /** Coil power switch state direct/cross */
+        PwrPolSwitch::state_t wantCoilSwitchState, procCoilSwitchState;
+
+        /* Get all values necesary for process decisions. */
+        // wanted values
+        if (ui->coilPolCrossCheckBox->isChecked())
+            wantCoilSwitchState = PwrPolSwitch::cross;
+        else
+            wantCoilSwitchState = PwrPolSwitch::direct;
+
+        wantCoilPower = ui->coilPowerCheckBox->isChecked();
+
+        if (wantCoilPower) {
+            wantI = ui->coilCurrDoubleSpinBox->value();
+            if (wantCoilSwitchState == PwrPolSwitch::cross)
+                wantI = -wantI;
+        }
+        else
+            wantI = 0;
+
+        // proc values
+        procCoilSwitchState = pwrPolSwitch.polarity();
+
+        sdp_lcd_info_t lcd_info;
+        sdp_get_lcd_info(&sdp, &lcd_info); // TODO check
+        procCoilPower = lcd_info.output;
+        procI = lcd_info.set_A;
+        if (procCoilSwitchState == PwrPolSwitch::cross)
+            procI = -procI;
+
+        ui->plainTextEdit->appendPlainText(QString("procI: %1, procCoilSwitchState: %2, procCoilPower: %3\n").arg(procI).arg(procCoilSwitchState).arg(procCoilPower));
+        ui->plainTextEdit->appendPlainText(QString("wantI: %1, wantCoilSwitchState: %2, wantCoilPower: %3\n").arg(wantI).arg(wantCoilSwitchState).arg(wantCoilPower));
+
+        /* process decision */
+        // Target reach, finish job
+        if (fabs(procI - wantI) < currentSlope) {
+            ui->sweppingLabel->setEnabled(false);
+            if (!wantCoilPower && procI <= currentSlope)
+                sdp_set_output(&sdp, 0); // TODO check
+
+            break;
+        }
+
+        // Need switch polarity?
+        if (procCoilSwitchState != wantCoilSwitchState) {
+            // Is polarity switch posible? (power is off)
+            if (!procCoilPower) {
+                pwrPolSwitch.setPolarity(wantCoilSwitchState); // TODO check
+                break;
+            }
+
+            // Is posible power-off in order to swich polarity?
+            if (fabs(procI) < currentSlope) {
+                sdp_set_output(&sdp, 0);
+                break;
+            }
+
+            // set current near to zero before polarity switching
+        }
+
+        // want current but power is off -> set power on at current 0.0 A
+        if (procCoilPower != wantCoilPower && wantCoilPower) {
+            sdp_set_curr(&sdp, 0.0);
+            sdp_set_output(&sdp, 1);
+            break;
+        }
+
+        // power is on, but current neet to be adjusted, do one step
+        if (procI > wantI)
+            procI -= currentSlope;
+        else
+            procI += currentSlope;
+
+        sdp_set_curr(&sdp, fabs(procI));
+
+        break;
+    }
 
     if (sdp_get_va_data(&sdp, &va_data) < 0) {
         // TODO
@@ -89,7 +167,6 @@ void MainWindow::on_currentTimer_timeout()
     }
 
     ui->coilCurrMeasDoubleSpinBox->setValue(va_data.curr);
-    /* TODO */
 }
 
 void MainWindow::on_measurePushButton_clicked()
@@ -152,17 +229,18 @@ bool MainWindow::openDevs()
     ui->coilPowerCheckBox->setChecked(lcd_info.output);
 
     s = settings.value(ConfigUI::cfg_polSwitchPort).toString();
-    if (!powerSwitch.open(s.toLocal8Bit().constData())) {
+    if (!pwrPolSwitch.open(s.toLocal8Bit().constData())) {
         err = errno;
         goto mag_pwr_switch_err;
     }
 
     bool cross;
-    cross = powerSwitch.polarity() == PolaritySwitch::cross;
+    cross = (pwrPolSwitch.polarity() == PwrPolSwitch::cross);
     ui->coilPolCrossCheckBox->setChecked(cross);
 
     /* TODO ... */
 
+    ui->sweppingLabel->setEnabled(true);
     currentTimer.start();
 
     return true;
