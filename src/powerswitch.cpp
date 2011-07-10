@@ -79,6 +79,12 @@ PolaritySwitch::state_t PolaritySwitch::polarity()
 
 bool PolaritySwitch::setPolarity(state_t state)
 {
+    if (polarity() != state && state != off) {
+        if (ioctl(fd, PPWDATA, off) < 0)
+            return false;
+        usleep(10000);
+    }
+
     if (ioctl(fd, PPWDATA, &state) < 0)
         return false;
 
