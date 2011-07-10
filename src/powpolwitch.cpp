@@ -82,8 +82,10 @@ PwrPolSwitch::state_t PwrPolSwitch::polarity()
 
 bool PwrPolSwitch::setPolarity(state_t state)
 {
+    const state_t state_off = off;
+
     if (polarity() != state && state != off) {
-        if (ioctl(fd, PPWDATA, off) < 0)
+        if (ioctl(fd, PPWDATA, &state_off) < 0)
             return false;
         usleep(10000);
     }
