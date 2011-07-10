@@ -29,9 +29,17 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::closeDevs()
+{
+    currentTimer.stop();
+    powerSwitch.close();
+    sdp_close(&sdp);
+}
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (configUI.isHidden() && configUI.result() == QDialog::Accepted) {
+        closeDevs();
         event->ignore();
         hide();
         configUI.show();
@@ -40,6 +48,68 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 
     QMainWindow::closeEvent(event);
+}
+
+void MainWindow::on_coilCurrDoubleSpinBox_valueChanged(double )
+{
+    //currentTimer.start();
+}
+
+void MainWindow::on_coilPolCrossCheckBox_toggled(bool)
+{
+    /*if (checked) {
+        powerSwitch.setPolarity(PolaritySwitch::cross);
+        ui->polarityLabel->setText(pol_mp);
+    } else {
+        powerSwitch.setPolarity(PolaritySwitch::direct);
+        ui->polarityLabel->setText(pol_pm);
+    }*/
+
+    //currentTimer.start();
+}
+
+void MainWindow::on_coilPowerCheckBox_toggled(bool checked)
+{
+    if (checked) {
+        // FIXME
+        // sdp_set_curr(&sdp, 0);
+        // sdp_set_output(&sdp, true);
+    }
+    //currentTimer.start();
+}
+
+void MainWindow::on_currentTimer_timeout()
+{
+    sdp_va_data_t va_data;
+
+    if (sdp_get_va_data(&sdp, &va_data) < 0) {
+        // TODO
+        close();
+        return;
+    }
+
+    ui->coilCurrMeasDoubleSpinBox->setValue(va_data.curr);
+    /* TODO */
+}
+
+void MainWindow::on_measurePushButton_clicked()
+{
+    /* TODO */
+}
+
+void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double )
+{
+
+}
+
+void MainWindow::on_samplePolCrossCheckBox_toggled(bool )
+{
+
+}
+
+void MainWindow::on_samplePowerCheckBox_toggled(bool )
+{
+
 }
 
 bool MainWindow::openDevs()
@@ -124,63 +194,6 @@ sdp_err0:
     return false;
 }
 
-void MainWindow::closeDevs()
-{
-    sdp_close(&sdp);
-}
-
-void MainWindow::on_coilPowerCheckBox_toggled(bool checked)
-{
-    if (checked) {
-        // FIXME
-        // sdp_set_curr(&sdp, 0);
-        // sdp_set_output(&sdp, true);
-    }
-    currentTimer.start();
-}
-
-void MainWindow::on_measurePushButton_clicked()
-{
-    /* TODO */
-}
-
-void MainWindow::on_currentTimer_timeout()
-{
-    /* TODO */
-}
-
-void MainWindow::updateCurrent()
-{
-    double current;
-
-    current = ui->coilCurrDoubleSpinBox->value();
-    if (ui->coilPolCrossCheckBox->isChecked())
-        current = -current;
-
-    sdp_set_curr(&sdp, current);
-
-    /* TODO */
-}
-
-void MainWindow::on_coilPolCrossCheckBox_toggled(bool checked)
-{
-    /*if (checked) {
-        powerSwitch.setPolarity(PolaritySwitch::cross);
-        ui->polarityLabel->setText(pol_mp);
-    } else {
-        powerSwitch.setPolarity(PolaritySwitch::direct);
-        ui->polarityLabel->setText(pol_pm);
-    }*/
-
-    currentTimer.start();
-}
-
-void MainWindow::on_coilCurrDoubleSpinBox_valueChanged(double )
-{
-    currentTimer.start();
-}
-
-
 void MainWindow::show()
 {
     if (!openDevs()) {
@@ -197,17 +210,15 @@ void MainWindow::startApp()
     configUI.show();
 }
 
-void MainWindow::on_samplePowerCheckBox_toggled(bool )
+void MainWindow::updateCurrent()
 {
+    double current;
 
-}
+    current = ui->coilCurrDoubleSpinBox->value();
+    if (ui->coilPolCrossCheckBox->isChecked())
+        current = -current;
 
-void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double )
-{
+    sdp_set_curr(&sdp, current);
 
-}
-
-void MainWindow::on_samplePolCrossCheckBox_toggled(bool )
-{
-
+    /* TODO */
 }
