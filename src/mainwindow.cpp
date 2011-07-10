@@ -142,10 +142,10 @@ void MainWindow::updateCurrent()
 void MainWindow::on_reverseCheckBox_toggled(bool checked)
 {
     if (checked) {
-        polSwitch.setPolarity(-1);
+        polSwitch.setPolarity(PowerSwitch::cross);
         ui->polarityLabel->setText(pol_mp);
     } else {
-        polSwitch.setPolarity(1);
+        polSwitch.setPolarity(PowerSwitch::direct);
         ui->polarityLabel->setText(pol_pm);
     }
 

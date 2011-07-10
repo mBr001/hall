@@ -7,7 +7,7 @@
 #include <msdp2xxx.h>
 
 #include "configui.h"
-#include "polswitch.h"
+#include "powerswitch.h"
 
 
 namespace Ui {
@@ -53,7 +53,7 @@ private:
     /** Maximal value of current posilbe drain from power source. */
     float currentMax;
     /** Polarity switch handler */
-    PolSwitch polSwitch;
+    PowerSwitch polSwitch;
 
 
     /** Close all devices, eg. power supply, Agilent, switch, ... */
