@@ -167,6 +167,7 @@ void MainWindow::on_currentTimer_timeout()
     }
 
     ui->coilCurrMeasDoubleSpinBox->setValue(va_data.curr);
+    ui->coilVoltMeasDoubleSpinBox->setValue(va_data.volt);
 }
 
 void MainWindow::on_measurePushButton_clicked()
