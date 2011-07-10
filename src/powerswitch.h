@@ -20,6 +20,8 @@ public:
 
       @return true on success, false otherwise. */
     bool open(const char *par_port);
+    /** Get current polarity settings */
+    state_t polarity();
     /** Set switch polarity. */
     bool setPolarity(state_t state);
 

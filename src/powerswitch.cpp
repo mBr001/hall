@@ -64,6 +64,19 @@ err1:
     return false;
 }
 
+PowerSwitch::state_t PowerSwitch::polarity()
+{
+    state_t state;
+
+    if (ioctl(fd, PPRDATA, &state) < 0)
+        return off;
+
+    if (state & direct)
+        return direct;
+
+    return cross;
+}
+
 bool PowerSwitch::setPolarity(state_t state)
 {
     if (ioctl(fd, PPWDATA, &state) < 0)
