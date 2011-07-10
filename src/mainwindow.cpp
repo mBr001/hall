@@ -112,14 +112,14 @@ void MainWindow::on_currentTimer_timeout()
         if (procCoilSwitchState == PwrPolSwitch::cross)
             procI = -procI;
 
-        ui->plainTextEdit->appendPlainText(QString("procI: %1, procCoilSwitchState: %2, procCoilPower: %3\n").arg(procI).arg(procCoilSwitchState).arg(procCoilPower));
+        ui->plainTextEdit->appendPlainText(QString("procI: %1, procCoilSwitchState: %2, procCoilPower: %3").arg(procI).arg(procCoilSwitchState).arg(procCoilPower));
         ui->plainTextEdit->appendPlainText(QString("wantI: %1, wantCoilSwitchState: %2, wantCoilPower: %3\n").arg(wantI).arg(wantCoilSwitchState).arg(wantCoilPower));
 
         /* process decision */
         // Target reach, finish job
         if (fabs(procI - wantI) < currentSlope) {
             ui->sweppingLabel->setEnabled(false);
-            if (!wantCoilPower && procI <= currentSlope)
+            if (!wantCoilPower && procI <= currentSlope && procCoilPower)
                 sdp_set_output(&sdp, 0); // TODO check
 
             break;
@@ -225,6 +225,7 @@ bool MainWindow::openDevs()
         goto sdp_err;
 
     sdp_lcd_info_t lcd_info;
+    sdp_get_lcd_info(&sdp, &lcd_info); // TODO check
     if (err < 0)
         goto sdp_err;
     ui->coilPowerCheckBox->setChecked(lcd_info.output);
