@@ -4,8 +4,11 @@
 #include <QMainWindow>
 #include <QSettings>
 #include <QTimer>
-#include "configui.h"
 #include <msdp2xxx.h>
+
+#include "configui.h"
+#include "polswitch.h"
+
 
 namespace Ui {
     class MainWindow;
@@ -49,6 +52,8 @@ private:
     static const float currentSlope = 0.001;
     /** Maximal value of current posilbe drain from power source. */
     float currentMax;
+    /** Polarity switch handler */
+    PolSwitch polSwitch;
 
 
     /** Close all devices, eg. power supply, Agilent, switch, ... */

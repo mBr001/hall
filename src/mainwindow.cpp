@@ -21,6 +21,8 @@ MainWindow::MainWindow(QWidget *parent) :
     currentTimer.setSingleShot(false);
     QObject::connect(&currentTimer, SIGNAL(timeout()), this,
                      SLOT(on_currentTimer_timeout()));
+
+    polSwitch.open("/dev/parport0");
 }
 
 MainWindow::~MainWindow()
@@ -47,7 +49,7 @@ bool MainWindow::openDevs()
     int err;
 
     s = settings.value(ConfigUI::cfg_powerSupplyPort).toString();
-    err = sdp_open(&sdp, s.toLocal8Bit().constData(), 0);
+    err = sdp_open(&sdp, s.toLocal8Bit().constData(), SDP_DEV_ADDR_MIN);
     if (err < 0)
         goto sdp_err0;
 
@@ -89,9 +91,11 @@ sdp_err:
     sdp_close(&sdp);
 
 sdp_err0:
-    // TODO: lepší hlášení, součástí hlavní zprávy by měla být hlavička
-    QMessageBox::critical(
-        this, "Failed to open Manson SDP power supply.", sdp_strerror(err));
+    QString errstr("Failed to open Manson SDP power supply:\n\n%1");
+
+    errstr = errstr.arg(sdp_strerror(err));
+    QMessageBox::critical(this, "Failed to open Manson SDP power supply.",
+                          errstr);
     statusBar()->showMessage(sdp_strerror(err));
 
     return false;
@@ -137,10 +141,13 @@ void MainWindow::updateCurrent()
 
 void MainWindow::on_reverseCheckBox_toggled(bool checked)
 {
-    if (checked)
+    if (checked) {
+        polSwitch.setPolarity(-1);
         ui->polarityLabel->setText(pol_mp);
-    else
+    } else {
+        polSwitch.setPolarity(1);
         ui->polarityLabel->setText(pol_pm);
+    }
 
     currentTimer.start();
 }
