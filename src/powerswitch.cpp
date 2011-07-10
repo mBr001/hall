@@ -11,12 +11,12 @@
 #include "powerswitch.h"
 
 
-PolaritySwitch::PolaritySwitch() :
+PwrPolSwitch::PwrPolSwitch() :
     fd(-1)
 {
 }
 
-void PolaritySwitch::close()
+void PwrPolSwitch::close()
 {
     if (fd >= 0) {
         ioctl(fd, PPRELEASE);
@@ -25,7 +25,7 @@ void PolaritySwitch::close()
     }
 }
 
-bool PolaritySwitch::open(const char *par_port)
+bool PwrPolSwitch::open(const char *par_port)
 {
     const int direction = 0x00;
     const int mode = IEEE1284_MODE_BYTE;
@@ -64,7 +64,7 @@ err1:
     return false;
 }
 
-PolaritySwitch::state_t PolaritySwitch::polarity()
+PwrPolSwitch::state_t PwrPolSwitch::polarity()
 {
     state_t state;
 
@@ -74,10 +74,13 @@ PolaritySwitch::state_t PolaritySwitch::polarity()
     if (state & direct)
         return direct;
 
-    return cross;
+    if (state & cross)
+        return cross;
+
+    return off;
 }
 
-bool PolaritySwitch::setPolarity(state_t state)
+bool PwrPolSwitch::setPolarity(state_t state)
 {
     if (polarity() != state && state != off) {
         if (ioctl(fd, PPWDATA, off) < 0)
@@ -91,7 +94,7 @@ bool PolaritySwitch::setPolarity(state_t state)
     return true;
 }
 
-PolaritySwitch::~PolaritySwitch()
+PwrPolSwitch::~PwrPolSwitch()
 {
     close();
 }
