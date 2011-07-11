@@ -180,8 +180,8 @@ void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
 {
     ps622Hack.setCurrent(value);
 
-    /*value = ps622Hack.current();
-    ui->sampleCurrMeasDoubleSpinBox->setValue(value);*/
+    value = ps622Hack.current();
+    ui->sampleCurrMeasDoubleSpinBox->setValue(value);
 }
 
 void MainWindow::on_samplePolCrossCheckBox_toggled(bool )
@@ -250,6 +250,9 @@ bool MainWindow::openDevs()
         err = errno;
         goto sample_pwr_err;
     }
+
+    ui->sampleCurrDoubleSpinBox->setValue(ps622Hack.current());
+
     /* TODO ... */
 
     ui->sweppingLabel->setEnabled(true);
