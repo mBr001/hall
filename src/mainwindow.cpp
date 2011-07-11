@@ -34,6 +34,7 @@ void MainWindow::closeDevs()
 {
     currentTimer.stop();
     ui->sweppingLabel->setEnabled(false);
+    ps622Hack.close();
     pwrPolSwitch.close();
     sdp_close(&sdp);
 }
@@ -175,9 +176,12 @@ void MainWindow::on_measurePushButton_clicked()
     /* TODO */
 }
 
-void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double )
+void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
 {
+    ps622Hack.setCurrent(value);
 
+    /*value = ps622Hack.current();
+    ui->sampleCurrMeasDoubleSpinBox->setValue(value);*/
 }
 
 void MainWindow::on_samplePolCrossCheckBox_toggled(bool )
@@ -208,7 +212,7 @@ bool MainWindow::openDevs()
         goto sdp_err;
     ui->coilCurrDoubleSpinBox->setMaximum(limits.curr);
 
-    /* Set current to actual value, avoiding anny jumps. */
+    /* Set actual current as wanted value, avoiding anny jumps. */
     sdp_va_data_t va_data;
     err = sdp_get_va_data(&sdp, &va_data);
     if (err < 0)
@@ -240,6 +244,12 @@ bool MainWindow::openDevs()
     cross = (pwrPolSwitch.polarity() == PwrPolSwitch::cross);
     ui->coilPolCrossCheckBox->setChecked(cross);
 
+    s = settings.value(ConfigUI::cfg_samplePSPort).toString();
+    if (!ps622Hack.open(s.toLocal8Bit().constData()))
+    {
+        err = errno;
+        goto sample_pwr_err;
+    }
     /* TODO ... */
 
     ui->sweppingLabel->setEnabled(true);
@@ -247,11 +257,18 @@ bool MainWindow::openDevs()
 
     return true;
 
-    // powerSwitch.close();
+    //ps622Hack.close();
+
+sample_pwr_err:
+    pwrPolSwitch.close();
+    if (err_title.isEmpty()) {
+        err_title = QString::fromLocal8Bit(
+                    "Failed to open sample power supply (Keithaly 6220)");
+        err_text = QString::fromLocal8Bit(strerror(err));
+    }
 
 mag_pwr_switch_err:
     if (err_title.isEmpty()) {
-
         err_title = QString::fromLocal8Bit(
                     "Failed to open power supply switch");
         err_text = QString::fromLocal8Bit(strerror(err));

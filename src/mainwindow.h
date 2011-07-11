@@ -8,6 +8,7 @@
 
 #include "configui.h"
 #include "powpolswitch.h"
+#include "ps6220hack.h"
 
 
 namespace Ui {
@@ -59,7 +60,8 @@ private:
     float currentMax;
     /** Power polarity switch handler */
     PwrPolSwitch pwrPolSwitch;
-
+    /** Keithlay PS 6220 hacky class */
+    PS6220Hack ps622Hack;
 
     /** Close all devices, eg. power supply, Agilent, switch, ... */
     void closeDevs();
