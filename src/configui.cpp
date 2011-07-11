@@ -8,6 +8,7 @@ const char ConfigUI::cfg_agilentPort[] = "Agilent Port";
 const char ConfigUI::cfg_fileName[] = "File name";
 const char ConfigUI::cfg_powerSupplyPort[] = "Power Supply Port";
 const char ConfigUI::cfg_polSwitchPort[] = "Switch Port";
+const char ConfigUI::cfg_samplePSPort[] = "Sample PS K6220";
 
 ConfigUI::ConfigUI(QWidget *parent) :
     QDialog(parent),
@@ -24,6 +25,9 @@ ConfigUI::ConfigUI(QWidget *parent) :
 
     s = settings.value(cfg_polSwitchPort, "LPT1").toString();
     ui->switchPortComboBox->setEditText(s);
+
+    s = settings.value(cfg_samplePSPort, "COM1").toString();
+    ui->samplePowerPortComboBox->setEditText(s);
 
     s = settings.value(cfg_fileName, QString()).toString();
     ui->fileNameLineEdit->setText(s);
@@ -47,6 +51,9 @@ void ConfigUI::on_buttonBox_accepted()
 
     s = ui->switchPortComboBox->currentText();
     settings.setValue(cfg_polSwitchPort, s);
+
+    s= ui->samplePowerPortComboBox->currentText();
+    settings.setValue(cfg_samplePSPort, s);
 
     s = ui->fileNameLineEdit->text();
     QFile f(s);

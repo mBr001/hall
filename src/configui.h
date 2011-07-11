@@ -18,9 +18,10 @@ public:
 
     /* Names of configuration options */
     static const char cfg_agilentPort[];
+    static const char cfg_fileName[];
     static const char cfg_powerSupplyPort[];
     static const char cfg_polSwitchPort[];
-    static const char cfg_fileName[];
+    static const char cfg_samplePSPort[];
 
 private slots:
     void on_buttonBox_accepted();
