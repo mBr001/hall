@@ -59,16 +59,43 @@ bool PS6220Hack::isline(const char *buf, ssize_t size)
 
 bool PS6220Hack::open(const char *fname)
 {
+    const char cmd_rem[] ="syst:rem\n";
+
     close();
 
     if (serial_open(fname) < 0)
         goto err;
+
+    write(fd, cmd_rem, sizeof(cmd_rem) - 1);
 
     return true;
 
 err:
 
     return false;
+}
+
+bool PS6220Hack::output()
+{
+    QString cmd("outp?\n");
+    char buf[256];
+    ssize_t size;
+
+    write(fd, cmd.toAscii().constData(), cmd.toAscii().size());
+
+    size = serial_read(buf, sizeof(buf));
+    if (size <= 0)
+        return -1.;
+
+    buf[size] = 0;
+    QString vals(buf);
+
+    vals = vals.trimmed();
+    bool ok;
+    int val;
+    val = QVariant(vals).toInt(&ok);
+
+    return val;
 }
 
 /**
@@ -152,4 +179,18 @@ void PS6220Hack::setCurrent(double current)
     cmd = cmd.arg(current).replace(",", ".");
 
     write(fd, cmd.toAscii().constData(), cmd.toAscii().size());
+}
+
+void PS6220Hack::setOutput(bool out)
+{
+    if (out) {
+        const char cmd_out_on[] = "OUTP ON\n";
+
+        write(fd, cmd_out_on, sizeof(cmd_out_on) - 1);
+    }
+    else {
+        const char cmd_out_on[] = "OUTP OFF\n";
+
+        write(fd, cmd_out_on, sizeof(cmd_out_on) - 1);
+    }
 }

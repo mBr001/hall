@@ -179,9 +179,6 @@ void MainWindow::on_measurePushButton_clicked()
 void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
 {
     ps622Hack.setCurrent(value);
-
-    value = ps622Hack.current();
-    ui->sampleCurrMeasDoubleSpinBox->setValue(value);
 }
 
 void MainWindow::on_samplePolCrossCheckBox_toggled(bool )
@@ -189,9 +186,9 @@ void MainWindow::on_samplePolCrossCheckBox_toggled(bool )
 
 }
 
-void MainWindow::on_samplePowerCheckBox_toggled(bool )
+void MainWindow::on_samplePowerCheckBox_toggled(bool checked)
 {
-
+    ps622Hack.setOutput(checked);
 }
 
 bool MainWindow::openDevs()
@@ -252,6 +249,7 @@ bool MainWindow::openDevs()
     }
 
     ui->sampleCurrDoubleSpinBox->setValue(ps622Hack.current());
+    ui->samplePowerCheckBox->setChecked(ps622Hack.output());
 
     /* TODO ... */
 

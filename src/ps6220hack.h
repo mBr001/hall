@@ -8,7 +8,9 @@ public:
     void close();
     double current();
     bool open(const char *);
+    bool output();
     void setCurrent(double current);
+    void setOutput(bool out);
     //double getVolt();
 
 private:
