@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QFile>
 #include <QMainWindow>
 #include <QSettings>
 #include <QTimer>
@@ -62,6 +63,8 @@ private:
     PwrPolSwitch pwrPolSwitch;
     /** Keithlay PS 6220 hacky class */
     PS6220Hack ps622Hack;
+    /** File to same measured data */
+    QFile csvFile;
 
     /** Close all devices, eg. power supply, Agilent, switch, ... */
     void closeDevs();

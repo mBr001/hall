@@ -1,7 +1,9 @@
 #include <errno.h>
 #include <math.h>
-#include <QMessageBox>
 #include <QCloseEvent>
+#include <QDateTime>
+#include <QMessageBox>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -34,6 +36,7 @@ void MainWindow::closeDevs()
 {
     currentTimer.stop();
     ui->sweppingLabel->setEnabled(false);
+    csvFile.close();
     ps622Hack.close();
     pwrPolSwitch.close();
     sdp_close(&sdp);
@@ -171,9 +174,36 @@ void MainWindow::on_currentTimer_timeout()
     ui->coilVoltMeasDoubleSpinBox->setValue(va_data.volt);
 }
 
+
 void MainWindow::on_measurePushButton_clicked()
 {
-    /* TODO */
+    QString line("%1,%2,%3,%4,%5\r\n");
+    QString s;
+    int row;
+
+    row = ui->dataTableWidget->rowCount();
+    ui->dataTableWidget->insertRow(row);
+
+    s = QDateTime::currentDateTime().toString("yyyy-MM-dd mm:ss");
+    ui->dataTableWidget->setItem(row, 3, new QTableWidgetItem(s));
+    line = line.arg(s);
+
+    s = ui->coilCurrMeasDoubleSpinBox->text().replace(",", ".");
+    ui->dataTableWidget->setItem(row, 0, new QTableWidgetItem(s));
+    line = line.arg(s);
+
+    s = ui->coilVoltMeasDoubleSpinBox->text().replace(",", ".");
+    line = line.arg(s);
+
+    s = ui->coilCurrDoubleSpinBox->text().replace(",", ".");
+    line = line.arg(s);
+
+    s = ui->sampleCurrDoubleSpinBox->text().replace(",", ".");
+    ui->dataTableWidget->setItem(row, 1, new QTableWidgetItem(s));
+    line = line.arg(s);
+
+    csvFile.write(line.toLocal8Bit());
+
 }
 
 void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
@@ -193,6 +223,7 @@ void MainWindow::on_samplePowerCheckBox_toggled(bool checked)
 
 bool MainWindow::openDevs()
 {
+    QString csvHeader("Time, coil curr. meas. [A], coil volt. meas. [V], coil curr want. [A], sample curr. want. [A]\r\n");
     QString err_text, err_title;
     QString s;
     int err;
@@ -251,6 +282,12 @@ bool MainWindow::openDevs()
     ui->sampleCurrDoubleSpinBox->setValue(ps622Hack.current());
     ui->samplePowerCheckBox->setChecked(ps622Hack.output());
 
+    s= settings.value(ConfigUI::cfg_fileName).toString();
+    csvFile.setFileName(s);
+    if (!csvFile.open(QFile::WriteOnly | QFile::Truncate))
+        goto file_err;
+
+    csvFile.write(csvHeader.toLocal8Bit());
     /* TODO ... */
 
     ui->sweppingLabel->setEnabled(true);
@@ -258,7 +295,13 @@ bool MainWindow::openDevs()
 
     return true;
 
-    //ps622Hack.close();
+file_err:
+    ps622Hack.close();
+    if (err_title.isEmpty()) {
+        err_title = QString::fromLocal8Bit(
+                    "Failed to open output file");
+        err_text = csvFile.errorString();
+    }
 
 sample_pwr_err:
     pwrPolSwitch.close();
