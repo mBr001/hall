@@ -202,6 +202,8 @@ void MainWindow::on_measurePushButton_clicked()
     ui->dataTableWidget->setItem(row, 1, new QTableWidgetItem(s));
     line = line.arg(s);
 
+    // TODO: inset hall U
+
     csvFile.write(line.toLocal8Bit());
 
 }
@@ -223,7 +225,11 @@ void MainWindow::on_samplePowerCheckBox_toggled(bool checked)
 
 bool MainWindow::openDevs()
 {
-    QString csvHeader("Time, coil curr. meas. [A], coil volt. meas. [V], coil curr want. [A], sample curr. want. [A]\r\n");
+    QString csvHeader("Time, coil curr. meas. [A],"
+                      "coil volt. meas. [V],"
+                      " coil curr want. [A],"
+                      " sample curr. want. [A],"
+                      " sample hall [V]\r\n");
     QString err_text, err_title;
     QString s;
     int err;
