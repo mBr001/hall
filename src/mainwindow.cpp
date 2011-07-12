@@ -254,11 +254,13 @@ bool MainWindow::openDevs()
     err = sdp_set_curr(&sdp, va_data.curr);
     if (err < 0)
         goto sdp_err;
+    ui->coilCurrDoubleSpinBox->setValue(va_data.curr);
+
     /* Set voltage to maximum, Hall is current driven. */
-    err = sdp_set_volt_limit(&sdp, va_data.volt);
+    err = sdp_set_volt_limit(&sdp, limits.volt);
     if (err < 0)
         goto sdp_err;
-    err = sdp_set_volt(&sdp, va_data.volt);
+    err = sdp_set_volt(&sdp, limits.volt);
     if (err < 0)
         goto sdp_err;
 
