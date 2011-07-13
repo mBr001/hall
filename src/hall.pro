@@ -17,12 +17,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     configui.cpp \
     powpolwitch.cpp \
-    ps6220hack.cpp
+    ps6220hack.cpp \
+    hp34970hack.cpp
 
 HEADERS  += mainwindow.h \
     configui.h \
     powpolswitch.h \
-    ps6220hack.h
+    ps6220hack.h \
+    hp34970hack.h
 
 FORMS    += mainwindow.ui \
     configui.ui
