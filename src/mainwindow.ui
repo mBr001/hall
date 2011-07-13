@@ -91,12 +91,12 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="4" column="2">
-        <widget class="QLabel" name="sweppingLabel">
+        <widget class="QLabel" name="sweepingLabel">
          <property name="enabled">
           <bool>false</bool>
          </property>
          <property name="text">
-          <string>Swepping!</string>
+          <string>Sweeping!</string>
          </property>
         </widget>
        </item>

@@ -35,7 +35,7 @@ MainWindow::~MainWindow()
 void MainWindow::closeDevs()
 {
     currentTimer.stop();
-    ui->sweppingLabel->setEnabled(false);
+    ui->sweepingLabel->setEnabled(false);
     csvFile.close();
     ps622Hack.close();
     pwrPolSwitch.close();
@@ -58,12 +58,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::on_coilCurrDoubleSpinBox_valueChanged(double )
 {
-    ui->sweppingLabel->setEnabled(true);
+    ui->sweepingLabel->setEnabled(true);
 }
 
 void MainWindow::on_coilPolCrossCheckBox_toggled(bool checked)
 {
-    ui->sweppingLabel->setEnabled(true);
+    ui->sweepingLabel->setEnabled(true);
 
     if (checked)
         ui->polarityLabel->setText(pol_mp);
@@ -73,7 +73,7 @@ void MainWindow::on_coilPolCrossCheckBox_toggled(bool checked)
 
 void MainWindow::on_coilPowerCheckBox_toggled(bool)
 {
-    ui->sweppingLabel->setEnabled(true);
+    ui->sweepingLabel->setEnabled(true);
 }
 
 void MainWindow::on_currentTimer_timeout()
@@ -81,7 +81,7 @@ void MainWindow::on_currentTimer_timeout()
     sdp_va_data_t va_data;
 
     // tweak coil current
-    while (ui->sweppingLabel->isEnabled()) {
+    while (ui->sweepingLabel->isEnabled()) {
         /** Curent trought coil */
         double wantI, procI;
         /** Coil power state, on/off */
@@ -122,7 +122,7 @@ void MainWindow::on_currentTimer_timeout()
         /* process decision */
         // Target reach, finish job
         if (fabs(procI - wantI) < currentSlope) {
-            ui->sweppingLabel->setEnabled(false);
+            ui->sweepingLabel->setEnabled(false);
             if (!wantCoilPower && procI <= currentSlope && procCoilPower)
                 sdp_set_output(&sdp, 0); // TODO check
 
@@ -298,7 +298,7 @@ bool MainWindow::openDevs()
     csvFile.write(csvHeader.toLocal8Bit());
     /* TODO ... */
 
-    ui->sweppingLabel->setEnabled(true);
+    ui->sweepingLabel->setEnabled(true);
     currentTimer.start();
 
     return true;
