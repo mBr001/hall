@@ -7,12 +7,12 @@ public:
     HP34970hack();
     ~HP34970hack();
     void close();
-    double current();
     bool open(const char *);
-    bool output();
-    void setCurrent(double current);
-    void setOutput(bool out);
-    //double getVolt();
+    void setChannel(int channel, bool open);
+    void setSense(int channel, Sense_t sense);
+    void setup();
+
+
 
 private:
     int fd;
