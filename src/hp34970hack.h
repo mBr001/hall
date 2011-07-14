@@ -1,9 +1,15 @@
 #ifndef PS6220HACK_H
 #define PS6220HACK_H
 
+
+
 class HP34970hack
 {
 public:
+    typedef enum {
+
+    } Sense_t;
+
     HP34970hack();
     ~HP34970hack();
     void close();
@@ -11,8 +17,6 @@ public:
     void setChannel(int channel, bool open);
     void setSense(int channel, Sense_t sense);
     void setup();
-
-
 
 private:
     int fd;

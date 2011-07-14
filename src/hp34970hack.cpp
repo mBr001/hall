@@ -189,29 +189,6 @@ void HP34970hack::close()
     }
 }
 
-double HP34970hack::current()
-{
-    QString cmd("curr?\n");
-    char buf[256];
-    ssize_t size;
-
-    write(fd, cmd.toAscii().constData(), cmd.toAscii().size());
-
-    size = serial_read(buf, sizeof(buf));
-    if (size <= 0)
-        return -1.;
-
-    buf[size] = 0;
-    QString vals(buf);
-
-    vals = vals.trimmed();
-    bool ok;
-    double val;
-    val = QVariant(vals).toDouble(&ok);
-
-    return val;
-}
-
 bool HP34970hack::isline(const char *buf, ssize_t size)
 {
     // empty line is not line
@@ -240,29 +217,6 @@ bool HP34970hack::open(const char *fname)
 err:
 
     return false;
-}
-
-bool HP34970hack::output()
-{
-    QString cmd("outp?\n");
-    char buf[256];
-    ssize_t size;
-
-    write(fd, cmd.toAscii().constData(), cmd.toAscii().size());
-
-    size = serial_read(buf, sizeof(buf));
-    if (size <= 0)
-        return -1.;
-
-    buf[size] = 0;
-    QString vals(buf);
-
-    vals = vals.trimmed();
-    bool ok;
-    int val;
-    val = QVariant(vals).toInt(&ok);
-
-    return val;
 }
 
 /**
@@ -350,23 +304,10 @@ void HP34970hack::setup()
     // ROUT:SCAN (@101,103,104)
     QString cmd("conf:volt (@)\n");
 
-    QString cmd_close()
+    QString cmd_close("closexxx");
     // CloseChannel101:104
-    cmd = cmd.arg(current).replace(",", ".");
+    cmd = cmd.arg("current").replace(",", ".");
 
     write(fd, cmd.toAscii().constData(), cmd.toAscii().size());
 }
 
-void HP34970hack::setOutput(bool out)
-{
-    if (out) {
-        const char cmd_out_on[] = "OUTP ON\n";
-
-        write(fd, cmd_out_on, sizeof(cmd_out_on) - 1);
-    }
-    else {
-        const char cmd_out_on[] = "OUTP OFF\n";
-
-        write(fd, cmd_out_on, sizeof(cmd_out_on) - 1);
-    }
-}
