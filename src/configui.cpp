@@ -49,11 +49,11 @@ void ConfigUI::on_buttonBox_accepted()
     s = ui->powerSupplyPortComboBox->currentText();
     settings.setValue(cfg_powerSupplyPort, s);
 
+    s = ui->samplePowerPortComboBox->currentText();
+    settings.setValue(cfg_samplePSPort, s);
+
     s = ui->switchPortComboBox->currentText();
     settings.setValue(cfg_polSwitchPort, s);
-
-    s= ui->samplePowerPortComboBox->currentText();
-    settings.setValue(cfg_samplePSPort, s);
 
     s = ui->fileNameLineEdit->text();
     QFile f(s);
