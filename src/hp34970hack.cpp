@@ -196,7 +196,7 @@ bool HP34970hack::open(const QString &port)
     if (!QSerial::open(port, QSerial::Baude9600, 200000, timeout))
         return false;
 
-    *this << cmd_rem;
+    write(cmd_rem);
 
     return true;
 }
@@ -208,10 +208,10 @@ void HP34970hack::setChannel(int channel, bool open)
 
 void HP34970hack::setup()
 {
-    QString cmd("conf:volt (@101:104)\n");
-    QString cmd_close("ROUT:CLOS (@201:206,209,210)\n");
+    const char cmd[] = "conf:volt (@101:104)\n";
+    const char cmd_close[] = "ROUT:CLOS (@201:206,209,210)\n";
 
-    *this << cmd;
-    *this << cmd_close;
+    write(cmd);
+    write(cmd_close);
 }
 

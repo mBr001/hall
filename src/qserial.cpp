@@ -148,26 +148,22 @@ bool QSerial::open(const QString &port, BaudeRate_t bauderate, long timeout = 0,
     return open(port_str, bauderate, timeout, timeoutPerChar);
 }
 
-QSerial QSerial::operator<<(const char *str)
+void QSerial::write(const char *str)
 {
     if (::write(fd, str, strlen(str)) < 0)
         stdError("Failed to write to serial port");
-
-    return *this;
 }
 
-QSerial QSerial::operator<<(const QString &str)
+void QSerial::write(const QString &str)
 {
     QByteArray bytes;
 
     bytes = str.toLocal8Bit();
     if (::write(fd, bytes.constData(), bytes.length()) < 0)
         stdError("Failed to write to serial port");
-
-    return *this;
 }
 
-QSerial QSerial::operator<<(const int &i)
+void QSerial::write(const int &i)
 {
     QVariant v(i);
     QByteArray b;
@@ -175,17 +171,13 @@ QSerial QSerial::operator<<(const int &i)
     b = v.toString().toLocal8Bit();
     if (::write(fd, b.constData(), b.length()) < 0)
         stdError("Failed to write to serial port");
-
-    return *this;
 }
 
-QSerial QSerial::operator>>(QString &str)
+void QSerial::read(QString &str)
 {
     QByteArray b;
 
     b = str.toLocal8Bit();
     if (::write(fd, b.constData(), b.length()) < 0)
         stdError("Failed to write to serial port");
-
-    return *this;
 }

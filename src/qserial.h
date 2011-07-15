@@ -20,10 +20,10 @@ public:
     bool open(const QString &port, BaudeRate_t bauderate, long timeoutOffs,
               long timeoutPerChar);
     
-    QSerial operator<<(const char *str);
-    QSerial operator<<(const QString &str);
-    QSerial operator<<(const int &i);
-    QSerial operator>>(QString &str);
+    void write(const char *str);
+    void write(const QString &str);
+    void write(const int &i);
+    void read(QString &str);
 private:
     int fd;
     long timeoutOffs, timeoutPerChar;
