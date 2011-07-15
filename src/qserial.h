@@ -15,8 +15,8 @@ public:
     ~QSerial();
     void close();
     bool isOpen();
-    bool open(const char *port, BaudeRate_t bauderate, int timeout);
-    bool open(const QString &port, BaudeRate_t bauderate, int timeout);
+    bool open(const char *port, BaudeRate_t bauderate, int timeout, int timeoutPerChar);
+    bool open(const QString &port, BaudeRate_t bauderate, int timeout, int timeoutPerChar);
     
     QSerial operator<<(const char *str);
     QSerial operator<<(const QString &str);
@@ -24,6 +24,7 @@ public:
     QSerial operator>>(QString &str);
 private:
     int fd;
+    int timeout, timeoutPerChar;
 
     bool isLine(const char *buf, ssize_t size);
     ssize_t read(char *buf, ssize_t count);
