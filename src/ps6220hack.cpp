@@ -9,6 +9,8 @@
 
 #include "ps6220hack.h"
 
+// (10l * 1000000l) / 9600l
+
 PS6220Hack::PS6220Hack() :
     fd(-1)
 {

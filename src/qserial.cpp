@@ -79,7 +79,7 @@ ssize_t QSerial::read(char *buf, ssize_t count)
         // TODO: check this value
         timeout.tv_sec = 0;
         // (bytes * 10 * usec) / bitrate + delay_to_reaction;
-        timeout.tv_usec = (count * 10l * 1000000l) / 9600l + 200000l;
+        timeout.tv_usec = count * timeoutPerChar + timeoutOffs;
         do {
                 ssize_t size_;
 
@@ -110,7 +110,8 @@ ssize_t QSerial::read(char *buf, ssize_t count)
  * @param timeoutPerChar Increase reading time timeout per recieved character [us].
  * @return       File descriptor on success, negative number (err no.) on error.
  */
-bool QSerial::open(const char *port, BaudeRate_t bauderate, int timeout = 0, int timeoutPerChar = 0)
+bool QSerial::open(const char *port, BaudeRate_t bauderate, long timeout = 0,
+                   long timeoutPerChar = 0)
 {
         struct termios tio;
 
@@ -133,12 +134,13 @@ bool QSerial::open(const char *port, BaudeRate_t bauderate, int timeout = 0, int
                 return false;
         }
 
-        this->timeout = timeout;
+        this->timeoutOffs = timeout;
         this->timeoutPerChar = timeoutPerChar;
         return fd;
 }
 
-bool QSerial::open(const QString &port, BaudeRate_t bauderate, int timeout = 0, int timeoutPerChar = 0)
+bool QSerial::open(const QString &port, BaudeRate_t bauderate, long timeout = 0,
+                   long timeoutPerChar = 0)
 {
     const char *port_str;
 
