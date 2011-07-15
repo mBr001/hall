@@ -76,10 +76,8 @@ ssize_t QSerial::readLine(char *buf, ssize_t count)
         FD_ZERO(&readfds);
         FD_SET(fd, &readfds);
 
-        // TODO: check this value
-        timeout.tv_sec = 0;
-        // (bytes * 10 * usec) / bitrate + delay_to_reaction;
-        timeout.tv_usec = timeoutOffs;
+        timeout.tv_sec = timeoutOffs / 1000000l;
+        timeout.tv_usec = timeoutOffs % 1000000l;
         do {
                 ssize_t size_;
 
@@ -91,6 +89,8 @@ ssize_t QSerial::readLine(char *buf, ssize_t count)
                 if (size_ < 0)
                         return -1;
                 timeout.tv_usec += timeoutPerChar * size_;
+                timeout.tv_sec += timeout.tv_usec / 1000000l;
+                timeout.tv_usec /= 1000000l;
                 size += size_;
                 count -= size_;
                 buf += size_;
