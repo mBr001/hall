@@ -23,13 +23,13 @@ public:
     void write(const char *str);
     void write(const QString &str);
     void write(const int &i);
-    void read(QString &str);
+    void readLine(QString &str);
 private:
     int fd;
     long timeoutOffs, timeoutPerChar;
 
     bool isLine(const char *buf, ssize_t size);
-    ssize_t read(char *buf, ssize_t count);
+    ssize_t readLine(char *buf, ssize_t count);
 };
 
 #endif // PS6220HACK_H

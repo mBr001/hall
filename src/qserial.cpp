@@ -65,7 +65,7 @@ bool QSerial::isLine(const char *buf, ssize_t size)
  * @return      Number of bytes succesfully readed, or gefative number
  *      (error no.) on error.
  */
-ssize_t QSerial::read(char *buf, ssize_t count)
+ssize_t QSerial::readLine(char *buf, ssize_t count)
 {
         const char *buf_ = buf;
         fd_set readfds;
@@ -79,7 +79,7 @@ ssize_t QSerial::read(char *buf, ssize_t count)
         // TODO: check this value
         timeout.tv_sec = 0;
         // (bytes * 10 * usec) / bitrate + delay_to_reaction;
-        timeout.tv_usec = count * timeoutPerChar + timeoutOffs;
+        timeout.tv_usec = timeoutOffs;
         do {
                 ssize_t size_;
 
@@ -90,6 +90,7 @@ ssize_t QSerial::read(char *buf, ssize_t count)
                 size_ = ::read(fd, buf, count);
                 if (size_ < 0)
                         return -1;
+                timeout.tv_usec += timeoutPerChar * size_;
                 size += size_;
                 count -= size_;
                 buf += size_;
@@ -173,7 +174,7 @@ void QSerial::write(const int &i)
         stdError("Failed to write to serial port");
 }
 
-void QSerial::read(QString &str)
+void QSerial::readLine(QString &str)
 {
     QByteArray b;
 
