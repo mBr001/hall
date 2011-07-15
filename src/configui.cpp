@@ -14,24 +14,24 @@ ConfigUI::ConfigUI(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ConfigUI)
 {
-    ui->setupUi(this);
     QString s;
 
-    s = settings.value(cfg_agilentPort, "GPIB1").toString();
+    ui->setupUi(this);
+
+    s = settings.value(cfg_agilentPort, QString()).toString();
     ui->agilentPortComboBox->setEditText(s);
 
-    s = settings.value(cfg_powerSupplyPort, "COM1").toString();
+    s = settings.value(cfg_powerSupplyPort, QString()).toString();
     ui->powerSupplyPortComboBox->setEditText(s);
 
-    s = settings.value(cfg_polSwitchPort, "LPT1").toString();
+    s = settings.value(cfg_polSwitchPort, QString()).toString();
     ui->switchPortComboBox->setEditText(s);
 
-    s = settings.value(cfg_samplePSPort, "COM1").toString();
+    s = settings.value(cfg_samplePSPort, QString()).toString();
     ui->samplePowerPortComboBox->setEditText(s);
 
     s = settings.value(cfg_fileName, QString()).toString();
     ui->fileNameLineEdit->setText(s);
-
 }
 
 ConfigUI::~ConfigUI()

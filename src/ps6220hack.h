@@ -11,7 +11,6 @@ public:
     bool output();
     void setCurrent(double current);
     void setOutput(bool out);
-    //double getVolt();
 
 private:
     int fd;

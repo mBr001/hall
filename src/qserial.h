@@ -10,19 +10,18 @@ public:
     static const BaudeRate_t Baude9600;
     static const BaudeRate_t Baude19200;
 
-
     QSerial();
     ~QSerial();
     void close();
     bool isOpen();
     bool open(const char *port, BaudeRate_t bauderate, long timeoutOffs,
               long timeoutPerChar);
-    bool open(const QString &port, BaudeRate_t bauderate, long timeoutOffs,
+    bool open(QString port, BaudeRate_t bauderate, long timeoutOffs,
               long timeoutPerChar);
     
     void write(const char *str);
-    void write(const QString &str);
-    void write(const int &i);
+    void write(QString str);
+    void write(int i);
     QString readLine(ssize_t count);
     QString readLine(ssize_t count, long timeout);
 private:

@@ -187,12 +187,12 @@ void HP34970hack::close()
     QSerial::close();
 }
 
-void HP34970hack::sendCmd(const QString cmd)
+void HP34970hack::sendCmd(QString cmd)
 {
-    this->sendCmd(cmd);
+    this->sendCmd(cmd, 0);
 }
 
-void HP34970hack::sendCmd(const QString cmd, long timeout)
+void HP34970hack::sendCmd(QString cmd, long timeout)
 {
     QString s;
 
@@ -201,7 +201,7 @@ void HP34970hack::sendCmd(const QString cmd, long timeout)
         throw new std::runtime_error("P34970hack::cmd response not empty.");
 }
 
-bool HP34970hack::open(const QString &port)
+bool HP34970hack::open(QString port)
 {
     const long timeout = (10l * 1000000l) / 9600l;
 
@@ -219,12 +219,12 @@ bool HP34970hack::open(const QString &port)
     return true;
 }
 
-QString HP34970hack::query(const QString cmd)
+QString HP34970hack::query(QString cmd)
 {
     return query(cmd, 0);
 }
 
-QString HP34970hack::query(const QString cmd, long timeout)
+QString HP34970hack::query(QString cmd, long timeout)
 {
     QString s;
 

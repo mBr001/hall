@@ -46,40 +46,35 @@ private:
     /** Configuration dialog. */
     ConfigUI configUI;
     /** HTML string to show colored "+ -". */
-    static const char pol_pm[];
+    static const char pol_pn[];
     /** HTML string to show colored "- +". */
-    static const char pol_mp[];
+    static const char pol_np[];
     /** Mansons SDP power supply driver. */
     sdp_t sdp;
+    /** Application settings */
     QSettings settings;
     /** Timer used to adjust current trought magnet in specified time. */
     QTimer currentTimer;
-    /** Delay betwen current value update [ms]. Do not change! */
+    /** Delay betwen current value update [ms].
+     * BAD CODE INSIDE, DO NOT CHANGE! */
     static const int currentDwell = 1000;
     /** Slope of current change flowing trought magnet [A/sec]. */
     static const float currentSlope = 0.01;
-    /** Maximal value of current posilbe drain from power source. */
+    /** Power source output current limit. */
     float currentMax;
-    /** Power polarity switch handler */
+    /** Power polarity switch handler. */
     PwrPolSwitch pwrPolSwitch;
-    /** Keithlay PS 6220 hacky class */
+    /** Keithlay PS 6220 hacky class. */
     PS6220Hack ps622Hack;
-    /** File to same measured data */
+    /** File to same measured data. */
     QFile csvFile;
-    /** HP 34970A device to measure voltage and resistivity */
+    /** HP 34970A device to measure voltage and resistivity. */
     HP34970hack hp34970Hack;
 
     /** Close all devices, eg. power supply, Agilent, switch, ... */
     void closeDevs();
-    /** Show configration dialog and open and configure devices.
-
-    @return true when user wants to measure and devices are ready,
-        false otherwise. */
-    bool getConfig();
     /** Open all devices. */
     bool openDevs();
-    /** One step of current change towards wanted value. */
-    void updateCurrent();
 };
 
 #endif // MAINWINDOW_H

@@ -25,7 +25,6 @@ public:
     /** Set switch polarity. */
     bool setPolarity(state_t state);
 
-
 private:
 	int fd;
 };

@@ -48,14 +48,14 @@ bool QSerial::isOpen()
 
 bool QSerial::isLine(const char *buf, ssize_t size)
 {
-    // empty line is not line
+    // empty line is not real line
     if (size <= 1)
         return false;
 
     if (buf[size - 1] == '\n' || buf[size - 1] == '\r')
         return true;
 
-     return false;
+    return false;
 }
 
 /**
@@ -69,38 +69,38 @@ bool QSerial::isLine(const char *buf, ssize_t size)
 bool QSerial::open(const char *port, BaudeRate_t bauderate, long timeout,
                    long timeoutPerChar)
 {
-        struct termios tio;
+    struct termios tio;
 
-        fd = ::open(port, O_RDWR | O_NONBLOCK);
-        if (fd < 0)
-                return false;
+    fd = ::open(port, O_RDWR | O_NONBLOCK);
+    if (fd < 0)
+         return false;
 
-        memset(&tio, 0, sizeof(tio));
-        tio.c_cflag = CS8 | CREAD | CLOCAL;
-        tio.c_cc[VMIN] = 1;
-        tio.c_cc[VTIME] = 5;
-        cfsetispeed(&tio, bauderate);
-        cfsetospeed(&tio, bauderate);
+    memset(&tio, 0, sizeof(tio));
+    tio.c_cflag = CS8 | CREAD | CLOCAL;
+    tio.c_cc[VMIN] = 1;
+    tio.c_cc[VTIME] = 5;
+    cfsetispeed(&tio, bauderate);
+    cfsetospeed(&tio, bauderate);
 
-        if (tcsetattr(fd, TCSANOW, &tio) < 0) {
-                int e = errno;
-                ::close(fd);
-                errno = e;
+    if (tcsetattr(fd, TCSANOW, &tio) < 0) {
+        int e = errno;
+        ::close(fd);
+        errno = e;
 
-                return false;
-        }
+        return false;
+    }
 
-        this->timeoutOffs = timeout;
-        this->timeoutPerChar = timeoutPerChar;
-        return fd;
+    this->timeoutOffs = timeout;
+    this->timeoutPerChar = timeoutPerChar;
+    return fd;
 }
 
-bool QSerial::open(const QString &port, BaudeRate_t bauderate, long timeout,
+bool QSerial::open(QString port, BaudeRate_t bauderate, long timeout,
                    long timeoutPerChar)
 {
     const char *port_str;
 
-    port_str = port.toLocal8Bit().constData();
+    port_str = qPrintable(port);
     return open(port_str, bauderate, timeout, timeoutPerChar);
 }
 
@@ -131,41 +131,41 @@ QString QSerial::readLine(ssize_t count, long timeout)
  */
 ssize_t QSerial::readLine(char *buf, ssize_t count, long timeout)
 {
-        const char *buf_ = buf;
-        fd_set readfds;
-        int ret;
-        ssize_t size = 0;
-        struct timeval timeout_s;
+    const char *buf_ = buf;
+    fd_set readfds;
+    int ret;
+    ssize_t size = 0;
+    struct timeval timeout_s;
 
-        timeout = timeout ? timeout : timeoutOffs;
-        timeout_s.tv_sec = timeout / 1000000l;
-        timeout_s.tv_usec = timeout % 1000000l;
+    timeout = timeout ? timeout : timeoutOffs;
+    timeout_s.tv_sec = timeout / 1000000l;
+    timeout_s.tv_usec = timeout % 1000000l;
 
-        FD_ZERO(&readfds);
-        FD_SET(fd, &readfds);
+    FD_ZERO(&readfds);
+    FD_SET(fd, &readfds);
 
-        do {
-                ssize_t size_;
+    do {
+        ssize_t size_;
 
-                ret = select(fd + 1, &readfds, NULL, NULL, &timeout_s);
-                if (ret <= 0) {
-                        return -1;
-                }
-                size_ = ::read(fd, buf, count);
-                if (size_ < 0)
-                        return size;
-                timeout_s.tv_usec += timeoutPerChar * size_;
-                timeout_s.tv_sec += timeout_s.tv_usec / 1000000l;
-                timeout_s.tv_usec %= 1000000l;
-                size += size_;
-                count -= size_;
-                buf += size_;
-                if (isLine(buf_, size))
-                        return size;
-        } while (count > 0);
+        ret = select(fd + 1, &readfds, NULL, NULL, &timeout_s);
+        if (ret <= 0) {
+                return -1;
+        }
+        size_ = ::read(fd, buf, count);
+        if (size_ < 0)
+                return size;
+        timeout_s.tv_usec += timeoutPerChar * size_;
+        timeout_s.tv_sec += timeout_s.tv_usec / 1000000l;
+        timeout_s.tv_usec %= 1000000l;
+        size += size_;
+        count -= size_;
+        buf += size_;
+        if (isLine(buf_, size))
+                return size;
+    } while (count > 0);
 
-        errno = ERANGE;
-        return -1;
+    errno = ERANGE;
+    return -1;
 }
 
 void QSerial::write(const char *str)
@@ -174,7 +174,7 @@ void QSerial::write(const char *str)
         stdError("Failed to write to serial port");
 }
 
-void QSerial::write(const QString &str)
+void QSerial::write(QString str)
 {
     QByteArray bytes;
 
@@ -183,7 +183,7 @@ void QSerial::write(const QString &str)
         stdError("Failed to write to serial port");
 }
 
-void QSerial::write(const int &i)
+void QSerial::write(int i)
 {
     QVariant v(i);
     QByteArray b;
