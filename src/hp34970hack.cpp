@@ -187,41 +187,64 @@ void HP34970hack::close()
     QSerial::close();
 }
 
-void HP34970hack::cmd(QString cmd)
+void HP34970hack::sendCmd(const QString cmd)
+{
+    this->sendCmd(cmd);
+}
+
+void HP34970hack::sendCmd(const QString cmd, long timeout)
 {
     QString s;
 
-    s = query(cmd);
+    s = query(cmd, timeout);
     if (!s.isEmpty())
         throw new std::runtime_error("P34970hack::cmd response not empty.");
 }
 
-QString HP34970hack::query(const QString &cmd)
-{
-    QString s;
-
-    s = cmd.trimmed().append(";*OPC?\n");
-    write(cmd);
-    s = readLine(1024).trimmed();
-    if (!s.endsWith('1'))
-        throw new std::runtime_error("P34970hack::query failed read response.");
-
-    return s.truncate();
-}
-
 bool HP34970hack::open(const QString &port)
 {
-    const char cmd_rem[] ="syst:rem\n";
     const long timeout = (10l * 1000000l) / 9600l;
 
     close();
 
-    if (!QSerial::open(port, QSerial::Baude9600, 200000, timeout))
+    if (!QSerial::open(port, QSerial::Baude9600, 300000, timeout))
         return false;
 
-    write(cmd_rem);
+    QString s("syst:rem");
+
+    write("\n");
+    sendCmd("*RST", 500000);
+    sendCmd(s);
 
     return true;
+}
+
+QString HP34970hack::query(const QString cmd)
+{
+    return query(cmd, 0);
+}
+
+QString HP34970hack::query(const QString cmd, long timeout)
+{
+    QString s;
+
+    s = cmd.trimmed().append(";*OPC?\n");
+    write(s);
+    s = readLine(1024, timeout).trimmed();
+    if (!s.endsWith('1'))
+        throw new std::runtime_error("P34970hack::query failed read response.");
+    if (s.endsWith(";1"))
+        return s.left(s.size() - 2);
+
+    return s.left(s.size() - 1);
+}
+
+QString HP34970hack::readCmd()
+{
+    QString s;
+
+    s = query("read?");
+    return s;
 }
 
 void HP34970hack::setChannel(int channel, bool open)
@@ -231,10 +254,8 @@ void HP34970hack::setChannel(int channel, bool open)
 
 void HP34970hack::setup()
 {
-    const char cmd[] = "conf:volt (@101:104)\n";
-    const char cmd_close[] = "ROUT:CLOS (@201:206,209,210)\n";
-
-    write(cmd);
-    write(cmd_close);
+    sendCmd("conf:volt (@101:104)");
+    sendCmd("ROUT:CLOS (@201:206,209,210)");
+    sendCmd("init", 2000000);
 }
 

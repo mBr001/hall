@@ -17,9 +17,13 @@ public:
     void setChannel(int channel, bool open);
     void setSense(int channel, Sense_t sense);
     void setup();
+    QString readCmd();
+
 protected:
-    void cmd(QString cmd);
-    QString query(const QString &cmd);
+    void sendCmd(const QString cmd);
+    void sendCmd(const QString cmd, long timeout);
+    QString query(const QString cmd);
+    QString query(const QString cmd, long timeout);
 
 private:
 

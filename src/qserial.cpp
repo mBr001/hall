@@ -55,53 +55,8 @@ bool QSerial::isLine(const char *buf, ssize_t size)
     if (buf[size - 1] == '\n' || buf[size - 1] == '\r')
         return true;
 
-    return false;
+     return false;
 }
-
-/**
- * Reads data from serial port.
- * @param buf   Buffer to store readed data.
- * @param count Maximal amount of bytes to read.
- * @return      Number of bytes succesfully readed, or gefative number
- *      (error no.) on error.
- */
-ssize_t QSerial::readLine(char *buf, ssize_t count)
-{
-        const char *buf_ = buf;
-        fd_set readfds;
-        int ret;
-        ssize_t size = 0;
-        struct timeval timeout;
-
-        FD_ZERO(&readfds);
-        FD_SET(fd, &readfds);
-
-        timeout.tv_sec = timeoutOffs / 1000000l;
-        timeout.tv_usec = timeoutOffs % 1000000l;
-        do {
-                ssize_t size_;
-
-                ret = select(fd + 1, &readfds, NULL, NULL, &timeout);
-                if (ret <= 0) {
-                        return -1;
-                }
-                size_ = ::read(fd, buf, count);
-                if (size_ < 0)
-                        return -1;
-                timeout.tv_usec += timeoutPerChar * size_;
-                timeout.tv_sec += timeout.tv_usec / 1000000l;
-                timeout.tv_usec /= 1000000l;
-                size += size_;
-                count -= size_;
-                buf += size_;
-                if (isLine(buf_, size))
-                        return size;
-        } while (count > 0);
-
-        errno = ERANGE;
-        return -1;
-}
-
 
 /**
  * Open serial port and set parameters as defined for SDP power source.
@@ -111,8 +66,8 @@ ssize_t QSerial::readLine(char *buf, ssize_t count)
  * @param timeoutPerChar Increase reading time timeout per recieved character [us].
  * @return       File descriptor on success, negative number (err no.) on error.
  */
-bool QSerial::open(const char *port, BaudeRate_t bauderate, long timeout = 0,
-                   long timeoutPerChar = 0)
+bool QSerial::open(const char *port, BaudeRate_t bauderate, long timeout,
+                   long timeoutPerChar)
 {
         struct termios tio;
 
@@ -140,13 +95,77 @@ bool QSerial::open(const char *port, BaudeRate_t bauderate, long timeout = 0,
         return fd;
 }
 
-bool QSerial::open(const QString &port, BaudeRate_t bauderate, long timeout = 0,
-                   long timeoutPerChar = 0)
+bool QSerial::open(const QString &port, BaudeRate_t bauderate, long timeout,
+                   long timeoutPerChar)
 {
     const char *port_str;
 
     port_str = port.toLocal8Bit().constData();
     return open(port_str, bauderate, timeout, timeoutPerChar);
+}
+
+QString QSerial::readLine(ssize_t count)
+{
+    return readLine(count, 0);
+}
+
+QString QSerial::readLine(ssize_t count, long timeout)
+{
+    char buf[count];
+    ssize_t len;
+
+    len = readLine(buf, sizeof(buf), timeout);
+    if (len <= 0)
+        stdError("QSerial::readLine read failed.");
+    buf[len] = 0;
+
+    return buf;
+}
+
+/**
+ * Reads data from serial port.
+ * @param buf   Buffer to store readed data.
+ * @param count Maximal amount of bytes to read.
+ * @return      Number of bytes succesfully readed, or gefative number
+ *      (error no.) on error.
+ */
+ssize_t QSerial::readLine(char *buf, ssize_t count, long timeout)
+{
+        const char *buf_ = buf;
+        fd_set readfds;
+        int ret;
+        ssize_t size = 0;
+        struct timeval timeout_s;
+
+        timeout = timeout ? timeout : timeoutOffs;
+        timeout_s.tv_sec = timeout / 1000000l;
+        timeout_s.tv_usec = timeout % 1000000l;
+
+        FD_ZERO(&readfds);
+        FD_SET(fd, &readfds);
+
+        do {
+                ssize_t size_;
+
+                ret = select(fd + 1, &readfds, NULL, NULL, &timeout_s);
+                if (ret <= 0) {
+                        return -1;
+                }
+                size_ = ::read(fd, buf, count);
+                if (size_ < 0)
+                        return size;
+                timeout_s.tv_usec += timeoutPerChar * size_;
+                timeout_s.tv_sec += timeout_s.tv_usec / 1000000l;
+                timeout_s.tv_usec %= 1000000l;
+                size += size_;
+                count -= size_;
+                buf += size_;
+                if (isLine(buf_, size))
+                        return size;
+        } while (count > 0);
+
+        errno = ERANGE;
+        return -1;
 }
 
 void QSerial::write(const char *str)
@@ -172,13 +191,4 @@ void QSerial::write(const int &i)
     b = v.toString().toLocal8Bit();
     if (::write(fd, b.constData(), b.length()) < 0)
         stdError("Failed to write to serial port");
-}
-
-QString QSerial::readLine(ssize_t count)
-{
-    char buf[count];
-
-    readLine(buf, sizeof(buf));
-
-    return buf;
 }

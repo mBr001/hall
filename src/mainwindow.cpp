@@ -203,6 +203,7 @@ void MainWindow::on_measurePushButton_clicked()
     ui->dataTableWidget->setItem(row, 1, new QTableWidgetItem(s));
     line = line.arg(s);
 
+    ui->plainTextEdit->appendPlainText(hp34970Hack.readCmd());
     // TODO: inset hall U
 
     csvFile.write(line.toLocal8Bit());
@@ -301,6 +302,7 @@ bool MainWindow::openDevs()
 
     csvFile.write(csvHeader.toLocal8Bit());
 
+    // Open and setup HP34970 device
     s = settings.value(ConfigUI::cfg_agilentPort).toString();
     if (!hp34970Hack.open(s)) {
         err = errno;
