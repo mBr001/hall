@@ -203,19 +203,15 @@ bool HP34970hack::open(const QString &port)
 
 void HP34970hack::setChannel(int channel, bool open)
 {
-
+    // ROUT:SCAN (@101,103,104) pro nastaveni z ktereho portu read? čte hodnoty
 }
 
 void HP34970hack::setup()
 {
-    // conf:res (@101); :conf:volt (@103,104
-    // ROUT:SCAN (@101,103,104)
-    QString cmd("conf:volt (@)\n");
-
-    QString cmd_close("closexxx");
-    // CloseChannel101:104
-    cmd = cmd.arg("current").replace(",", ".");
+    QString cmd("conf:volt (@101:104)\n");
+    QString cmd_close("ROUT:CLOS (@201:206,209,210)\n");
 
     *this << cmd;
+    *this << cmd_close;
 }
 

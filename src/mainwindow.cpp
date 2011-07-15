@@ -306,6 +306,7 @@ bool MainWindow::openDevs()
         err = errno;
         goto hp34970hack_err;
     }
+    hp34970Hack.setup();
 
     /* TODO ... */
 
