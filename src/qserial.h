@@ -1,5 +1,5 @@
-#ifndef PS6220HACK_H
-#define PS6220HACK_H
+#ifndef QSERAL_H
+#define QSERAL_H
 
 class QSerial
 {
@@ -7,7 +7,7 @@ public:
 
     typedef int BaudeRate_t;
 
-    static const BaudeRate_t Baude9200;
+    static const BaudeRate_t Baude9600;
     static const BaudeRate_t Baude19200;
 
 

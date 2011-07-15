@@ -1,9 +1,9 @@
-#ifndef PS6220HACK_H
-#define PS6220HACK_H
+#ifndef HP34970HACK_H
+#define HP34970HACK_H
 
+#include "qserial.h"
 
-
-class HP34970hack
+class HP34970hack : protected QSerial
 {
 public:
     typedef enum {
@@ -13,17 +13,13 @@ public:
     HP34970hack();
     ~HP34970hack();
     void close();
-    bool open(const char *);
+    bool open(const QString &port);
     void setChannel(int channel, bool open);
     void setSense(int channel, Sense_t sense);
     void setup();
 
 private:
-    int fd;
 
-    bool isline(const char *buf, ssize_t size);
-    int serial_open(const char* fname);
-    ssize_t serial_read(char *buf, ssize_t count);
 };
 
-#endif // PS6220HACK_H
+#endif // HP34970HACK_H

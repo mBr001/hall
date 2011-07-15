@@ -172,7 +172,7 @@ end;
 
 
 HP34970hack::HP34970hack() :
-    fd(-1)
+    QSerial()
 {
 }
 
@@ -183,114 +183,22 @@ HP34970hack::~HP34970hack()
 
 void HP34970hack::close()
 {
-    if (fd >= 0) {
-        ::close(fd);
-        fd = -1;
-    }
+    QSerial::close();
 }
 
-bool HP34970hack::isline(const char *buf, ssize_t size)
-{
-    // empty line is not line
-    if (size <= 1)
-        return false;
-
-    if (buf[size - 1] == '\n' || buf[size - 1] == '\r')
-        return true;
-
-    return false;
-}
-
-bool HP34970hack::open(const char *fname)
+bool HP34970hack::open(const QString &port)
 {
     const char cmd_rem[] ="syst:rem\n";
+    const long timeout = (10l * 1000000l) / 9600l;
 
     close();
 
-    if (serial_open(fname) < 0)
-        goto err;
+    if (!QSerial::open(port, QSerial::Baude9600, 200000, timeout))
+        return false;
 
-    write(fd, cmd_rem, sizeof(cmd_rem) - 1);
+    *this << cmd_rem;
 
     return true;
-
-err:
-
-    return false;
-}
-
-/**
- * Reads data from serial port.
- * @param buf   Buffer to store readed data.
- * @param count Maximal amount of bytes to read.
- * @return      Number of bytes succesfully readed, or gefative number
- *      (error no.) on error.
- */
-ssize_t HP34970hack::serial_read(char *buf, ssize_t count)
-{
-        const char *buf_ = buf;
-        fd_set readfds;
-        int ret;
-        ssize_t size = 0;
-        struct timeval timeout;
-
-        FD_ZERO(&readfds);
-        FD_SET(fd, &readfds);
-
-        // TODO: check this value
-        timeout.tv_sec = 0;
-        // (bytes * 10 * usec) / bitrate + delay_to_reaction;
-        timeout.tv_usec = (count * 10l * 1000000l) / 9600l + 200000l;
-        do {
-                ssize_t size_;
-
-                ret = select(fd + 1, &readfds, NULL, NULL, &timeout);
-                if (ret <= 0) {
-                        return -1;
-                }
-                size_ = read(fd, buf, count);
-                if (size_ < 0)
-                        return -1;
-                size += size_;
-                count -= size_;
-                buf += size_;
-                if (isline(buf_, size))
-                        return size;
-        } while (count > 0);
-
-        errno = ERANGE;
-        return -1;
-}
-
-/**
- * Open serial port and set parameters as defined for SDP power source.
- * @param fname File name of serial port.
- * @return      File descriptor on success, negative number (err no.) on error.
- */
-int HP34970hack::serial_open(const char* fname)
-{
-        struct termios tio;
-
-        fd = ::open(fname, O_RDWR | O_NONBLOCK);
-        if (fd < 0)
-                return -1;
-
-        memset(&tio, 0, sizeof(tio));
-        tio.c_cflag = CS8 | CREAD | CLOCAL;
-        tio.c_cc[VMIN] = 1;
-        tio.c_cc[VTIME] = 5;
-        cfsetispeed(&tio, B19200);
-        cfsetospeed(&tio, B19200);
-
-        if (tcsetattr(fd, TCSANOW, &tio) < 0) {
-                int e = errno;
-                ::close(fd);
-                errno = e;
-
-                return -1;
-        }
-
-        return fd;
 }
 
 void HP34970hack::setChannel(int channel, bool open)
@@ -308,6 +216,6 @@ void HP34970hack::setup()
     // CloseChannel101:104
     cmd = cmd.arg("current").replace(",", ".");
 
-    write(fd, cmd.toAscii().constData(), cmd.toAscii().size());
+    *this << cmd;
 }
 
