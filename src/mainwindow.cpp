@@ -270,6 +270,7 @@ bool MainWindow::openDevs()
         goto sdp_err;
     ui->coilPowerCheckBox->setChecked(lcd_info.output);
 
+    // Open port with connected polarity switch
     s = settings.value(ConfigUI::cfg_polSwitchPort).toString();
     if (!pwrPolSwitch.open(s.toLocal8Bit().constData())) {
         err = errno;
@@ -280,6 +281,7 @@ bool MainWindow::openDevs()
     cross = (pwrPolSwitch.polarity() == PwrPolSwitch::cross);
     ui->coilPolCrossCheckBox->setChecked(cross);
 
+    // Open sample power source
     s = settings.value(ConfigUI::cfg_samplePSPort).toString();
     if (!ps622Hack.open(s.toLocal8Bit().constData()))
     {
@@ -290,18 +292,33 @@ bool MainWindow::openDevs()
     ui->sampleCurrDoubleSpinBox->setValue(ps622Hack.current());
     ui->samplePowerCheckBox->setChecked(ps622Hack.output());
 
-    s= settings.value(ConfigUI::cfg_fileName).toString();
+    // Open CSV file to save data
+    s = settings.value(ConfigUI::cfg_fileName).toString();
     csvFile.setFileName(s);
     if (!csvFile.open(QFile::WriteOnly | QFile::Truncate))
         goto file_err;
 
     csvFile.write(csvHeader.toLocal8Bit());
+
+    s = settings.value(ConfigUI::cfg_agilentPort).toString();
+    if (!hp34970Hack.open(s)) {
+        err = errno;
+        goto hp34970hack_err;
+    }
+
     /* TODO ... */
 
     ui->sweepingLabel->setEnabled(true);
     currentTimer.start();
 
     return true;
+
+hp34970hack_err:
+    if (err_title.isEmpty()) {
+        err_title = QString::fromLocal8Bit(
+                    "Failed to open HP34970 device");
+        err_text = QString::fromLocal8Bit(strerror(err));
+    }
 
 file_err:
     ps622Hack.close();

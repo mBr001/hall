@@ -10,6 +10,7 @@
 #include "configui.h"
 #include "powpolswitch.h"
 #include "ps6220hack.h"
+#include "hp34970hack.h"
 
 
 namespace Ui {
@@ -65,6 +66,8 @@ private:
     PS6220Hack ps622Hack;
     /** File to same measured data */
     QFile csvFile;
+    /** HP 34970A device to measure voltage and resistivity */
+    HP34970hack hp34970Hack;
 
     /** Close all devices, eg. power supply, Agilent, switch, ... */
     void closeDevs();
