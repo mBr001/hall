@@ -36,6 +36,7 @@ void MainWindow::closeDevs()
 {
     currentTimer.stop();
     ui->sweepingLabel->setEnabled(false);
+    hp34970Hack.close();
     csvFile.close();
     ps622Hack.close();
     pwrPolSwitch.close();
@@ -312,6 +313,8 @@ bool MainWindow::openDevs()
     currentTimer.start();
 
     return true;
+
+    // hp34970Hack.close();
 
 hp34970hack_err:
     if (err_title.isEmpty()) {
