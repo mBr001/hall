@@ -6,6 +6,7 @@
 #include <sys/select.h>
 #include <unistd.h>
 #include <QtCore>
+#include <stdexcept>
 
 #include "hp34970hack.h"
 
@@ -184,6 +185,28 @@ HP34970hack::~HP34970hack()
 void HP34970hack::close()
 {
     QSerial::close();
+}
+
+void HP34970hack::cmd(QString cmd)
+{
+    QString s;
+
+    s = query(cmd);
+    if (!s.isEmpty())
+        throw new std::runtime_error("P34970hack::cmd response not empty.");
+}
+
+QString HP34970hack::query(const QString &cmd)
+{
+    QString s;
+
+    s = cmd.trimmed().append(";*OPC?\n");
+    write(cmd);
+    s = readLine(1024).trimmed();
+    if (!s.endsWith('1'))
+        throw new std::runtime_error("P34970hack::query failed read response.");
+
+    return s.truncate();
 }
 
 bool HP34970hack::open(const QString &port)

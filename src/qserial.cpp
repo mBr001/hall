@@ -174,11 +174,11 @@ void QSerial::write(const int &i)
         stdError("Failed to write to serial port");
 }
 
-void QSerial::readLine(QString &str)
+QString QSerial::readLine(ssize_t count)
 {
-    QByteArray b;
+    char buf[count];
 
-    b = str.toLocal8Bit();
-    if (::write(fd, b.constData(), b.length()) < 0)
-        stdError("Failed to write to serial port");
+    readLine(buf, sizeof(buf));
+
+    return buf;
 }

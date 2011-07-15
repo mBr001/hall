@@ -23,7 +23,7 @@ public:
     void write(const char *str);
     void write(const QString &str);
     void write(const int &i);
-    void readLine(QString &str);
+    QString readLine(ssize_t count);
 private:
     int fd;
     long timeoutOffs, timeoutPerChar;

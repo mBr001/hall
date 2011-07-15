@@ -17,6 +17,9 @@ public:
     void setChannel(int channel, bool open);
     void setSense(int channel, Sense_t sense);
     void setup();
+protected:
+    void cmd(QString cmd);
+    QString query(const QString &cmd);
 
 private:
 
