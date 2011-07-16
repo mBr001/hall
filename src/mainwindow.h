@@ -40,6 +40,7 @@ private slots:
     void on_sampleCurrDoubleSpinBox_valueChanged(double );
     void on_samplePolCrossCheckBox_toggled(bool checked);
     void on_samplePowerCheckBox_toggled(bool checked);
+    void on_startPushButton_clicked();
 
 private:
     Ui::MainWindow *ui;

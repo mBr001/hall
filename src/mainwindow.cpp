@@ -60,12 +60,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::on_coilCurrDoubleSpinBox_valueChanged(double )
 {
-    ui->sweepingLabel->setEnabled(true);
+    ui->sweepingWidget->setEnabled(true);
 }
 
 void MainWindow::on_coilPolCrossCheckBox_toggled(bool checked)
 {
-    ui->sweepingLabel->setEnabled(true);
+    ui->sweepingWidget->setEnabled(true);
 
     if (checked)
         ui->polarityLabel->setText(pol_np);
@@ -75,7 +75,7 @@ void MainWindow::on_coilPolCrossCheckBox_toggled(bool checked)
 
 void MainWindow::on_coilPowerCheckBox_toggled(bool)
 {
-    ui->sweepingLabel->setEnabled(true);
+    ui->sweepingWidget->setEnabled(true);
 }
 
 void MainWindow::on_currentTimer_timeout()
@@ -358,7 +358,7 @@ bool MainWindow::openDevs()
     }
     hp34970Hack.setup();
 
-    ui->sweepingLabel->setEnabled(true);
+    ui->sweepingWidget->setEnabled(true);
     currentTimer.start();
 
     return true;
@@ -428,3 +428,8 @@ void MainWindow::startApp()
     configUI.show();
 }
 
+
+void MainWindow::on_startPushButton_clicked()
+{
+
+}
