@@ -191,7 +191,7 @@ void HP34970hack::sendCmd(QString cmd, long timeout)
 {
     QString s;
 
-    s = query(cmd, timeout);
+    s = sendQuery(cmd, timeout);
     if (!s.isEmpty())
         throw new std::runtime_error("P34970hack::cmd response not empty.");
 }
@@ -214,7 +214,7 @@ bool HP34970hack::open(QString port)
     return true;
 }
 
-QString HP34970hack::query(QString cmd, long timeout)
+QString HP34970hack::sendQuery(QString cmd, long timeout)
 {
     QString s;
 
@@ -222,7 +222,7 @@ QString HP34970hack::query(QString cmd, long timeout)
     write(s);
     s = readLine(1024, timeout).trimmed();
     if (!s.endsWith('1'))
-        throw new std::runtime_error("P34970hack::query failed read response.");
+        throw new std::runtime_error("P34970hack::sendQuery failed read response.");
     if (s.endsWith(";1"))
         return s.left(s.size() - 2);
 
@@ -233,7 +233,7 @@ QString HP34970hack::readCmd()
 {
     QString s;
 
-    s = query("read?");
+    s = sendQuery("read?");
     return s;
 }
 

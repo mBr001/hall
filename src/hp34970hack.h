@@ -21,7 +21,7 @@ public:
 
 protected:
     void sendCmd(QString cmd, long timeout = 0);
-    QString query(QString cmd, long timeout = 0);
+    QString sendQuery(QString cmd, long timeout = 0);
 
 private:
 
