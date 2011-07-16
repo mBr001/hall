@@ -205,11 +205,9 @@ bool HP34970hack::open(QString port)
     if (!QSerial::open(port, QSerial::Baude9600, 300000, timeout))
         return false;
 
-    QString s("syst:rem");
-
     write("\n");
-    sendCmd("*RST", 500000);
-    sendCmd(s);
+    sendCmd("*RST;*CLS", 500000);
+    sendCmd("SYST:REM");
 
     return true;
 }
@@ -233,7 +231,7 @@ QString HP34970hack::readCmd()
 {
     QString s;
 
-    s = sendQuery("read?");
+    s = sendQuery("READ?");
     return s;
 }
 
@@ -244,8 +242,8 @@ void HP34970hack::setChannel(int channel, bool open)
 
 void HP34970hack::setup()
 {
-    sendCmd("conf:volt (@101:104)");
+    sendCmd("CONF:VOLT (@101:104)");
     sendCmd("ROUT:CLOS (@201:206,209,210)");
-    sendCmd("init", 2000000);
+    sendCmd("INIT", 2000000);
 }
 
