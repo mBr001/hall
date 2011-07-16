@@ -20,10 +20,8 @@ public:
     QString readCmd();
 
 protected:
-    void sendCmd(QString cmd);
-    void sendCmd(QString cmd, long timeout);
-    QString query(QString cmd);
-    QString query(QString cmd, long timeout);
+    void sendCmd(QString cmd, long timeout = 0);
+    QString query(QString cmd, long timeout = 0);
 
 private:
 

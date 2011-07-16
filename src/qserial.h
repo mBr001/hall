@@ -4,7 +4,6 @@
 class QSerial
 {
 public:
-
     typedef int BaudeRate_t;
 
     static const BaudeRate_t Baude9600;

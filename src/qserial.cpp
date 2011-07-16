@@ -104,12 +104,7 @@ bool QSerial::open(QString port, BaudeRate_t bauderate, long timeout,
     return open(port_str, bauderate, timeout, timeoutPerChar);
 }
 
-QString QSerial::readLine(ssize_t count)
-{
-    return readLine(count, 0);
-}
-
-QString QSerial::readLine(ssize_t count, long timeout)
+QString QSerial::readLine(ssize_t count, long timeout = 0)
 {
     char buf[count];
     ssize_t len;

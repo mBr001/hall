@@ -187,11 +187,6 @@ void HP34970hack::close()
     QSerial::close();
 }
 
-void HP34970hack::sendCmd(QString cmd)
-{
-    this->sendCmd(cmd, 0);
-}
-
 void HP34970hack::sendCmd(QString cmd, long timeout)
 {
     QString s;
@@ -217,11 +212,6 @@ bool HP34970hack::open(QString port)
     sendCmd(s);
 
     return true;
-}
-
-QString HP34970hack::query(QString cmd)
-{
-    return query(cmd, 0);
 }
 
 QString HP34970hack::query(QString cmd, long timeout)
