@@ -227,6 +227,7 @@ void MainWindow::on_measurePushButton_clicked()
 
     val = ui->coilCurrMeasDoubleSpinBox->value();
     csvRow = csvRowAppendColumn(csvRow, val);
+    s = ui->coilCurrMeasDoubleSpinBox->text();
     ui->dataTableWidget->setItem(0, 0, new QTableWidgetItem(s));
 
     val = ui->coilVoltMeasDoubleSpinBox->value();
@@ -236,8 +237,9 @@ void MainWindow::on_measurePushButton_clicked()
     csvRow = csvRowAppendColumn(csvRow, val);
 
     val = ui->sampleCurrDoubleSpinBox->value();
-    ui->dataTableWidget->setItem(0, 1, new QTableWidgetItem(s));
     csvRow = csvRowAppendColumn(csvRow, val);
+    s = ui->sampleCurrDoubleSpinBox->text();
+    ui->dataTableWidget->setItem(0, 1, new QTableWidgetItem(s));
 
     s = hp34970Hack.readCmd();
     QStringList cells(s.split(","));
@@ -249,7 +251,6 @@ void MainWindow::on_measurePushButton_clicked()
     // TODO: inset hall U
 
     csvFile.write(csvRow.toUtf8());
-
 }
 
 void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
