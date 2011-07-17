@@ -32,6 +32,7 @@ public slots:
     void show();
 
 private slots:
+    void on_automationTimer_timeout();
     void on_coilCurrDoubleSpinBox_valueChanged(double );
     void on_coilPolCrossCheckBox_toggled(bool checked);
     void on_coilPowerCheckBox_toggled(bool checked);
@@ -43,7 +44,10 @@ private slots:
     void on_startPushButton_clicked();
 
 private:
-    Ui::MainWindow *ui;
+    /** Fully automated measurement in progress */
+    bool automationRunning;
+    /** Timer used for fully automated testing process. */
+    QTimer automationTimer;
     /** Configuration dialog. */
     ConfigUI configUI;
     /** HTML string to show colored "+ -". */
@@ -71,6 +75,8 @@ private:
     QFile csvFile;
     /** HP 34970A device to measure voltage and resistivity. */
     HP34970hack hp34970Hack;
+    /** User interface widgets */
+    Ui::MainWindow *ui;
 
     /** Close all devices, eg. power supply, Agilent, switch, ... */
     void closeDevs();

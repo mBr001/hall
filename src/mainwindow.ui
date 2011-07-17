@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>819</width>
-    <height>552</height>
+    <height>555</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_2">
     <item row="0" column="0" rowspan="2">
-     <widget class="QGroupBox" name="groupBox">
+     <widget class="QGroupBox" name="coilGroupBox">
       <property name="title">
        <string>Coil</string>
       </property>
@@ -214,7 +214,7 @@ p, li { white-space: pre-wrap; }
      </spacer>
     </item>
     <item row="2" column="0">
-     <widget class="QGroupBox" name="groupBox_2">
+     <widget class="QGroupBox" name="sampleGroupBox">
       <property name="title">
        <string>Sample</string>
       </property>

@@ -15,8 +15,9 @@ const char MainWindow::pol_np[] =
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    configUI()
+    automationRunning(false),
+    configUI(),
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
@@ -26,11 +27,20 @@ MainWindow::MainWindow(QWidget *parent) :
     coilTimer.setSingleShot(false);
     QObject::connect(&coilTimer, SIGNAL(timeout()), this,
                      SLOT(on_currentTimer_timeout()));
+
+    automationTimer.setSingleShot(true);
+    QObject::connect(&automationTimer, SIGNAL(timeout()), this,
+                     SLOT(on_automationTimer_timeout()));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::on_automationTimer_timeout()
+{
+    // TODO ...
 }
 
 void MainWindow::closeDevs()
@@ -431,5 +441,11 @@ void MainWindow::startApp()
 
 void MainWindow::on_startPushButton_clicked()
 {
-
+    ui->coilGroupBox->setEnabled(automationRunning);
+    ui->sampleGroupBox->setEnabled(automationRunning);
+    automationRunning = !automationRunning;
+    if (automationRunning)
+        ui->startPushButton->setText("Stop");
+    else
+        ui->startPushButton->setText("Stop");
 }
