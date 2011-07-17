@@ -55,7 +55,7 @@ private:
     /** Application settings */
     QSettings settings;
     /** Timer used to adjust current trought magnet in specified time. */
-    QTimer currentTimer;
+    QTimer coilTimer;
     /** Delay betwen current value update [ms].
      * BAD CODE INSIDE, DO NOT CHANGE! */
     static const int currentDwell = 1000;

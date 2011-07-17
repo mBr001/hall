@@ -22,9 +22,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(&configUI, SIGNAL(accepted()), this, SLOT(show()));
 
-    currentTimer.setInterval(currentDwell);
-    currentTimer.setSingleShot(false);
-    QObject::connect(&currentTimer, SIGNAL(timeout()), this,
+    coilTimer.setInterval(currentDwell);
+    coilTimer.setSingleShot(false);
+    QObject::connect(&coilTimer, SIGNAL(timeout()), this,
                      SLOT(on_currentTimer_timeout()));
 }
 
@@ -35,7 +35,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeDevs()
 {
-    currentTimer.stop();
+    coilTimer.stop();
     ui->sweepingLabel->setEnabled(false);
     csvFile.close();
     hp34970Hack.close();
@@ -359,7 +359,7 @@ bool MainWindow::openDevs()
     hp34970Hack.setup();
 
     ui->sweepingWidget->setEnabled(true);
-    currentTimer.start();
+    coilTimer.start();
 
     return true;
 
