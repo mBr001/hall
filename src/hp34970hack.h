@@ -14,7 +14,7 @@ public:
     ~HP34970hack();
     void close();
     bool open(QString port);
-    void setChannel(int channel, bool open);
+    void setChannelOpen(int channel, bool open);
     void setSense(int channel, Sense_t sense);
     void setup();
     QString readCmd();

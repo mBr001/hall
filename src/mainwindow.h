@@ -78,10 +78,36 @@ private:
     /** User interface widgets */
     Ui::MainWindow *ui;
 
+    typedef struct {
+        /** Function to call.
+            @return true if next function should be called, false should cause
+                automation process abort. */
+        bool (*func)(MainWindow *this_);
+        /** Delay before next function execution */
+        int delay;
+    } automationStep_t;
+
+    /* Steps for Hall measurement automation */
+    static bool auto00(MainWindow *this_);
+    static bool auto01(MainWindow *this_);
+    static bool auto02(MainWindow *this_);
+    static bool auto03(MainWindow *this_);
+    static bool auto04(MainWindow *this_);
+    static bool auto05(MainWindow *this_);
+    static bool auto06(MainWindow *this_);
+    static bool auto07(MainWindow *this_);
+    static bool auto08(MainWindow *this_);
+    static bool auto09(MainWindow *this_);
+    static bool auto10(MainWindow *this_);
+    static bool autoStop(MainWindow *this_);
     /** Close all devices, eg. power supply, Agilent, switch, ... */
     void closeDevs();
     /** Open all devices. */
     bool openDevs();
+
+    static const automationStep_t autoSteps[];
+
+    std::vector<automationStep_t> autoSteps_;
 };
 
 #endif // MAINWINDOW_H

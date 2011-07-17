@@ -235,7 +235,7 @@ QString HP34970hack::readCmd()
     return s;
 }
 
-void HP34970hack::setChannel(int channel, bool open)
+void HP34970hack::setChannelOpen(int channel, bool open)
 {
     // ROUT:SCAN (@101,103,104) pro nastaveni z ktereho portu read? čte hodnoty
 }

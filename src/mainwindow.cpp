@@ -13,6 +13,12 @@ const char MainWindow::pol_pn[] =
 const char MainWindow::pol_np[] =
         "<span style='font-weight:600;'><span style='color:#0000ff;'>-</span> <span style='color:#ff0000;'>+</span></span>";
 
+const MainWindow::automationStep_t MainWindow::autoSteps[] = {
+    {
+       autoStop, 0,
+    },
+};
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     automationRunning(false),
@@ -36,6 +42,71 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+bool MainWindow::auto00(MainWindow *this_)
+{
+    this_->hp34970Hack.setChannelOpen(209, true);
+    this_->hp34970Hack.setChannelOpen(210, true);
+
+    return true;
+}
+
+bool MainWindow::auto01(MainWindow *this_)
+{
+    this_->ps622Hack.setCurrent(this_->ui->sampleCurrDoubleSpinBox->value());
+
+    return true;
+}
+
+bool MainWindow::auto02(MainWindow *this_)
+{
+    return false;
+}
+
+bool MainWindow::auto03(MainWindow *this_)
+{
+    return false;
+}
+
+bool MainWindow::auto04(MainWindow *this_)
+{
+    return false;
+}
+
+bool MainWindow::auto05(MainWindow *this_)
+{
+    return false;
+}
+
+bool MainWindow::auto06(MainWindow *this_)
+{
+    return false;
+}
+
+bool MainWindow::auto07(MainWindow *this_)
+{
+    return false;
+}
+
+bool MainWindow::auto08(MainWindow *this_)
+{
+    return false;
+}
+
+bool MainWindow::auto09(MainWindow *this_)
+{
+    return false;
+}
+
+bool MainWindow::auto10(MainWindow *this_)
+{
+    return false;
+}
+
+bool MainWindow::autoStop(MainWindow *this_)
+{
+    return false;
 }
 
 void MainWindow::on_automationTimer_timeout()
