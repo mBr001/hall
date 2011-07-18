@@ -5,6 +5,10 @@
 #include <QMessageBox>
 #include <stdexcept>
 
+#ifndef ARRAY_SIZE
+#define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
+#endif
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -19,9 +23,12 @@ const MainWindow::automationStep_t MainWindow::autoSteps[] = {
     },
 };
 
+const std::vector<MainWindow::automationStep_t>
+        MainWindow::autoStepsVect(autoSteps[0], autoSteps[ARRAY_SIZE(autoSteps) - 1]);
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    automationRunning(false),
+    autoRunning(false),
     configUI(),
     ui(new Ui::MainWindow)
 {
@@ -512,10 +519,10 @@ void MainWindow::startApp()
 
 void MainWindow::on_startPushButton_clicked()
 {
-    ui->coilGroupBox->setEnabled(automationRunning);
-    ui->sampleGroupBox->setEnabled(automationRunning);
-    automationRunning = !automationRunning;
-    if (automationRunning)
+    ui->coilGroupBox->setEnabled(autoRunning);
+    ui->sampleGroupBox->setEnabled(autoRunning);
+    autoRunning = !autoRunning;
+    if (autoRunning)
         ui->startPushButton->setText("Stop");
     else
         ui->startPushButton->setText("Stop");

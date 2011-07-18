@@ -44,8 +44,25 @@ private slots:
     void on_startPushButton_clicked();
 
 private:
+    typedef struct {
+        /** Function to call.
+            @return true if next function should be called, false should cause
+                automation process abort. */
+        bool (*func)(MainWindow *this_);
+        /** Delay before next function execution */
+        int delay;
+    } automationStep_t;
+
     /** Fully automated measurement in progress */
-    bool automationRunning;
+    bool autoRunning;
+    /** Array of steps and loop marks for automated Hall measurement. */
+    static const automationStep_t autoSteps[];
+    /** Vector of steps created from autoSteps */
+    static const std::vector<automationStep_t> autoStepsVect;
+    /** Current step of automated Hall measurement. */
+    std::vector<automationStep_t>::const_iterator autoStepCurrent;
+    /** Dinamic "mark" in hall automation steps for loops. */
+    std::vector<automationStep_t>::const_iterator autoStepMark;
     /** Timer used for fully automated testing process. */
     QTimer automationTimer;
     /** Configuration dialog. */
@@ -78,15 +95,6 @@ private:
     /** User interface widgets */
     Ui::MainWindow *ui;
 
-    typedef struct {
-        /** Function to call.
-            @return true if next function should be called, false should cause
-                automation process abort. */
-        bool (*func)(MainWindow *this_);
-        /** Delay before next function execution */
-        int delay;
-    } automationStep_t;
-
     /* Steps for Hall measurement automation */
     static bool auto00(MainWindow *this_);
     static bool auto01(MainWindow *this_);
@@ -104,10 +112,6 @@ private:
     void closeDevs();
     /** Open all devices. */
     bool openDevs();
-
-    static const automationStep_t autoSteps[];
-
-    std::vector<automationStep_t> autoSteps_;
 };
 
 #endif // MAINWINDOW_H
