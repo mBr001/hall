@@ -133,7 +133,7 @@ void MainWindow::on_automationTimer_timeout()
 void MainWindow::closeDevs()
 {
     coilTimer.stop();
-    ui->sweepingLabel->setEnabled(false);
+    ui->sweepingWidget->setEnabled(false);
     csvFile.close();
     hp34970Hack.close();
     ps622Hack.close();
@@ -189,7 +189,7 @@ void MainWindow::on_currentTimer_timeout()
     ui->coilVoltMeasDoubleSpinBox->setValue(lcd_info.read_V);
 
     // update coil current 
-    if (!ui->sweepingLabel->isEnabled())
+    if (!ui->sweepingWidget->isEnabled())
         return;
 
     /** Curent trought coil */
@@ -234,7 +234,7 @@ void MainWindow::on_currentTimer_timeout()
     /* Make process decision. */
     // Target reach, finish job
     if (fabs(procI - wantI) < currentSlope) {
-        ui->sweepingLabel->setEnabled(false);
+        ui->sweepingWidget->setEnabled(false);
         if (!wantCoilPower && fabs(procI) <= currentSlope && procCoilPower) {
             if ( sdp_set_output(&sdp, 0) < 0)
                 throw new std::runtime_error("timer - sdp_set_output");
