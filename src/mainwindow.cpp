@@ -115,7 +115,7 @@ bool MainWindow::auto10(MainWindow *this_)
 
 bool MainWindow::autoMark(MainWindow *this_)
 {
-    this_->autoStepMark = this_->autoStepCurrent;
+    this_->autoStepMark = this_->autoStepCurrent + 1;
 
     return true;
 }
