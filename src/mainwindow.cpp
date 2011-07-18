@@ -24,7 +24,7 @@ const MainWindow::automationStep_t MainWindow::autoSteps[] = {
     },
 };
 
-QVector<MainWindow::automationStep_t>
+const QVector<MainWindow::automationStep_t>
         MainWindow::autoStepsVect((int)ARRAY_SIZE(MainWindow::autoSteps), MainWindow::autoSteps[0]);
 
 MainWindow::MainWindow(QWidget *parent) :
