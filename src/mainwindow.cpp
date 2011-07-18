@@ -113,6 +113,13 @@ bool MainWindow::auto10(MainWindow *this_)
     return false;
 }
 
+bool MainWindow::autoMark(MainWindow *this_)
+{
+    this_->autoStepMark = this_->autoStepCurrent;
+
+    return true;
+}
+
 bool MainWindow::autoStop(MainWindow *this_)
 {
     return false;

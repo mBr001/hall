@@ -107,6 +107,7 @@ private:
     static bool auto08(MainWindow *this_);
     static bool auto09(MainWindow *this_);
     static bool auto10(MainWindow *this_);
+    static bool autoMark(MainWindow *this_);
     static bool autoStop(MainWindow *this_);
     /** Close all devices, eg. power supply, Agilent, switch, ... */
     void closeDevs();
