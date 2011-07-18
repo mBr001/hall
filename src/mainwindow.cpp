@@ -4,6 +4,7 @@
 #include <QDateTime>
 #include <QMessageBox>
 #include <stdexcept>
+#include <vector>
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
@@ -23,8 +24,8 @@ const MainWindow::automationStep_t MainWindow::autoSteps[] = {
     },
 };
 
-const std::vector<MainWindow::automationStep_t>
-        MainWindow::autoStepsVect(autoSteps[0], autoSteps[ARRAY_SIZE(autoSteps) - 1]);
+QVector<MainWindow::automationStep_t>
+        MainWindow::autoStepsVect((int)ARRAY_SIZE(MainWindow::autoSteps), MainWindow::autoSteps[0]);
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -32,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     configUI(),
     ui(new Ui::MainWindow)
 {
+
     ui->setupUi(this);
 
     QObject::connect(&configUI, SIGNAL(accepted()), this, SLOT(show()));

@@ -58,7 +58,7 @@ private:
     /** Array of steps and loop marks for automated Hall measurement. */
     static const automationStep_t autoSteps[];
     /** Vector of steps created from autoSteps */
-    static const std::vector<automationStep_t> autoStepsVect;
+    static QVector<automationStep_t> autoStepsVect;
     /** Current step of automated Hall measurement. */
     std::vector<automationStep_t>::const_iterator autoStepCurrent;
     /** Dinamic "mark" in hall automation steps for loops. */
