@@ -53,6 +53,38 @@ private:
         int delay;
     } automationStep_t;
 
+    /** Channel offset for 34901A card */
+    static const int _34901A;
+    /** 34901A: sample pins cd */
+    static const int _34901A_sample_cd;
+    /** 34901A: sample pins da */
+    static const int _34901A_sample_da;
+    /** 34901A: sample pins bd */
+    static const int _34901A_sample_bd;
+    /** 34901A: sample pins ac */
+    static const int _34901A_sample_ac;
+    /** 34901A: hall probe */
+    static const int _34901A_hall_probe;
+
+    /** Channel offset for 34903A card */
+    static const int _34903A;
+    /** 34903A: sample pin a <-> current source (-) */
+    static const int _34903A_sample_a_pwr_m;
+    /** 34903A: sample pin b <-> current source (+) */
+    static const int _34903A_sample_b_pwr_p;
+    /** 34903A: sample pin c <-> current source (0/(+/-)) */
+    static const int _34903A_sample_c_pwr_sw1;
+    /** 34903A: sample pin d <-> current source (-) */
+    static const int _34903A_sample_d_pwr_m;
+    /** 34903A: current source (0/(+/-)) <-> current source (-) */
+    static const int _34903A_pwr_sw1_pwr_m;
+    /** 34903A: current source (0/(+/-)) <-> current source (+) */
+    static const int _34903A_pwr_sw1_pwr_p;
+    /** 34903A: hall probe - pin 1 <-> current source (-) */
+    static const int _34903A_hall_probe_1_pwr_m;
+    /** 34903A: hall probe - pin 2 <-> current source (+) */
+    static const int _34903A_hall_probe_2_pwr_p;
+
     /** Fully automated measurement in progress */
     bool autoRunning;
     /** Array of steps and loop marks for automated Hall measurement. */
@@ -104,9 +136,9 @@ private:
     static bool auto05(MainWindow *this_);
     static bool auto06(MainWindow *this_);
     static bool auto07(MainWindow *this_);
-    static bool auto08(MainWindow *this_);
-    static bool auto09(MainWindow *this_);
-    static bool auto10(MainWindow *this_);
+    static bool autoCloseAll(MainWindow *this_);
+    static bool autoMeasB01(MainWindow *this_);
+    static bool autoMeasB02(MainWindow *this_);
     static bool autoMark(MainWindow *this_);
     static bool autoStop(MainWindow *this_);
     /** Close all devices, eg. power supply, Agilent, switch, ... */

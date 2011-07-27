@@ -18,6 +18,23 @@ const char MainWindow::pol_pn[] =
 const char MainWindow::pol_np[] =
         "<span style='font-weight:600;'><span style='color:#0000ff;'>-</span> <span style='color:#ff0000;'>+</span></span>";
 
+const int MainWindow::_34901A = 100;
+const int MainWindow::_34901A_sample_cd = _34901A + 1;
+const int MainWindow::_34901A_sample_da = _34901A + 2;
+const int MainWindow::_34901A_sample_bd = _34901A + 3;
+const int MainWindow::_34901A_sample_ac = _34901A + 4;
+const int MainWindow::_34901A_hall_probe = _34901A + 14;
+
+const int MainWindow::_34903A = 200;
+const int MainWindow::_34903A_sample_a_pwr_m = _34903A + 1;
+const int MainWindow::_34903A_sample_b_pwr_p = _34903A + 2;
+const int MainWindow::_34903A_sample_c_pwr_sw1 = _34903A + 3;
+const int MainWindow::_34903A_sample_d_pwr_m = _34903A + 4;
+const int MainWindow::_34903A_pwr_sw1_pwr_m = _34903A + 5;
+const int MainWindow::_34903A_pwr_sw1_pwr_p = _34903A + 6;
+const int MainWindow::_34903A_hall_probe_1_pwr_m = _34903A + 9;
+const int MainWindow::_34903A_hall_probe_2_pwr_p = _34903A + 10;
+
 const MainWindow::automationStep_t MainWindow::autoSteps[] = {
     {
        autoStop, 0,
@@ -55,8 +72,11 @@ MainWindow::~MainWindow()
 
 bool MainWindow::auto00(MainWindow *this_)
 {
-    this_->hp34970Hack.setChannelOpen(209, true);
-    this_->hp34970Hack.setChannelOpen(210, true);
+    QList<int> openChannels;
+
+    openChannels.append(209);
+    openChannels.append(210);
+    this_->hp34970Hack.setupChannels(openChannels);
 
     return true;
 }
@@ -98,17 +118,27 @@ bool MainWindow::auto07(MainWindow *this_)
     return false;
 }
 
-bool MainWindow::auto08(MainWindow *this_)
+bool MainWindow::autoCloseAll(MainWindow *this_)
 {
+    QList<int> openChannels;
+
+    this_->hp34970Hack.setupChannels(openChannels);
+
     return false;
 }
 
-bool MainWindow::auto09(MainWindow *this_)
+bool MainWindow::autoMeasB01(MainWindow *this_)
 {
-    return false;
+    QList<int> openChannels;
+
+    openChannels.append(_34903A_hall_probe_1_pwr_m);
+    openChannels.append(_34903A_hall_probe_2_pwr_p);
+    this_->hp34970Hack.setupChannels(openChannels);
+
+    return true;
 }
 
-bool MainWindow::auto10(MainWindow *this_)
+bool MainWindow::autoMeasB02(MainWindow *this_)
 {
     return false;
 }
