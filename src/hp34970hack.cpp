@@ -187,6 +187,11 @@ void HP34970hack::close()
     QSerial::close();
 }
 
+void HP34970hack::init()
+{
+    sendCmd("INIT", 2000000);
+}
+
 void HP34970hack::sendCmd(QString cmd, long timeout)
 {
     QString s;
@@ -235,15 +240,40 @@ QString HP34970hack::readCmd()
     return s;
 }
 
-void HP34970hack::setupChannels(QList<int> openChannels)
+void HP34970hack::setScan(QList<int> channels)
 {
-    // ROUT:SCAN (@101,103,104) pro nastaveni z ktereho portu read? čte hodnoty
+    QStringList ch;
+
+    foreach(int channel, channels)
+    {
+        ch.append(QVariant(channel).toString());
+    }
+
+    QString cmd("ROUT:SCAN (@%1)");
+
+    sendCmd(cmd.arg(ch.join(",")));
+}
+
+void HP34970hack::routeChannels(QList<int> openChannels, int offs)
+{
+    QStringList close, open;
+
+    for (int x(offs + 1); x <= offs + 20; ++x) {
+        QVariant channel(x);
+        if (openChannels.contains(x))
+            open.append(channel.toString());
+        else
+            close.append(channel.toString());
+    }
+
+    sendCmd(QString("ROUT:CLOS (@%1)").arg(close.join(",")));
+    if (!open.empty())
+        sendCmd(QString("ROUT:OPEN (@%1)").arg(open.join(",")));
 }
 
 void HP34970hack::setup()
 {
-    sendCmd("CONF:VOLT (@101:104)");
-    sendCmd("ROUT:CLOS (@201:206,209,210)");
-    sendCmd("INIT", 2000000);
+    sendCmd("CONF:VOLT (@101:104,114)");
+    init();
 }
 

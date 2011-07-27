@@ -137,8 +137,8 @@ private:
     static bool auto06(MainWindow *this_);
     static bool auto07(MainWindow *this_);
     static bool autoCloseAll(MainWindow *this_);
-    static bool autoMeasB01(MainWindow *this_);
-    static bool autoMeasB02(MainWindow *this_);
+    static bool autoMeasB_01(MainWindow *this_);
+    static bool autoMeasB_02(MainWindow *this_);
     static bool autoMark(MainWindow *this_);
     static bool autoStop(MainWindow *this_);
     /** Close all devices, eg. power supply, Agilent, switch, ... */

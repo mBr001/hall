@@ -14,8 +14,10 @@ public:
     HP34970hack();
     ~HP34970hack();
     void close();
+    void init();
     bool open(QString port);
-    void setupChannels(QList<int> openChannels);
+    void routeChannels(QList<int> openChannels, int offs);
+    void setScan(QList<int> channels);
     void setSense(int channel, Sense_t sense);
     void setup();
     QString readCmd();

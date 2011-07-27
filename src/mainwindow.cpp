@@ -72,13 +72,7 @@ MainWindow::~MainWindow()
 
 bool MainWindow::auto00(MainWindow *this_)
 {
-    QList<int> openChannels;
-
-    openChannels.append(209);
-    openChannels.append(210);
-    this_->hp34970Hack.setupChannels(openChannels);
-
-    return true;
+    return false;
 }
 
 bool MainWindow::auto01(MainWindow *this_)
@@ -122,25 +116,36 @@ bool MainWindow::autoCloseAll(MainWindow *this_)
 {
     QList<int> openChannels;
 
-    this_->hp34970Hack.setupChannels(openChannels);
+    this_->hp34970Hack.routeChannels(openChannels, _34903A);
 
     return false;
 }
 
-bool MainWindow::autoMeasB01(MainWindow *this_)
+bool MainWindow::autoMeasB_01(MainWindow *this_)
 {
     QList<int> openChannels;
 
     openChannels.append(_34903A_hall_probe_1_pwr_m);
     openChannels.append(_34903A_hall_probe_2_pwr_p);
-    this_->hp34970Hack.setupChannels(openChannels);
+    this_->hp34970Hack.routeChannels(openChannels, _34903A);
+
+    QList<int> scan;
+
+    scan.append(MainWindow::_34901A_hall_probe);
+    this_->hp34970Hack.setScan(scan);
+    this_->hp34970Hack.init();
 
     return true;
 }
 
-bool MainWindow::autoMeasB02(MainWindow *this_)
+bool MainWindow::autoMeasB_02(MainWindow *this_)
 {
-    return false;
+    //QString val;
+
+    //val = this_->hp34970Hack.sendQuery("read?");
+    // write to file and show
+
+    return true;
 }
 
 bool MainWindow::autoMark(MainWindow *this_)
