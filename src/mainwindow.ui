@@ -51,7 +51,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="3" column="0" colspan="2">
         <widget class="QLabel" name="label_6">
          <property name="text">
           <string>Measured:</string>
@@ -104,7 +104,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="1" column="0" colspan="2">
         <widget class="QLabel" name="label_11">
          <property name="text">
           <string>Step:</string>
@@ -125,7 +125,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="2" column="0" colspan="2">
         <widget class="QLabel" name="label_4">
          <property name="text">
           <string>Dwell</string>
@@ -149,17 +149,40 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="1" colspan="3">
+       <item row="6" column="0" colspan="3">
         <widget class="QCheckBox" name="coilPolCrossCheckBox">
          <property name="toolTip">
           <string>Cross polarity on coil input.</string>
          </property>
          <property name="text">
-          <string>Polarity Cross</string>
+          <string>Polarity Reversed</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
+       <item row="5" column="3">
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>mT</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2">
+        <widget class="QDoubleSpinBox" name="coilBDoubleSpinBox">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="buttonSymbols">
+          <enum>QAbstractSpinBox::NoButtons</enum>
+         </property>
+         <property name="specialValueText">
+          <string>N/A</string>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="3">
         <widget class="QLabel" name="polarityLabel">
          <property name="text">
           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
