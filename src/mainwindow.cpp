@@ -140,10 +140,15 @@ bool MainWindow::autoMeasB_01(MainWindow *this_)
 
 bool MainWindow::autoMeasB_02(MainWindow *this_)
 {
-    //QString val;
+    QStringList data;
+    bool ok;
 
-    //val = this_->hp34970Hack.sendQuery("read?");
-    // write to file and show
+    data = this_->hp34970Hack.read();
+    // TODO: write to file and show
+    if (data.size() == 1)
+        this_->ui->coilBDoubleSpinBox->setValue(QVariant(data[0]).toDouble(&ok));
+    else
+        throw new std::runtime_error("Could not get B data.");
 
     return true;
 }

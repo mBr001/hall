@@ -3,6 +3,7 @@
 
 #include "qserial.h"
 #include <qlist.h>
+#include <qstringlist.h>
 
 class HP34970hack : protected QSerial
 {
@@ -16,6 +17,7 @@ public:
     void close();
     void init();
     bool open(QString port);
+    QStringList read();
     void routeChannels(QList<int> openChannels, int offs);
     void setScan(QList<int> channels);
     void setSense(int channel, Sense_t sense);

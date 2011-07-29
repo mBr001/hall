@@ -232,6 +232,21 @@ QString HP34970hack::sendQuery(QString cmd, long timeout)
     return s.left(s.size() - 1);
 }
 
+QStringList HP34970hack::read()
+{
+    QString s;
+    QStringList data;
+
+    s = sendQuery("read?");
+    data = s.split(",", QString::SkipEmptyParts);
+
+    for (QStringList::iterator idata(data.begin()); idata != data.end(); ++idata) {
+        *idata = idata->trimmed();
+    }
+
+    return data;
+}
+
 QString HP34970hack::readCmd()
 {
     QString s;
