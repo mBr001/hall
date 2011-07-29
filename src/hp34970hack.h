@@ -18,7 +18,7 @@ public:
     void init();
     bool open(QString port);
     QStringList read();
-    void routeChannels(QList<int> openChannels, int offs);
+    void routeChannels(QList<int> closeChannels, int offs);
     void setScan(QList<int> channels);
     void setSense(int channel, Sense_t sense);
     void setup();

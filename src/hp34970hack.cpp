@@ -269,21 +269,21 @@ void HP34970hack::setScan(QList<int> channels)
     sendCmd(cmd.arg(ch.join(",")));
 }
 
-void HP34970hack::routeChannels(QList<int> openChannels, int offs)
+void HP34970hack::routeChannels(QList<int> closeChannels, int offs)
 {
     QStringList close, open;
 
     for (int x(offs + 1); x <= offs + 20; ++x) {
         QVariant channel(x);
-        if (openChannels.contains(x))
-            open.append(channel.toString());
-        else
+        if (closeChannels.contains(x))
             close.append(channel.toString());
+        else
+            open.append(channel.toString());
     }
 
-    sendCmd(QString("ROUT:CLOS (@%1)").arg(close.join(",")));
-    if (!open.empty())
-        sendCmd(QString("ROUT:OPEN (@%1)").arg(open.join(",")));
+    sendCmd(QString("ROUT:OPEN (@%1)").arg(open.join(",")));
+    if (!close.empty())
+        sendCmd(QString("ROUT:CLOS (@%1)").arg(close.join(",")));
 }
 
 void HP34970hack::setup()

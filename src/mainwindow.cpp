@@ -114,29 +114,29 @@ bool MainWindow::auto07(MainWindow *this_)
 
 bool MainWindow::autoCloseAll(MainWindow *this_)
 {
-    QList<int> openChannels;
+    QList<int> closeChannels;
 
-    this_->hp34970Hack.routeChannels(openChannels, _34903A);
+    this_->hp34970Hack.routeChannels(closeChannels, _34903A);
 
     return false;
 }
 
 bool MainWindow::autoMeasB_01(MainWindow *this_)
 {
-    QList<int> openChannels;
+    QList<int> closeChannels;
 
     /* Close power, set current to 1mA, open probe current source */
-    this_->hp34970Hack.routeChannels(openChannels, _34903A);
+    this_->hp34970Hack.routeChannels(closeChannels, _34903A);
     this_->ps622Hack.setCurrent(0.001);
-    openChannels.append(_34903A_hall_probe_1_pwr_m);
-    openChannels.append(_34903A_hall_probe_2_pwr_p);
-    this_->hp34970Hack.routeChannels(openChannels, _34903A);
 
     QList<int> scan;
-
     scan.append(MainWindow::_34901A_hall_probe);
     this_->hp34970Hack.setScan(scan);
     this_->hp34970Hack.init();
+
+    closeChannels.append(_34903A_hall_probe_1_pwr_m);
+    closeChannels.append(_34903A_hall_probe_2_pwr_p);
+    this_->hp34970Hack.routeChannels(closeChannels, _34903A);
 
     return true;
 }
@@ -147,6 +147,7 @@ bool MainWindow::autoMeasB_02(MainWindow *this_)
     bool ok;
 
     data = this_->hp34970Hack.read();
+    this_->ui->plainTextEdit->appendPlainText(QString("B :") + data.join(","));
     // TODO: write to file and show
     if (data.size() == 1)
         this_->ui->coilBDoubleSpinBox->setValue(QVariant(data[0]).toDouble(&ok));
