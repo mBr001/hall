@@ -125,6 +125,9 @@ bool MainWindow::autoMeasB_01(MainWindow *this_)
 {
     QList<int> openChannels;
 
+    /* Close power, set current to 1mA, open probe current source */
+    this_->hp34970Hack.routeChannels(openChannels, _34903A);
+    this_->ps622Hack.setCurrent(0.001);
     openChannels.append(_34903A_hall_probe_1_pwr_m);
     openChannels.append(_34903A_hall_probe_2_pwr_p);
     this_->hp34970Hack.routeChannels(openChannels, _34903A);
@@ -575,4 +578,14 @@ void MainWindow::on_startPushButton_clicked()
         ui->startPushButton->setText("Stop");
     else
         ui->startPushButton->setText("Stop");
+}
+
+void MainWindow::on_toolButton_3_clicked()
+{
+    autoMeasB_01(this);
+}
+
+void MainWindow::on_toolButton_2_clicked()
+{
+    autoMeasB_02(this);
 }

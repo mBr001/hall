@@ -43,6 +43,10 @@ private slots:
     void on_samplePowerCheckBox_toggled(bool checked);
     void on_startPushButton_clicked();
 
+    void on_toolButton_3_clicked();
+
+    void on_toolButton_2_clicked();
+
 private:
     typedef struct {
         /** Function to call.
