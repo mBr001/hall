@@ -53,7 +53,7 @@ private:
             @return true if next function should be called, false should cause
                 automation process abort. */
         bool (*func)(MainWindow *this_);
-        /** Delay before next function execution */
+        /** Delay before next function execution. */
         int delay;
     } automationStep_t;
 
@@ -93,6 +93,8 @@ private:
     bool autoRunning;
     /** Array of steps and loop marks for automated Hall measurement. */
     static const automationStep_t autoSteps[];
+    /** Array of steps for single "hand made" measurement. */
+    static const automationStep_t measureSteps[];
     /** Vector of steps created from autoSteps */
     static const QVector<automationStep_t> autoStepsVect;
     /** Current step of automated Hall measurement. */
@@ -140,7 +142,7 @@ private:
     static bool auto05(MainWindow *this_);
     static bool auto06(MainWindow *this_);
     static bool auto07(MainWindow *this_);
-    static bool autoCloseAll(MainWindow *this_);
+    static bool autoOpenAll(MainWindow *this_);
     static bool autoMeasB_01(MainWindow *this_);
     static bool autoMeasB_02(MainWindow *this_);
     static bool autoMark(MainWindow *this_);

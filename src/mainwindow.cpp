@@ -41,6 +41,12 @@ const MainWindow::automationStep_t MainWindow::autoSteps[] = {
     },
 };
 
+const MainWindow::automationStep_t MainWindow::measureSteps[] = {
+    {
+        autoStop, 0,
+    }
+};
+
 const QVector<MainWindow::automationStep_t>
         MainWindow::autoStepsVect((int)ARRAY_SIZE(MainWindow::autoSteps), MainWindow::autoSteps[0]);
 
@@ -112,7 +118,7 @@ bool MainWindow::auto07(MainWindow *this_)
     return false;
 }
 
-bool MainWindow::autoCloseAll(MainWindow *this_)
+bool MainWindow::autoOpenAll(MainWindow *this_)
 {
     QList<int> closeChannels;
 
@@ -123,10 +129,7 @@ bool MainWindow::autoCloseAll(MainWindow *this_)
 
 bool MainWindow::autoMeasB_01(MainWindow *this_)
 {
-    QList<int> closeChannels;
-
-    /* Close power, set current to 1mA, open probe current source */
-    this_->hp34970Hack.routeChannels(closeChannels, _34903A);
+    /* set current to 1mA, open probe current source */
     this_->ps622Hack.setCurrent(0.001);
 
     QList<int> scan;
@@ -134,6 +137,7 @@ bool MainWindow::autoMeasB_01(MainWindow *this_)
     this_->hp34970Hack.setScan(scan);
     this_->hp34970Hack.init();
 
+    QList<int> closeChannels;
     closeChannels.append(_34903A_hall_probe_1_pwr_m);
     closeChannels.append(_34903A_hall_probe_2_pwr_p);
     this_->hp34970Hack.routeChannels(closeChannels, _34903A);
@@ -382,8 +386,7 @@ void MainWindow::on_measurePushButton_clicked()
     s = ui->sampleCurrDoubleSpinBox->text();
     ui->dataTableWidget->setItem(0, 1, new QTableWidgetItem(s));
 
-    s = hp34970Hack.readCmd();
-    QStringList cells(s.split(","));
+    QStringList cells(hp34970Hack.read());
     for (QStringList::const_iterator cell(cells.begin());
                 cell != cells.end();
                 ++cell)

@@ -171,6 +171,8 @@ begin
 end;
 */
 
+HP34970hack::Sense_t HP34970hack::SenseVolt = "CONF:VOLT";
+HP34970hack::Sense_t HP34970hack::SenseRes = "CONF:RES";
 
 HP34970hack::HP34970hack() :
     QSerial()
@@ -237,7 +239,7 @@ QStringList HP34970hack::read()
     QString s;
     QStringList data;
 
-    s = sendQuery("read?");
+    s = sendQuery("READ?");
     data = s.split(",", QString::SkipEmptyParts);
 
     for (QStringList::iterator idata(data.begin()); idata != data.end(); ++idata) {
@@ -245,14 +247,6 @@ QStringList HP34970hack::read()
     }
 
     return data;
-}
-
-QString HP34970hack::readCmd()
-{
-    QString s;
-
-    s = sendQuery("READ?");
-    return s;
 }
 
 void HP34970hack::setScan(QList<int> channels)
@@ -267,6 +261,20 @@ void HP34970hack::setScan(QList<int> channels)
     QString cmd("ROUT:SCAN (@%1)");
 
     sendCmd(cmd.arg(ch.join(",")));
+}
+
+void HP34970hack::setSense(QList<int> channels, Sense_t sense)
+{
+    QStringList ch;
+
+    foreach(int channel, channels)
+    {
+        ch.append(QVariant(channel).toString());
+    }
+
+    QString cmd("%1 (@%2)");
+
+    sendCmd(cmd.arg(sense).arg(ch.join(",")));
 }
 
 void HP34970hack::routeChannels(QList<int> closeChannels, int offs)
@@ -288,6 +296,10 @@ void HP34970hack::routeChannels(QList<int> closeChannels, int offs)
 
 void HP34970hack::setup()
 {
+    QList<int> channels;
+
+    channels << 101 << 102 << 103 << 104 << 114;
+    setSense(channels, SenseVolt);
     sendCmd("CONF:VOLT (@101:104,114)");
     init();
 }

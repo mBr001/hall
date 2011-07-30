@@ -8,9 +8,10 @@
 class HP34970hack : protected QSerial
 {
 public:
-    typedef enum {
+    typedef const char *Sense_t;
 
-    } Sense_t;
+    static Sense_t SenseVolt;
+    static Sense_t SenseRes;
 
     HP34970hack();
     ~HP34970hack();
@@ -20,9 +21,8 @@ public:
     QStringList read();
     void routeChannels(QList<int> closeChannels, int offs);
     void setScan(QList<int> channels);
-    void setSense(int channel, Sense_t sense);
+    void setSense(QList<int> channels, Sense_t sense);
     void setup();
-    QString readCmd();
 
 protected:
     void sendCmd(QString cmd, long timeout = 0);
