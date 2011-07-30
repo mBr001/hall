@@ -20,7 +20,7 @@ public:
     void init();
     bool open(QString port);
     QStringList read();
-    void routeChannels(Channels_t closeChannels, int offs);
+    void setRoute(Channels_t closeChannels, int offs);
     void setScan(Channels_t channels);
     void setSense(Sense_t sense, Channels_t channels);
     void setup();

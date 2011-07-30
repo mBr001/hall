@@ -273,17 +273,7 @@ QString HP34970hack::sendQuery(QString cmd, const Channels_t &channels, long tim
     return sendQuery(cmd, timeout);
 }
 
-void HP34970hack::setScan(Channels_t channels)
-{
-    sendCmd("ROUT:SCAN", channels);
-}
-
-void HP34970hack::setSense(Sense_t sense, Channels_t channels)
-{
-    sendCmd(sense, channels);
-}
-
-void HP34970hack::routeChannels(Channels_t closeChannels, int offs)
+void HP34970hack::setRoute(Channels_t closeChannels, int offs)
 {
     Channels_t openChannels;
 
@@ -296,6 +286,16 @@ void HP34970hack::routeChannels(Channels_t closeChannels, int offs)
     sendCmd("ROUT:OPEN", openChannels);
     if (!closeChannels.empty())
         sendCmd("ROUT:CLOS", closeChannels);
+}
+
+void HP34970hack::setScan(Channels_t channels)
+{
+    sendCmd("ROUT:SCAN", channels);
+}
+
+void HP34970hack::setSense(Sense_t sense, Channels_t channels)
+{
+    sendCmd(sense, channels);
 }
 
 void HP34970hack::setup()

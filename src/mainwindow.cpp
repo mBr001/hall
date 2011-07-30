@@ -122,7 +122,7 @@ bool MainWindow::autoOpenAll(MainWindow *this_)
 {
     HP34970hack::Channels_t closeChannels;
 
-    this_->hp34970Hack.routeChannels(closeChannels, _34903A);
+    this_->hp34970Hack.setRoute(closeChannels, _34903A);
 
     return false;
 }
@@ -140,7 +140,7 @@ bool MainWindow::autoMeasB_01(MainWindow *this_)
     HP34970hack::Channels_t closeChannels;
     closeChannels.append(_34903A_hall_probe_1_pwr_m);
     closeChannels.append(_34903A_hall_probe_2_pwr_p);
-    this_->hp34970Hack.routeChannels(closeChannels, _34903A);
+    this_->hp34970Hack.setRoute(closeChannels, _34903A);
 
     return true;
 }
