@@ -120,7 +120,7 @@ bool MainWindow::auto07(MainWindow *this_)
 
 bool MainWindow::autoOpenAll(MainWindow *this_)
 {
-    QList<int> closeChannels;
+    HP34970hack::Channels_t closeChannels;
 
     this_->hp34970Hack.routeChannels(closeChannels, _34903A);
 
@@ -132,12 +132,12 @@ bool MainWindow::autoMeasB_01(MainWindow *this_)
     /* set current to 1mA, open probe current source */
     this_->ps622Hack.setCurrent(0.001);
 
-    QList<int> scan;
+    HP34970hack::Channels_t scan;
     scan.append(MainWindow::_34901A_hall_probe);
     this_->hp34970Hack.setScan(scan);
     this_->hp34970Hack.init();
 
-    QList<int> closeChannels;
+    HP34970hack::Channels_t closeChannels;
     closeChannels.append(_34903A_hall_probe_1_pwr_m);
     closeChannels.append(_34903A_hall_probe_2_pwr_p);
     this_->hp34970Hack.routeChannels(closeChannels, _34903A);
