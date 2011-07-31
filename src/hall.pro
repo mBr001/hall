@@ -19,14 +19,16 @@ SOURCES += main.cpp\
     powpolwitch.cpp \
     ps6220hack.cpp \
     hp34970hack.cpp \
-    qserial.cpp
+    qserial.cpp \
+    qcsvfile.cpp
 
 HEADERS  += mainwindow.h \
     configui.h \
     powpolswitch.h \
     ps6220hack.h \
     hp34970hack.h \
-    qserial.h
+    qserial.h \
+    qcsvfile.h
 
 FORMS    += mainwindow.ui \
     configui.ui
