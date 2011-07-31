@@ -15,15 +15,6 @@
 // 'SENS:VOLT:DC:RANG'+qs+', (@'+IntToStr(chan)+')';
 // SENS:VOLT:DC:NPLC'+qs+', (@'+IntToStr(chan)+')'
 
-// read value
-// ROUT:SCAN ()
-// READ?
-//
-
-// howto:
-// conf:res (@101); :conf:volt (@103,104
-// ROUT:SCAN (@101,103,104)
-
 
 /*
 procedure THall.ResBtnClick(Sender: TObject);
@@ -33,16 +24,10 @@ var s:string;
 begin
  ResBtn.Enabled:=false; HallBtn.Enabled:=false;
  OpenChannel('209,210');
+ // Convert'+#13+'Current to Number
  s:=EditCurr.Text; val(s,cur,kod);
- if not(kod=0) then begin
-  ShowMessage('Failed to Convert'+#13+'Current to Number');
-  exit;
- end;
+ // Convert'+#13+'Thickness to Number
  s:=EditT.Text; val(s,t,kod);
- if not(kod=0) then begin
-  ShowMessage('Failed to Convert'+#13+'Thickness to Number');
-  exit;
- end;
  t:=t/10;
  cur:=cur/1000; str(cur:5:3,s);
  { --- Measure R_a --- }
@@ -103,16 +88,10 @@ var s:string;
 begin
  ResBtn.Enabled:=false; HallBtn.Enabled:=false;
  OpenChannel('209,210');
+ // Convert'+#13+'Current to Number
  s:=EditCurr.Text; val(s,cur,kod);
- if not(kod=0) then begin
-  ShowMessage('Failed to Convert'+#13+'Current to Number');
-  exit;
- end;
+ // Convert'+#13+'Thickness to Number
  s:=EditT.Text; val(s,t,kod);
- if not(kod=0) then begin
-  ShowMessage('Failed to Convert'+#13+'Thickness to Number');
-  exit;
- end;
  t:=t/10;
  cur:=cur/1000; str(cur:6:4,s);
  { --- Measure R_b --- }
