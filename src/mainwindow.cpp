@@ -49,6 +49,14 @@ const MainWindow::Step_t MainWindow::stepsMeasure[] = {
     {   stepAbort, 0 },
 };
 
+MainWindow::Steps_t::Steps_t(const Step_t *begin, const Step_t *end)
+{
+    reserve(end - begin);
+    for (; begin < end; ++begin) {
+        append(*begin);
+    }
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     measRunning(false),
@@ -73,112 +81,6 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-bool MainWindow::stepAbort(MainWindow *)
-{
-    return false;
-}
-
-bool MainWindow::stepCreateLoopMark(MainWindow *this_)
-{
-    this_->stepLoopMark = this_->stepCurrent + 1;
-
-    return true;
-}
-
-bool MainWindow::stepFinish(MainWindow *this_)
-{
-    this_->csvFile.write();
-
-    return true;
-}
-
-bool MainWindow::stepGetTime(MainWindow *this_)
-{
-    QString s;
-
-    s = this_->csvFile.setAt(csvColTime, QDateTime::currentDateTimeUtc());
-    this_->ui->dataTableWidget->setItem(0, 3, new QTableWidgetItem(s));
-
-    return true;
-}
-
-bool MainWindow::stepOpenAllRoutes(MainWindow *this_)
-{
-    HP34970hack::Channels_t closeChannels;
-
-    this_->hp34970Hack.setRoute(closeChannels, _34903A);
-
-    return true;
-}
-
-bool MainWindow::stepMeasHallProbe(MainWindow *this_)
-{
-    QStringList data;
-    bool ok;
-    double val;
-
-    data = this_->hp34970Hack.read();
-
-    if (data.size() == 1) {
-        val = QVariant(data[0]).toDouble(&ok);
-        this_->csvFile.setAt(csvColHallProbeU, val);
-        val = -30.588 + sqrt(934.773 + 392.163 * val);
-        this_->ui->coilBDoubleSpinBox->setValue(val);
-        this_->csvFile.setAt(csvColHallProbeB, val);
-    }
-    else {
-        throw new std::runtime_error("Could not get B data.");
-    }
-
-    return true;
-}
-
-bool MainWindow::stepMeasHallProbeFinish(MainWindow *this_)
-{
-    this_->ps622Hack.setOutput(false);
-
-    HP34970hack::Channels_t closeChannels;
-    this_->hp34970Hack.setRoute(closeChannels, _34903A);
-
-    return true;
-}
-
-bool MainWindow::stepMeasHallProbePrepare(MainWindow *this_)
-{
-    const double hallProbeI = 0.001;
-    /* set current to 1mA, open probe current source */
-    this_->ps622Hack.setCurrent(hallProbeI);
-    this_->csvFile.setAt(csvColHallProbeI, hallProbeI);
-
-    HP34970hack::Channels_t closeChannels;
-    closeChannels.append(_34903A_hall_probe_1_pwr_m);
-    closeChannels.append(_34903A_hall_probe_2_pwr_p);
-    this_->hp34970Hack.setRoute(closeChannels, _34903A);
-
-    HP34970hack::Channels_t scan;
-    scan.append(MainWindow::_34901A_hall_probe);
-    this_->hp34970Hack.setScan(scan);
-    this_->hp34970Hack.init();
-
-    this_->ps622Hack.setOutput(true);
-
-    return true;
-}
-
-void MainWindow::on_measTimer_timeout()
-{
-    if (stepCurrent != stepsRunning.end()) {
-        if (stepCurrent->func(this)) {
-            measTimer.start(stepCurrent->delay);
-            ++stepCurrent;
-            return;
-        }
-    }
-    ui->coilGroupBox->setEnabled(true);
-    ui->sampleGroupBox->setEnabled(true);
-    measRunning = false;
 }
 
 void MainWindow::closeDevs()
@@ -252,7 +154,7 @@ void MainWindow::on_currentTimer_timeout()
     ui->coilCurrMeasDoubleSpinBox->setValue(lcd_info.read_A);
     ui->coilVoltMeasDoubleSpinBox->setValue(lcd_info.read_V);
 
-    // update coil current 
+    // update coil current
     if (!ui->sweepingWidget->isEnabled())
         return;
 
@@ -340,13 +242,20 @@ void MainWindow::on_currentTimer_timeout()
     sdp_set_curr(&sdp, fabs(procI));
 }
 
-MainWindow::Steps_t::Steps_t(const Step_t *begin, const Step_t *end)
+void MainWindow::on_measTimer_timeout()
 {
-    reserve(end - begin);
-    for (; begin < end; ++begin) {
-        append(*begin);
+    if (stepCurrent != stepsRunning.end()) {
+        if (stepCurrent->func(this)) {
+            measTimer.start(stepCurrent->delay);
+            ++stepCurrent;
+            return;
+        }
     }
+    ui->coilGroupBox->setEnabled(true);
+    ui->sampleGroupBox->setEnabled(true);
+    measRunning = false;
 }
+
 
 void MainWindow::on_measurePushButton_clicked()
 {
@@ -395,6 +304,17 @@ void MainWindow::on_samplePolCrossCheckBox_toggled(bool )
 void MainWindow::on_samplePowerCheckBox_toggled(bool checked)
 {
     ps622Hack.setOutput(checked);
+}
+
+void MainWindow::on_startPushButton_clicked()
+{
+    ui->coilGroupBox->setEnabled(measRunning);
+    ui->sampleGroupBox->setEnabled(measRunning);
+    measRunning = !measRunning;
+    if (measRunning)
+        ui->startPushButton->setText("Stop");
+    else
+        ui->startPushButton->setText("Stop");
 }
 
 bool MainWindow::openDevs()
@@ -564,14 +484,94 @@ void MainWindow::startApp()
     configUI.show();
 }
 
-
-void MainWindow::on_startPushButton_clicked()
+bool MainWindow::stepAbort(MainWindow *)
 {
-    ui->coilGroupBox->setEnabled(measRunning);
-    ui->sampleGroupBox->setEnabled(measRunning);
-    measRunning = !measRunning;
-    if (measRunning)
-        ui->startPushButton->setText("Stop");
-    else
-        ui->startPushButton->setText("Stop");
+    return false;
+}
+
+bool MainWindow::stepCreateLoopMark(MainWindow *this_)
+{
+    this_->stepLoopMark = this_->stepCurrent + 1;
+
+    return true;
+}
+
+bool MainWindow::stepFinish(MainWindow *this_)
+{
+    this_->csvFile.write();
+
+    return true;
+}
+
+bool MainWindow::stepGetTime(MainWindow *this_)
+{
+    QString s;
+
+    s = this_->csvFile.setAt(csvColTime, QDateTime::currentDateTimeUtc());
+    this_->ui->dataTableWidget->setItem(0, 3, new QTableWidgetItem(s));
+
+    return true;
+}
+
+bool MainWindow::stepMeasHallProbe(MainWindow *this_)
+{
+    QStringList data;
+    bool ok;
+    double val;
+
+    data = this_->hp34970Hack.read();
+
+    if (data.size() == 1) {
+        val = QVariant(data[0]).toDouble(&ok);
+        this_->csvFile.setAt(csvColHallProbeU, val);
+        val = -30.588 + sqrt(934.773 + 392.163 * val);
+        this_->ui->coilBDoubleSpinBox->setValue(val);
+        this_->csvFile.setAt(csvColHallProbeB, val);
+    }
+    else {
+        throw new std::runtime_error("Could not get B data.");
+    }
+
+    return true;
+}
+
+bool MainWindow::stepMeasHallProbeFinish(MainWindow *this_)
+{
+    this_->ps622Hack.setOutput(false);
+
+    HP34970hack::Channels_t closeChannels;
+    this_->hp34970Hack.setRoute(closeChannels, _34903A);
+
+    return true;
+}
+
+bool MainWindow::stepMeasHallProbePrepare(MainWindow *this_)
+{
+    const double hallProbeI = 0.001;
+    /* set current to 1mA, open probe current source */
+    this_->ps622Hack.setCurrent(hallProbeI);
+    this_->csvFile.setAt(csvColHallProbeI, hallProbeI);
+
+    HP34970hack::Channels_t closeChannels;
+    closeChannels.append(_34903A_hall_probe_1_pwr_m);
+    closeChannels.append(_34903A_hall_probe_2_pwr_p);
+    this_->hp34970Hack.setRoute(closeChannels, _34903A);
+
+    HP34970hack::Channels_t scan;
+    scan.append(MainWindow::_34901A_hall_probe);
+    this_->hp34970Hack.setScan(scan);
+    this_->hp34970Hack.init();
+
+    this_->ps622Hack.setOutput(true);
+
+    return true;
+}
+
+bool MainWindow::stepOpenAllRoutes(MainWindow *this_)
+{
+    HP34970hack::Channels_t closeChannels;
+
+    this_->hp34970Hack.setRoute(closeChannels, _34903A);
+
+    return true;
 }
