@@ -296,17 +296,6 @@ void MainWindow::on_currentTimer_timeout()
             .arg(wantI).arg(wantCoilSwitchState).arg(wantCoilPower));
 
     /* Make process decision. */
-    // Target reach, finish job
-    if (fabs(procI - wantI) < currentSlope) {
-        ui->sweepingWidget->setEnabled(false);
-        if (!wantCoilPower && fabs(procI) <= currentSlope && procCoilPower) {
-            if ( sdp_set_output(&sdp, 0) < 0)
-                throw new std::runtime_error("timer - sdp_set_output");
-        }
-
-        return;
-    }
-
     // Need switch polarity?
     if (procCoilSwitchState != wantCoilSwitchState) {
         // Is polarity switch posible? (power is off)
@@ -322,6 +311,17 @@ void MainWindow::on_currentTimer_timeout()
         }
 
         // set current near to zero before polarity switching
+    }
+
+    // Target reach, finish job
+    if (fabs(procI - wantI) < currentSlope) {
+        ui->sweepingWidget->setEnabled(false);
+        if (!wantCoilPower && fabs(procI) <= currentSlope && procCoilPower) {
+            if (sdp_set_output(&sdp, 0) < 0)
+                throw new std::runtime_error("timer - sdp_set_output");
+        }
+
+        return;
     }
 
     // want current but power is off -> set power on at current 0.0 A
