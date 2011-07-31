@@ -19,9 +19,8 @@ protected:
     /** C locale, used to convert numbers to strig etc. */
     QLocale localeC;
 
-    QCSVFile();
-
 public:
+    QCSVFile();
     QCSVFile(int columns);
     QChar cellSeparator() { return _cellSeparator_; }
     void close();

@@ -340,40 +340,6 @@ void MainWindow::on_currentTimer_timeout()
     sdp_set_curr(&sdp, fabs(procI));
 }
 
-/** Column separator. */
-const char cellSeparator[] = ",";
-/** Decimal separator used in file for floating point numbers. */
-const char decimalSeparator[] = ".";
-/** Decimal separator specified by locale settings. */
-const char localDecimalSeparator[] = ",";
-
-static QString csvRowAppendColumn(QString row, double val)
-{
-    /** CSV cell template. */
-    QString cell("%1");
-
-    cell = cell.arg(val);
-    if (localDecimalSeparator != decimalSeparator)
-        cell = cell.replace(decimalSeparator, localDecimalSeparator);
-
-    if (row.isEmpty())
-        return cell;
-
-    return QString("%1%2%3").arg(row).arg(cellSeparator).arg(cell);
-}
-
-static QString csvRowAppendColumn(QString row, QString cell)
-{
-    cell = cell.replace("\"", "\"\"");
-    if (cell.contains(cellSeparator))
-        cell = QString("\"%1\"").arg(cell);
-
-    if (row.isEmpty())
-        return cell;
-
-    return row + cellSeparator + cell;
-}
-
 MainWindow::Steps_t::Steps_t(const Step_t *begin, const Step_t *end)
 {
     reserve(end - begin);
@@ -384,7 +350,7 @@ MainWindow::Steps_t::Steps_t(const Step_t *begin, const Step_t *end)
 
 void MainWindow::on_measurePushButton_clicked()
 {
-    stepsRunning = Steps_t(
+    /*stepsRunning = Steps_t(
                 stepsMeasure,
                 stepsMeasure + ARRAY_SIZE(stepsMeasure));
     stepCurrent = stepsRunning.begin();
@@ -392,42 +358,38 @@ void MainWindow::on_measurePushButton_clicked()
     measTimer.start(0);
     measRunning = true;
 
-    return;
+    return;*/
 
-    QString csvRow;
     QString s;
     double val;
 
     ui->dataTableWidget->insertRow(0);
 
-    s = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-    csvRow = csvRowAppendColumn(csvRow, s);
+    s = csvFile.setAt(0, QDateTime::currentDateTime());
     ui->dataTableWidget->setItem(0, 3, new QTableWidgetItem(s));
 
     val = ui->coilCurrMeasDoubleSpinBox->value();
-    csvRow = csvRowAppendColumn(csvRow, val);
-    s = ui->coilCurrMeasDoubleSpinBox->text();
+    s = csvFile.setAt(1, val);
     ui->dataTableWidget->setItem(0, 0, new QTableWidgetItem(s));
 
     val = ui->coilVoltMeasDoubleSpinBox->value();
-    csvRow = csvRowAppendColumn(csvRow, val);
+    csvFile.setAt(2, val);
 
     val = ui->coilCurrDoubleSpinBox->value();
-    csvRow = csvRowAppendColumn(csvRow, val);
+    csvFile.setAt(3, val);
 
     val = ui->sampleCurrDoubleSpinBox->value();
-    csvRow = csvRowAppendColumn(csvRow, val);
-    s = ui->sampleCurrDoubleSpinBox->text();
+    s = csvFile.setAt(4, val);
     ui->dataTableWidget->setItem(0, 1, new QTableWidgetItem(s));
 
-    QStringList cells(hp34970Hack.read());
+    /*QStringList cells(hp34970Hack.read());
     for (QStringList::const_iterator cell(cells.begin());
                 cell != cells.end();
                 ++cell)
         csvRow = csvRowAppendColumn(csvRow, *cell);
-    ui->plainTextEdit->appendPlainText(s);
+    ui->plainTextEdit->appendPlainText(s);*/
 
-    csvFile.write(csvRow.toUtf8());
+    csvFile.write();
 }
 
 void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
@@ -447,13 +409,6 @@ void MainWindow::on_samplePowerCheckBox_toggled(bool checked)
 
 bool MainWindow::openDevs()
 {
-    QString csvHeader("Time,"
-                      "coil curr. meas. [A],"
-                      "coil volt. meas. [V],"
-                      "coil curr want. [A],"
-                      "sample curr. want. [A],"
-                      "sample hall [V]"
-                      "\r\n");
     /** Text and title shown in error message box */
     QString err_text, err_title;
     QString s;
@@ -522,10 +477,17 @@ bool MainWindow::openDevs()
     // Open CSV file to save data
     s = settings.value(ConfigUI::cfg_fileName).toString();
     csvFile.setFileName(s);
-    if (!csvFile.open(QFile::WriteOnly | QFile::Truncate))
+    if (!csvFile.open())
         goto file_err;
 
-    csvFile.write(csvHeader.toUtf8());
+    csvFile.resize(6);
+    csvFile[0] = "Time";
+    csvFile[1] = "coil curr. meas. [A]";
+    csvFile[2] = "coil volt. meas. [V]";
+    csvFile[3] = "coil curr want. [A]";
+    csvFile[4] = "sample curr. want. [A]";
+    csvFile[5] = "sample hall [V]";
+    csvFile.write();
 
     // Open and setup HP34970 device
     s = settings.value(ConfigUI::cfg_agilentPort).toString();

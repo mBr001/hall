@@ -1,6 +1,16 @@
 #include "qcsvfile.h"
 #include <QStringList>
 
+QCSVFile::QCSVFile() :
+    QVector<QString>(),
+    _cellSeparator_(','),
+    _decimalPoint_('.'),
+    file(),
+    firstRow(true),
+    localeC(QLocale::c())
+{
+}
+
 QCSVFile::QCSVFile(int columns) :
     QVector<QString>(columns),
     _cellSeparator_(','),

@@ -1,16 +1,16 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QFile>
 #include <QMainWindow>
 #include <QSettings>
 #include <QTimer>
 #include <msdp2xxx.h>
 
 #include "configui.h"
+#include "hp34970hack.h"
 #include "powpolswitch.h"
 #include "ps6220hack.h"
-#include "hp34970hack.h"
+#include "qcsvfile.h"
 
 
 namespace Ui {
@@ -133,8 +133,8 @@ private:
     PwrPolSwitch pwrPolSwitch;
     /** Keithlay PS 6220 hacky class. */
     PS6220Hack ps622Hack;
-    /** File to same measured data. */
-    QFile csvFile;
+    /** File to save measured data. */
+    QCSVFile csvFile;
     /** HP 34970A device to measure voltage and resistivity. */
     HP34970hack hp34970Hack;
     /** User interface widgets */
