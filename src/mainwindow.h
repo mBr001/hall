@@ -158,10 +158,16 @@ private:
     /** User interface widgets */
     Ui::MainWindow *ui;
 
+    /** Close all devices, eg. power supply, Agilent, switch, ... */
+    void closeDevs();
     /** Abort measurement. */
     void measureAbort();
     /** Start prepared measurement steps. */
     void measureStart();
+    /** Open all devices. */
+    bool openDevs();
+    /** Read single value from 34901A. */
+    double readSingle();
     /* Steps for Hall measurement automation */
     /** Abort process. */
     static bool stepAbort(MainWindow *this_);
@@ -179,10 +185,10 @@ private:
     static bool stepMeasHallProbe(MainWindow *this_);
     /** Clean up after measurement on hall probe. */
     static bool stepMeasHallProbeFinish(MainWindow *this_);
-    /** Close all devices, eg. power supply, Agilent, switch, ... */
-    void closeDevs();
-    /** Open all devices. */
-    bool openDevs();
+    /** Set sample power source power. */
+    static bool stepSamplePower_mp(MainWindow *this_);
+    /** Set sample power source power (reversed). */
+    static bool stepSamplePower_pm(MainWindow *this_);
 };
 
 #endif // MAINWINDOW_H

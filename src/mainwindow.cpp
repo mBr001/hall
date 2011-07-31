@@ -483,6 +483,20 @@ sdp_err0:
     return false;
 }
 
+double MainWindow::readSingle()
+{
+    QStringList data(hp34970Hack.read());
+    if (data.size() != 1) {
+        throw new std::runtime_error("Could not get B data.");
+    }
+
+    bool ok;
+    double val(QVariant(data[0]).toDouble(&ok));
+    if (!ok)
+        return NAN;
+    return val;
+}
+
 void MainWindow::show()
 {
     if (!openDevs()) {
@@ -498,6 +512,57 @@ void MainWindow::startApp()
 {
     configUI.show();
 }
+
+bool MainWindow::stepSamplePower_mp(MainWindow *this_)
+{
+    this_->ps622Hack.setOutput(false);
+
+    double val(this_->ui->sampleCurrDoubleSpinBox->value());
+    this_->ps622Hack.setCurrent(-val);
+
+    return true;
+}
+
+bool MainWindow::stepSamplePower_pm(MainWindow *this_)
+{
+    this_->ps622Hack.setOutput(false);
+
+    double val(this_->ui->sampleCurrDoubleSpinBox->value());
+    this_->ps622Hack.setCurrent(val);
+
+    return true;
+}
+
+
+/*bool MainWindow::stepSamplePower_ab(MainWindow *this_)
+{
+    HP34970hack::Channels_t channels;
+    channels.append(_34903A_sample_a_pwr_m);
+    channels.append(_34903A_sample_b_pwr_p);
+    this_->hp34970Hack.setRoute(channels, _34903A);
+
+    return true;
+}
+
+bool MainWindow::stepSampleMeas_cd_Prepare(MainWindow *this_)
+{
+    HP34970hack::Channels_t channels;
+    channels.clear();
+    channels.append(_34901A_sample_cd);
+    this_->hp34970Hack.setScan(channels);
+
+    return true;
+}
+
+bool MainWindow::stepSample_dc_Power_ab_Meas(MainWindow *this_)
+{
+    double val;
+
+    val = this_->readSingle();
+
+    return true;
+}
+*/
 
 bool MainWindow::stepAbort(MainWindow *)
 {
@@ -530,22 +595,13 @@ bool MainWindow::stepGetTime(MainWindow *this_)
 
 bool MainWindow::stepMeasHallProbe(MainWindow *this_)
 {
-    QStringList data;
-    bool ok;
-    double val;
+    double val(this_->readSingle());
 
-    data = this_->hp34970Hack.read();
-
-    if (data.size() == 1) {
-        val = QVariant(data[0]).toDouble(&ok);
-        this_->csvFile.setAt(csvColHallProbeU, val);
-        val = -30.588 + sqrt(934.773 + 392.163 * val);
-        this_->ui->coilBDoubleSpinBox->setValue(val);
-        this_->csvFile.setAt(csvColHallProbeB, val);
-    }
-    else {
-        throw new std::runtime_error("Could not get B data.");
-    }
+    this_->csvFile.setAt(csvColHallProbeU, val);
+    // Some math magic to get B
+    val = -30.588 + sqrt(934.773 + 392.163 * val);
+    this_->ui->coilBDoubleSpinBox->setValue(val);
+    this_->csvFile.setAt(csvColHallProbeB, val);
 
     return true;
 }
