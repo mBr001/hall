@@ -121,6 +121,26 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QMainWindow::closeEvent(event);
 }
 
+void MainWindow::measureAbort()
+{
+    measTimer.stop();
+    measRunning = false;
+    ui->coilGroupBox->setEnabled(true);
+    ui->sampleGroupBox->setEnabled(true);
+    ui->measurePushButton->setEnabled(true);
+    ui->startPushButton->setText("Start");
+}
+
+void MainWindow::measureStart()
+{
+    measTimer.start(0);
+    measRunning = true;
+    ui->coilGroupBox->setEnabled(false);
+    ui->sampleGroupBox->setEnabled(false);
+    ui->measurePushButton->setEnabled(false);
+    ui->startPushButton->setText("Abort");
+}
+
 void MainWindow::on_coilCurrDoubleSpinBox_valueChanged(double )
 {
     ui->sweepingWidget->setEnabled(true);
@@ -251,9 +271,7 @@ void MainWindow::on_measTimer_timeout()
             return;
         }
     }
-    ui->coilGroupBox->setEnabled(true);
-    ui->sampleGroupBox->setEnabled(true);
-    measRunning = false;
+    measureAbort();
 }
 
 
@@ -266,10 +284,7 @@ void MainWindow::on_measurePushButton_clicked()
                 stepsMeasure + ARRAY_SIZE(stepsMeasure));
     stepCurrent = stepsRunning.begin();
 
-    measTimer.start(0);
-    measRunning = true;
-    ui->coilGroupBox->setEnabled(false);
-    ui->sampleGroupBox->setEnabled(false);
+    measureStart();
 
     return;
 
@@ -308,13 +323,13 @@ void MainWindow::on_samplePowerCheckBox_toggled(bool checked)
 
 void MainWindow::on_startPushButton_clicked()
 {
-    ui->coilGroupBox->setEnabled(measRunning);
-    ui->sampleGroupBox->setEnabled(measRunning);
-    measRunning = !measRunning;
-    if (measRunning)
-        ui->startPushButton->setText("Stop");
-    else
-        ui->startPushButton->setText("Stop");
+    if (measRunning) {
+        measureAbort();
+    }
+    else {
+        // TODO
+        //measureStart();
+    }
 }
 
 bool MainWindow::openDevs()

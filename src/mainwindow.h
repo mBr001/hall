@@ -158,6 +158,10 @@ private:
     /** User interface widgets */
     Ui::MainWindow *ui;
 
+    /** Abort measurement. */
+    void measureAbort();
+    /** Start prepared measurement steps. */
+    void measureStart();
     /* Steps for Hall measurement automation */
     /** Abort process. */
     static bool stepAbort(MainWindow *this_);
