@@ -96,6 +96,24 @@ private:
     /** 34903A: hall probe - pin 2 <-> current source (+) */
     static const int _34903A_hall_probe_2_pwr_p;
 
+    /** Indexes of columns in CSV file with data from experiment. */
+    enum {
+        csvColTime = 0,
+        csvColHallProbeI,
+        csvColHallProbeU,
+        csvColHallProbeB,
+        csvColSampleI,
+        csvColSampleUabF,
+        csvColSampleUabB,
+        csvColSampleUbcF,
+        csvColSampleUbcB,
+        csvColSampleUcdF,
+        csvColSampleUcdB,
+        csvColSampleUdaF,
+        csvColSampleUdaB,
+        /** csvColEnd is number of columns we have. */
+        csvColEnd,
+    };
     /** Fully automated measurement in progress */
     bool measRunning;
     /** Array of steps for fully automatized Hall measurement. */
@@ -141,19 +159,22 @@ private:
     Ui::MainWindow *ui;
 
     /* Steps for Hall measurement automation */
-    /*static bool auto00(MainWindow *this_);
-    static bool auto01(MainWindow *this_);
-    static bool auto02(MainWindow *this_);
-    static bool auto03(MainWindow *this_);
-    static bool auto04(MainWindow *this_);
-    static bool auto05(MainWindow *this_);
-    static bool auto06(MainWindow *this_);
-    static bool auto07(MainWindow *this_);*/
-    static bool stepOpenAllRoutes(MainWindow *this_);
-    static bool stepMeasB_01(MainWindow *this_);
-    static bool stepMeasB_02(MainWindow *this_);
-    static bool stepCreateLoopMark(MainWindow *this_);
+    /** Abort process. */
     static bool stepAbort(MainWindow *this_);
+    /** Put loop mark, record position where to return with stepLoopIf... . */
+    static bool stepCreateLoopMark(MainWindow *this_);
+    /** Finish measurement, write data into file etc. . */
+    static bool stepFinish(MainWindow *this_);
+    /** Get current time and put in into measurement data. */
+    static bool stepGetTime(MainWindow *this_);
+    /** Open all routes (clean up). */
+    static bool stepOpenAllRoutes(MainWindow *this_);
+    /** Prepare measurement on hall probe. */
+    static bool stepMeasHallProbePrepare(MainWindow *this_);
+    /** Do measurement on hall probe. */
+    static bool stepMeasHallProbe(MainWindow *this_);
+    /** Clean up after measurement on hall probe. */
+    static bool stepMeasHallProbeFinish(MainWindow *this_);
     /** Close all devices, eg. power supply, Agilent, switch, ... */
     void closeDevs();
     /** Open all devices. */
