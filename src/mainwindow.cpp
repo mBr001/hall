@@ -188,8 +188,21 @@ void MainWindow::closeDevs()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (configUI.isHidden() && configUI.result() == QDialog::Accepted) {
-        closeDevs();
         event->ignore();
+        if (ui->coilPowerCheckBox->isChecked() ||
+                ui->coilPolCrossCheckBox->isChecked() ||
+                ui->samplePowerCheckBox->isChecked()) {
+            if (QMessageBox::warning(
+                        this, "Power is still on!",
+                        "Power is still on and should be turned (slowly!) "
+                        "off before end of experiment.\n\n"
+                        "Exit experiment withought shutdown?",
+                        QMessageBox::Yes, QMessageBox::No) != QMessageBox::Yes) {
+                // TODO: Offer automated shut down.
+                return;
+            }
+        }
+        closeDevs();
         hide();
         configUI.show();
 
