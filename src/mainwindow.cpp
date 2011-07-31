@@ -171,7 +171,14 @@ bool MainWindow::stepAbort(MainWindow *)
 
 void MainWindow::on_measTimer_timeout()
 {
-    // TODO ...
+    if (stepCurrent != stepsRunning.end()) {
+        if (stepCurrent->func(this)) {
+            measTimer.start(stepCurrent->delay);
+            ++stepCurrent;
+            return;
+        }
+    }
+    measRunning = false;
 }
 
 void MainWindow::closeDevs()
@@ -377,6 +384,16 @@ MainWindow::Steps_t::Steps_t(const Step_t *begin, const Step_t *end)
 
 void MainWindow::on_measurePushButton_clicked()
 {
+    stepsRunning = Steps_t(
+                stepsMeasure,
+                stepsMeasure + ARRAY_SIZE(stepsMeasure));
+    stepCurrent = stepsRunning.begin();
+
+    measTimer.start(0);
+    measRunning = true;
+
+    return;
+
     QString csvRow;
     QString s;
     double val;
@@ -409,12 +426,6 @@ void MainWindow::on_measurePushButton_clicked()
                 ++cell)
         csvRow = csvRowAppendColumn(csvRow, *cell);
     ui->plainTextEdit->appendPlainText(s);
-    // TODO: inset hall U
-
-    stepsRunning = Steps_t(
-                stepsMeasure,
-                stepsMeasure + ARRAY_SIZE(stepsMeasure));
-    stepCurrent = stepsRunning.begin();
 
     csvFile.write(csvRow.toUtf8());
 }
@@ -604,14 +615,4 @@ void MainWindow::on_startPushButton_clicked()
         ui->startPushButton->setText("Stop");
     else
         ui->startPushButton->setText("Stop");
-}
-
-void MainWindow::on_toolButton_3_clicked()
-{
-    stepMeasB_01(this);
-}
-
-void MainWindow::on_toolButton_2_clicked()
-{
-    stepMeasB_02(this);
 }
