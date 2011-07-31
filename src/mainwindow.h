@@ -32,7 +32,7 @@ public slots:
     void show();
 
 private slots:
-    void on_automationTimer_timeout();
+    void on_measTimer_timeout();
     void on_coilCurrDoubleSpinBox_valueChanged(double );
     void on_coilPolCrossCheckBox_toggled(bool checked);
     void on_coilPowerCheckBox_toggled(bool checked);
@@ -48,14 +48,25 @@ private slots:
     void on_toolButton_2_clicked();
 
 private:
+    /** Comprises one timed task in measurement automation. */
     typedef struct {
         /** Function to call.
-            @return true if next function should be called, false should cause
-                automation process abort. */
+            @return true to continue measurement, false to abort measurement. */
         bool (*func)(MainWindow *this_);
-        /** Delay before next function execution. */
+        /** Delay before next step execution. */
         int delay;
-    } automationStep_t;
+    } Step_t;
+
+    /** Series of measurement automation steps. */
+    class Steps_t : public QVector<Step_t>
+    {
+    public:
+        Steps_t() : QVector<Step_t>() {};
+        /** Initiate steps from array of steps in form <begin, end).
+            @par begin pointer to first element of array.
+            @par end pointer behind last element of array.  */
+        Steps_t(const Step_t *begin, const Step_t *end);
+    };
 
     /** Channel offset for 34901A card */
     static const int _34901A;
@@ -90,19 +101,19 @@ private:
     static const int _34903A_hall_probe_2_pwr_p;
 
     /** Fully automated measurement in progress */
-    bool autoRunning;
-    /** Array of steps and loop marks for automated Hall measurement. */
-    static const automationStep_t autoSteps[];
+    bool measRunning;
+    /** Array of steps for fully automatized Hall measurement. */
+    static const Step_t stepsAll[];
     /** Array of steps for single "hand made" measurement. */
-    static const automationStep_t measureSteps[];
-    /** Vector of steps created from autoSteps */
-    static const QVector<automationStep_t> autoStepsVect;
+    static const Step_t stepsMeasure[];
+    /** Vector of steps to run, created from autoSteps. */
+    Steps_t stepsRunning;
     /** Current step of automated Hall measurement. */
-    std::vector<automationStep_t>::const_iterator autoStepCurrent;
+    Steps_t::const_iterator stepCurrent;
     /** Dinamic "mark" in hall automation steps for loops. */
-    std::vector<automationStep_t>::const_iterator autoStepMark;
+    Steps_t::const_iterator stepLoopMark;
     /** Timer used for fully automated testing process. */
-    QTimer automationTimer;
+    QTimer measTimer;
     /** Configuration dialog. */
     ConfigUI configUI;
     /** HTML string to show colored "+ -". */
@@ -134,19 +145,19 @@ private:
     Ui::MainWindow *ui;
 
     /* Steps for Hall measurement automation */
-    static bool auto00(MainWindow *this_);
+    /*static bool auto00(MainWindow *this_);
     static bool auto01(MainWindow *this_);
     static bool auto02(MainWindow *this_);
     static bool auto03(MainWindow *this_);
     static bool auto04(MainWindow *this_);
     static bool auto05(MainWindow *this_);
     static bool auto06(MainWindow *this_);
-    static bool auto07(MainWindow *this_);
-    static bool autoOpenAll(MainWindow *this_);
-    static bool autoMeasB_01(MainWindow *this_);
-    static bool autoMeasB_02(MainWindow *this_);
-    static bool autoMark(MainWindow *this_);
-    static bool autoStop(MainWindow *this_);
+    static bool auto07(MainWindow *this_);*/
+    static bool stepOpenAllRoutes(MainWindow *this_);
+    static bool stepMeasB_01(MainWindow *this_);
+    static bool stepMeasB_02(MainWindow *this_);
+    static bool stepCreateLoopMark(MainWindow *this_);
+    static bool stepAbort(MainWindow *this_);
     /** Close all devices, eg. power supply, Agilent, switch, ... */
     void closeDevs();
     /** Open all devices. */

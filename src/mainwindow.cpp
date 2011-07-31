@@ -35,24 +35,20 @@ const int MainWindow::_34903A_pwr_sw1_pwr_p = _34903A + 6;
 const int MainWindow::_34903A_hall_probe_1_pwr_m = _34903A + 9;
 const int MainWindow::_34903A_hall_probe_2_pwr_p = _34903A + 10;
 
-const MainWindow::automationStep_t MainWindow::autoSteps[] = {
-    {
-       autoStop, 0,
-    },
+const MainWindow::Step_t MainWindow::stepsAll[] = {
+    {   stepAbort, 0,    },
 };
 
-const MainWindow::automationStep_t MainWindow::measureSteps[] = {
-    {
-        autoStop, 0,
-    }
+const MainWindow::Step_t MainWindow::stepsMeasure[] = {
+    {   stepOpenAllRoutes, 10,    },
+    {   stepMeasB_01, 50 },
+    {   stepMeasB_02, 0 },
+    {   stepAbort, 0,    },
 };
-
-const QVector<MainWindow::automationStep_t>
-        MainWindow::autoStepsVect((int)ARRAY_SIZE(MainWindow::autoSteps), MainWindow::autoSteps[0]);
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    autoRunning(false),
+    measRunning(false),
     configUI(),
     ui(new Ui::MainWindow)
 {
@@ -66,16 +62,16 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&coilTimer, SIGNAL(timeout()), this,
                      SLOT(on_currentTimer_timeout()));
 
-    automationTimer.setSingleShot(true);
-    QObject::connect(&automationTimer, SIGNAL(timeout()), this,
-                     SLOT(on_automationTimer_timeout()));
+    measTimer.setSingleShot(true);
+    QObject::connect(&measTimer, SIGNAL(timeout()), this,
+                     SLOT(on_measTimer_timeout()));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
-
+/*
 bool MainWindow::auto00(MainWindow *this_)
 {
     return false;
@@ -116,9 +112,9 @@ bool MainWindow::auto06(MainWindow *this_)
 bool MainWindow::auto07(MainWindow *this_)
 {
     return false;
-}
+}*/
 
-bool MainWindow::autoOpenAll(MainWindow *this_)
+bool MainWindow::stepOpenAllRoutes(MainWindow *this_)
 {
     HP34970hack::Channels_t closeChannels;
 
@@ -127,7 +123,7 @@ bool MainWindow::autoOpenAll(MainWindow *this_)
     return false;
 }
 
-bool MainWindow::autoMeasB_01(MainWindow *this_)
+bool MainWindow::stepMeasB_01(MainWindow *this_)
 {
     /* set current to 1mA, open probe current source */
     this_->ps622Hack.setCurrent(0.001);
@@ -145,7 +141,7 @@ bool MainWindow::autoMeasB_01(MainWindow *this_)
     return true;
 }
 
-bool MainWindow::autoMeasB_02(MainWindow *this_)
+bool MainWindow::stepMeasB_02(MainWindow *this_)
 {
     QStringList data;
     bool ok;
@@ -161,19 +157,19 @@ bool MainWindow::autoMeasB_02(MainWindow *this_)
     return true;
 }
 
-bool MainWindow::autoMark(MainWindow *this_)
+bool MainWindow::stepCreateLoopMark(MainWindow *this_)
 {
-    this_->autoStepMark = this_->autoStepCurrent + 1;
+    this_->stepLoopMark = this_->stepCurrent + 1;
 
     return true;
 }
 
-bool MainWindow::autoStop(MainWindow *this_)
+bool MainWindow::stepAbort(MainWindow *)
 {
     return false;
 }
 
-void MainWindow::on_automationTimer_timeout()
+void MainWindow::on_measTimer_timeout()
 {
     // TODO ...
 }
@@ -358,6 +354,14 @@ static QString csvRowAppendColumn(QString row, QString cell)
     return row + cellSeparator + cell;
 }
 
+MainWindow::Steps_t::Steps_t(const Step_t *begin, const Step_t *end)
+{
+    reserve(end - begin);
+    for (; begin < end; ++begin) {
+        append(*begin);
+    }
+}
+
 void MainWindow::on_measurePushButton_clicked()
 {
     QString csvRow;
@@ -393,6 +397,11 @@ void MainWindow::on_measurePushButton_clicked()
         csvRow = csvRowAppendColumn(csvRow, *cell);
     ui->plainTextEdit->appendPlainText(s);
     // TODO: inset hall U
+
+    stepsRunning = Steps_t(
+                stepsMeasure,
+                stepsMeasure + ARRAY_SIZE(stepsMeasure));
+    stepCurrent = stepsRunning.begin();
 
     csvFile.write(csvRow.toUtf8());
 }
@@ -575,10 +584,10 @@ void MainWindow::startApp()
 
 void MainWindow::on_startPushButton_clicked()
 {
-    ui->coilGroupBox->setEnabled(autoRunning);
-    ui->sampleGroupBox->setEnabled(autoRunning);
-    autoRunning = !autoRunning;
-    if (autoRunning)
+    ui->coilGroupBox->setEnabled(measRunning);
+    ui->sampleGroupBox->setEnabled(measRunning);
+    measRunning = !measRunning;
+    if (measRunning)
         ui->startPushButton->setText("Stop");
     else
         ui->startPushButton->setText("Stop");
@@ -586,10 +595,10 @@ void MainWindow::on_startPushButton_clicked()
 
 void MainWindow::on_toolButton_3_clicked()
 {
-    autoMeasB_01(this);
+    stepMeasB_01(this);
 }
 
 void MainWindow::on_toolButton_2_clicked()
 {
-    autoMeasB_02(this);
+    stepMeasB_02(this);
 }
