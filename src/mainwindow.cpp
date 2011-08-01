@@ -44,7 +44,23 @@ const MainWindow::Step_t MainWindow::stepsMeasure[] = {
     {   stepGetTime, 0 },
     {   stepMeasHallProbePrepare, 100 },
     {   stepMeasHallProbe, 0 },
-    {   stepMeasHallProbeFinish, 0 },
+
+    {   stepSamplePower_pm, 10 },
+    {   stepSamplePower_ba, 100 },
+    {   stepSampleMeasPrepare_ac, 10 },
+    {   stepSampleMeas_ac, 100 },
+    {   stepSamplePower_ca, 100 },
+    {   stepSampleMeasPrepare_bd, 10 },
+    {   stepSampleMeas_bd, 100 },
+
+    {   stepSamplePower_mp, 10 },
+    {   stepSamplePower_ba, 100 },
+    {   stepSampleMeasPrepare_ac, 10 },
+    {   stepSampleMeas_acRev, 100 },
+    {   stepSamplePower_ca, 10 },
+    {   stepSampleMeasPrepare_bd, 10 },
+    {   stepSampleMeas_bdRev, 100 },
+
     {   stepFinish, 0 },
     {   stepAbort, 0 },
 };
@@ -101,6 +117,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         if (ui->coilPowerCheckBox->isChecked() ||
                 ui->coilPolCrossCheckBox->isChecked() ||
                 ui->samplePowerCheckBox->isChecked()) {
+            // TODO: kontrolovat skutečný stav
             if (QMessageBox::warning(
                         this, "Power is still on!",
                         "Power is still on and should be turned (slowly!) "
@@ -411,14 +428,15 @@ bool MainWindow::openDevs()
     csvFile[csvColHallProbeU] = "Hall proble U [V]";
     csvFile[csvColHallProbeB] = "Hall proble B [T]";
     csvFile[csvColSampleI] = "sample I [A]";
-    csvFile[csvColSampleI] = "sample U [V]";
-    csvFile[csvColSampleI] = "sample U [V]";
-    csvFile[csvColSampleI] = "sample U [V]";
-    csvFile[csvColSampleI] = "sample U [V]";
-    csvFile[csvColSampleI] = "sample U [V]";
-    csvFile[csvColSampleI] = "sample U [V]";
-    csvFile[csvColSampleI] = "sample U [V]";
-    csvFile[csvColSampleI] = "sample U [V]";
+    csvFile[csvColSampleUacF] = "sample U ac [V]";
+    csvFile[csvColSampleUacB] = "sample U ac (rev. pol.) [V]";
+    csvFile[csvColSampleUbdF] = "sample U bd[V]";
+    csvFile[csvColSampleUbdB] = "sample U bd (rev. pol.) [V]";
+    csvFile[csvColSampleUcdF] = "sample U cd[V]";
+    csvFile[csvColSampleUcdB] = "sample U cd (rev. pol.) [V]";
+    csvFile[csvColSampleUdaF] = "sample U da[V]";
+    csvFile[csvColSampleUdaB] = "sample U da (rev. pol.) [V]";
+
     csvFile.write();
 
     // Open and setup HP34970 device
@@ -513,6 +531,110 @@ void MainWindow::startApp()
     configUI.show();
 }
 
+bool MainWindow::stepSampleMeas_cd(MainWindow *this_)
+{
+    double val(this_->readSingle());
+    this_->csvFile.setAt(csvColSampleUcdF, val);
+
+    return stepOpenAllRoutes(this_);
+}
+
+bool MainWindow::stepSampleMeas_cdRev(MainWindow *this_)
+{
+    double val(this_->readSingle());
+    this_->csvFile.setAt(csvColSampleUcdB, val);
+
+    return stepOpenAllRoutes(this_);
+}
+
+bool MainWindow::stepSampleMeas_da(MainWindow *this_)
+{
+    double val(this_->readSingle());
+    this_->csvFile.setAt(csvColSampleUdaF, val);
+
+    return stepOpenAllRoutes(this_);
+}
+
+bool MainWindow::stepSampleMeas_daRev(MainWindow *this_)
+{
+    double val(this_->readSingle());
+    this_->csvFile.setAt(csvColSampleUdaB, val);
+
+    return stepOpenAllRoutes(this_);
+}
+
+bool MainWindow::stepSampleMeas_ac(MainWindow *this_)
+{
+    double val(this_->readSingle());
+    this_->csvFile.setAt(csvColSampleUacF, val);
+
+    return stepOpenAllRoutes(this_);
+}
+
+bool MainWindow::stepSampleMeas_acRev(MainWindow *this_)
+{
+    double val(this_->readSingle());
+    this_->csvFile.setAt(csvColSampleUacB, val);
+
+    return stepOpenAllRoutes(this_);
+}
+
+bool MainWindow::stepSampleMeas_bd(MainWindow *this_)
+{
+    double val(this_->readSingle());
+    this_->csvFile.setAt(csvColSampleUbdF, val);
+
+    return stepOpenAllRoutes(this_);
+}
+
+bool MainWindow::stepSampleMeas_bdRev(MainWindow *this_)
+{
+    double val(this_->readSingle());
+    this_->csvFile.setAt(csvColSampleUbdB, val);
+
+    return stepOpenAllRoutes(this_);
+}
+
+bool MainWindow::stepSampleMeasPrepare_cd(MainWindow *this_)
+{
+    HP34970hack::Channels_t scan;
+    scan.append(MainWindow::_34901A_sample_cd);
+    this_->hp34970Hack.setScan(scan);
+    this_->hp34970Hack.init();
+
+    return true;
+}
+
+bool MainWindow::stepSampleMeasPrepare_da(MainWindow *this_)
+{
+    HP34970hack::Channels_t scan;
+    scan.append(MainWindow::_34901A_sample_da);
+    this_->hp34970Hack.setScan(scan);
+    this_->hp34970Hack.init();
+
+    return true;
+}
+
+bool MainWindow::stepSampleMeasPrepare_ac(MainWindow *this_)
+{
+    HP34970hack::Channels_t scan;
+    scan.append(MainWindow::_34901A_sample_ac);
+    this_->hp34970Hack.setScan(scan);
+    this_->hp34970Hack.init();
+
+    return true;
+}
+
+bool MainWindow::stepSampleMeasPrepare_bd(MainWindow *this_)
+{
+    HP34970hack::Channels_t scan;
+    scan.append(MainWindow::_34901A_sample_bd);
+    this_->hp34970Hack.setScan(scan);
+    this_->hp34970Hack.init();
+
+    return true;
+}
+
 bool MainWindow::stepSamplePower_mp(MainWindow *this_)
 {
     this_->ps622Hack.setOutput(false);
@@ -529,40 +651,57 @@ bool MainWindow::stepSamplePower_pm(MainWindow *this_)
 
     double val(this_->ui->sampleCurrDoubleSpinBox->value());
     this_->ps622Hack.setCurrent(val);
+    this_->csvFile.setAt(csvColSampleI, val);
 
     return true;
 }
 
 
-/*bool MainWindow::stepSamplePower_ab(MainWindow *this_)
+bool MainWindow::stepSamplePower_ba(MainWindow *this_)
 {
     HP34970hack::Channels_t channels;
     channels.append(_34903A_sample_a_pwr_m);
     channels.append(_34903A_sample_b_pwr_p);
     this_->hp34970Hack.setRoute(channels, _34903A);
+    this_->ps622Hack.setOutput(true);
 
     return true;
 }
 
-bool MainWindow::stepSampleMeas_cd_Prepare(MainWindow *this_)
+bool MainWindow::stepSamplePower_bc(MainWindow *this_)
 {
     HP34970hack::Channels_t channels;
-    channels.clear();
-    channels.append(_34901A_sample_cd);
-    this_->hp34970Hack.setScan(channels);
+    channels.append(_34903A_sample_b_pwr_p);
+    channels.append(_34903A_sample_c_pwr_sw1);
+    channels.append(_34903A_pwr_sw1_pwr_m);
+    this_->hp34970Hack.setRoute(channels, _34903A);
+    this_->ps622Hack.setOutput(true);
 
     return true;
 }
 
-bool MainWindow::stepSample_dc_Power_ab_Meas(MainWindow *this_)
+bool MainWindow::stepSamplePower_bd(MainWindow *this_)
 {
-    double val;
-
-    val = this_->readSingle();
+    HP34970hack::Channels_t channels;
+    channels.append(_34903A_sample_b_pwr_p);
+    channels.append(_34903A_sample_d_pwr_m);
+    this_->hp34970Hack.setRoute(channels, _34903A);
+    this_->ps622Hack.setOutput(true);
 
     return true;
 }
-*/
+
+bool MainWindow::stepSamplePower_ca(MainWindow *this_)
+{
+    HP34970hack::Channels_t channels;
+    channels.append(_34903A_sample_a_pwr_m);
+    channels.append(_34903A_sample_c_pwr_sw1);
+    channels.append(_34903A_pwr_sw1_pwr_p);
+    this_->hp34970Hack.setRoute(channels, _34903A);
+    this_->ps622Hack.setOutput(true);
+
+    return true;
+}
 
 bool MainWindow::stepAbort(MainWindow *)
 {
@@ -603,17 +742,7 @@ bool MainWindow::stepMeasHallProbe(MainWindow *this_)
     this_->ui->coilBDoubleSpinBox->setValue(val);
     this_->csvFile.setAt(csvColHallProbeB, val);
 
-    return true;
-}
-
-bool MainWindow::stepMeasHallProbeFinish(MainWindow *this_)
-{
-    this_->ps622Hack.setOutput(false);
-
-    HP34970hack::Channels_t closeChannels;
-    this_->hp34970Hack.setRoute(closeChannels, _34903A);
-
-    return true;
+    return stepOpenAllRoutes(this_);
 }
 
 bool MainWindow::stepMeasHallProbePrepare(MainWindow *this_)
@@ -643,6 +772,7 @@ bool MainWindow::stepOpenAllRoutes(MainWindow *this_)
     HP34970hack::Channels_t closeChannels;
 
     this_->hp34970Hack.setRoute(closeChannels, _34903A);
+    this_->ps622Hack.setOutput(false);
 
     return true;
 }

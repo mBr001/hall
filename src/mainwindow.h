@@ -103,10 +103,10 @@ private:
         csvColHallProbeU,
         csvColHallProbeB,
         csvColSampleI,
-        csvColSampleUabF,
-        csvColSampleUabB,
-        csvColSampleUbcF,
-        csvColSampleUbcB,
+        csvColSampleUacF,
+        csvColSampleUacB,
+        csvColSampleUbdF,
+        csvColSampleUbdB,
         csvColSampleUcdF,
         csvColSampleUcdB,
         csvColSampleUdaF,
@@ -183,8 +183,31 @@ private:
     static bool stepMeasHallProbePrepare(MainWindow *this_);
     /** Do measurement on hall probe. */
     static bool stepMeasHallProbe(MainWindow *this_);
-    /** Clean up after measurement on hall probe. */
-    static bool stepMeasHallProbeFinish(MainWindow *this_);
+
+    static bool stepSampleMeas_cd(MainWindow *this_);
+    static bool stepSampleMeas_cdRev(MainWindow *this_);
+    static bool stepSampleMeas_da(MainWindow *this_);
+    static bool stepSampleMeas_daRev(MainWindow *this_);
+    static bool stepSampleMeas_ac(MainWindow *this_);
+    static bool stepSampleMeas_acRev(MainWindow *this_);
+    static bool stepSampleMeas_bd(MainWindow *this_);
+    static bool stepSampleMeas_bdRev(MainWindow *this_);
+    /** Prepare measurement on sample pins c, d. */
+    static bool stepSampleMeasPrepare_cd(MainWindow *this_);
+    /** Prepare measurement on sample pins d, a. */
+    static bool stepSampleMeasPrepare_da(MainWindow *this_);
+    /** Prepare measurement on sample pins a, c. */
+    static bool stepSampleMeasPrepare_ac(MainWindow *this_);
+    /** Prepare measurement on sample pins b, d. */
+    static bool stepSampleMeasPrepare_bd(MainWindow *this_);
+    /** Put power on sample on pins (b, a) = (+, -) */
+    static bool stepSamplePower_ba(MainWindow *this_);
+    /** Put power on sample on pins (b, c) = (+, -) */
+    static bool stepSamplePower_bc(MainWindow *this_);
+    /** Put power on sample on pins (b, d) = (+, -) */
+    static bool stepSamplePower_bd(MainWindow *this_);
+    /** Put power on sample on pins (c, a) = (+, -) */
+    static bool stepSamplePower_ca(MainWindow *this_);
     /** Set sample power source power. */
     static bool stepSamplePower_mp(MainWindow *this_);
     /** Set sample power source power (reversed). */
