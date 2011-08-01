@@ -33,6 +33,9 @@ QString QCSVFile::errorString() const
 
 bool QCSVFile::open()
 {
+    if (file.isOpen())
+        file.close();
+    firstRow = true;
     return file.open(QFile::WriteOnly | QFile::Truncate);
 }
 
