@@ -46,20 +46,34 @@ const MainWindow::Step_t MainWindow::stepsMeasure[] = {
     {   stepMeasHallProbe, 0 },
 
     {   stepSamplePower_pm, 10 },
-    {   stepSamplePower_ba, 100 },
+    {   stepSamplePower_bd, 100 },
     {   stepSampleMeasPrepare_ac, 10 },
     {   stepSampleMeas_ac, 100 },
     {   stepSamplePower_ca, 100 },
     {   stepSampleMeasPrepare_bd, 10 },
     {   stepSampleMeas_bd, 100 },
 
-    {   stepSamplePower_mp, 10 },
     {   stepSamplePower_ba, 100 },
+    {   stepSampleMeasPrepare_cd, 10 },
+    {   stepSampleMeas_cd, 100 },
+    {   stepSamplePower_bc, 100 },
+    {   stepSampleMeasPrepare_da, 10 },
+    {   stepSampleMeas_da, 100 },
+
+    {   stepSamplePower_mp, 10 },
+    {   stepSamplePower_bd, 100 },
     {   stepSampleMeasPrepare_ac, 10 },
     {   stepSampleMeas_acRev, 100 },
     {   stepSamplePower_ca, 10 },
     {   stepSampleMeasPrepare_bd, 10 },
     {   stepSampleMeas_bdRev, 100 },
+
+    {   stepSamplePower_ba, 100 },
+    {   stepSampleMeasPrepare_cd, 10 },
+    {   stepSampleMeas_cdRev, 100 },
+    {   stepSamplePower_bc, 100 },
+    {   stepSampleMeasPrepare_da, 10 },
+    {   stepSampleMeas_daRev, 100 },
 
     {   stepFinish, 0 },
     {   stepAbort, 0 },
@@ -428,14 +442,14 @@ bool MainWindow::openDevs()
     csvFile[csvColHallProbeU] = "Hall proble U [V]";
     csvFile[csvColHallProbeB] = "Hall proble B [T]";
     csvFile[csvColSampleI] = "sample I [A]";
-    csvFile[csvColSampleUacF] = "sample U ac [V]";
-    csvFile[csvColSampleUacB] = "sample U ac (rev. pol.) [V]";
-    csvFile[csvColSampleUbdF] = "sample U bd[V]";
-    csvFile[csvColSampleUbdB] = "sample U bd (rev. pol.) [V]";
-    csvFile[csvColSampleUcdF] = "sample U cd[V]";
-    csvFile[csvColSampleUcdB] = "sample U cd (rev. pol.) [V]";
-    csvFile[csvColSampleUdaF] = "sample U da[V]";
-    csvFile[csvColSampleUdaB] = "sample U da (rev. pol.) [V]";
+    csvFile[csvColSampleUacF] = "sample Uac/+- [V]";
+    csvFile[csvColSampleUacB] = "sample Uac/-+ [V]";
+    csvFile[csvColSampleUbdF] = "sample Ubd/+- [V]";
+    csvFile[csvColSampleUbdB] = "sample Ubd/-+ [V]";
+    csvFile[csvColSampleUcdF] = "sample Ucd/+- [V]";
+    csvFile[csvColSampleUcdB] = "sample Ucd/-+ [V]";
+    csvFile[csvColSampleUdaF] = "sample Uda/+- [V]";
+    csvFile[csvColSampleUdaB] = "sample Uda/-+ [V]";
 
     csvFile.write();
 
