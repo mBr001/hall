@@ -9,7 +9,7 @@ QT       += core gui
 TARGET = hall
 TEMPLATE = app
 
-LIBS += -L/usr/local/lib -lmsdp2xxx
+LIBS += -L/usr/local/lib -lmsdp2xxx -lqwt-qt4
 
 INCLUDEPATH += /usr/local/include
 
