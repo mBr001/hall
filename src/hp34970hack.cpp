@@ -168,12 +168,28 @@ void HP34970hack::close()
     QSerial::close();
 }
 
+QString HP34970hack::formatCmd(const QString &cmd, const Channels_t &channels)
+{
+    if (!channels.size()) {
+        return cmd;
+    }
+
+    QStringList ch;
+    foreach(int channel, channels) {
+        ch.append(QVariant(channel).toString());
+    }
+
+    QString format("%1 (@%2)");
+
+    return format.arg(cmd).arg(ch.join(","));
+}
+
 void HP34970hack::init()
 {
     sendCmd("INIT", 2000000);
 }
 
-bool HP34970hack::open(QString port)
+bool HP34970hack::open(const QString &port)
 {
     const long timeout = (10l * 1000000l) / 9600l;
 
@@ -204,7 +220,7 @@ QStringList HP34970hack::read()
     return data;
 }
 
-void HP34970hack::sendCmd(QString cmd, long timeout)
+void HP34970hack::sendCmd(const QString &cmd, long timeout)
 {
     QString s;
 
@@ -213,7 +229,7 @@ void HP34970hack::sendCmd(QString cmd, long timeout)
         throw new std::runtime_error("P34970hack::cmd response not empty.");
 }
 
-void HP34970hack::sendCmd(QString cmd, const Channels_t &channels, long timeout)
+void HP34970hack::sendCmd(const QString &cmd, const Channels_t &channels, long timeout)
 {
     QString s;
 
@@ -222,10 +238,10 @@ void HP34970hack::sendCmd(QString cmd, const Channels_t &channels, long timeout)
         throw new std::runtime_error("P34970hack::cmd response not empty.");
 }
 
-QString HP34970hack::sendQuery(QString cmd, long timeout)
+QString HP34970hack::sendQuery(const QString &cmd, long timeout)
 {
-    cmd += ";*OPC?\n";
-    write(cmd);
+    QString _cmd(cmd + ";*OPC?\n");
+    write(_cmd);
 
     QString result(readLine(1024, timeout).trimmed());
     if (result == "1")
@@ -236,20 +252,11 @@ QString HP34970hack::sendQuery(QString cmd, long timeout)
     throw new std::runtime_error("P34970hack::sendQuery failed read response.");
 }
 
-QString HP34970hack::sendQuery(QString cmd, const Channels_t &channels, long timeout)
+QString HP34970hack::sendQuery(const QString &cmd, const Channels_t &channels, long timeout)
 {
-    if (channels.size()) {
-        QStringList ch;
+    QString _cmd(formatCmd(cmd, channels));
 
-        foreach(int channel, channels) {
-            ch.append(QVariant(channel).toString());
-        }
-
-        QString format("%1 (@%2)");
-
-        cmd = format.arg(cmd).arg(ch.join(","));
-    }
-    return sendQuery(cmd, timeout);
+    return sendQuery(_cmd, timeout);
 }
 
 void HP34970hack::setRoute(Channels_t closeChannels, int offs)
@@ -269,7 +276,11 @@ void HP34970hack::setRoute(Channels_t closeChannels, int offs)
 
 void HP34970hack::setScan(Channels_t channels)
 {
-    sendCmd("ROUT:SCAN", channels);
+    QString cmd("ROUT:SCAN");
+
+    cmd = formatCmd(cmd, channels).append(";:INIT");
+
+    sendCmd(cmd);
 }
 
 void HP34970hack::setSense(Sense_t sense, Channels_t channels)

@@ -40,40 +40,40 @@ const MainWindow::Step_t MainWindow::stepsAll[] = {
 };
 
 const MainWindow::Step_t MainWindow::stepsMeasure[] = {
-    {   stepOpenAllRoutes, 100, },
+    {   stepOpenAllRoutes, 10, },
     {   stepGetTime, 0 },
-    {   stepMeasHallProbePrepare, 100 },
+    {   stepMeasHallProbePrepare, 10 },
     {   stepMeasHallProbe, 0 },
 
     {   stepSamplePower_pm, 10 },
-    {   stepSamplePower_bd, 100 },
+    {   stepSamplePower_bd, 10 },
     {   stepSampleMeasPrepare_ac, 10 },
-    {   stepSampleMeas_ac, 100 },
-    {   stepSamplePower_ca, 100 },
-    {   stepSampleMeasPrepare_bd, 10 },
-    {   stepSampleMeas_bd, 100 },
-
-    {   stepSamplePower_ba, 100 },
-    {   stepSampleMeasPrepare_cd, 10 },
-    {   stepSampleMeas_cd, 100 },
-    {   stepSamplePower_bc, 100 },
-    {   stepSampleMeasPrepare_da, 10 },
-    {   stepSampleMeas_da, 100 },
-
-    {   stepSamplePower_mp, 10 },
-    {   stepSamplePower_bd, 100 },
-    {   stepSampleMeasPrepare_ac, 10 },
-    {   stepSampleMeas_acRev, 100 },
+    {   stepSampleMeas_ac, 10 },
     {   stepSamplePower_ca, 10 },
     {   stepSampleMeasPrepare_bd, 10 },
-    {   stepSampleMeas_bdRev, 100 },
+    {   stepSampleMeas_bd, 10 },
 
-    {   stepSamplePower_ba, 100 },
+    {   stepSamplePower_ba, 10 },
     {   stepSampleMeasPrepare_cd, 10 },
-    {   stepSampleMeas_cdRev, 100 },
-    {   stepSamplePower_bc, 100 },
+    {   stepSampleMeas_cd, 10 },
+    {   stepSamplePower_bc, 10 },
     {   stepSampleMeasPrepare_da, 10 },
-    {   stepSampleMeas_daRev, 100 },
+    {   stepSampleMeas_da, 10 },
+
+    {   stepSamplePower_mp, 10 },
+    {   stepSamplePower_bd, 10 },
+    {   stepSampleMeasPrepare_ac, 10 },
+    {   stepSampleMeas_acRev, 10 },
+    {   stepSamplePower_ca, 10 },
+    {   stepSampleMeasPrepare_bd, 10 },
+    {   stepSampleMeas_bdRev, 10 },
+
+    {   stepSamplePower_ba, 10 },
+    {   stepSampleMeasPrepare_cd, 10 },
+    {   stepSampleMeas_cdRev, 10 },
+    {   stepSamplePower_bc, 10 },
+    {   stepSampleMeasPrepare_da, 10 },
+    {   stepSampleMeas_daRev, 10 },
 
     {   stepFinish, 0 },
     {   stepAbort, 0 },
@@ -628,7 +628,6 @@ bool MainWindow::stepSampleMeasPrepare_cd(MainWindow *this_)
     HP34970hack::Channels_t scan;
     scan.append(MainWindow::_34901A_sample_cd);
     this_->hp34970Hack.setScan(scan);
-    this_->hp34970Hack.init();
 
     return true;
 }
@@ -638,7 +637,6 @@ bool MainWindow::stepSampleMeasPrepare_da(MainWindow *this_)
     HP34970hack::Channels_t scan;
     scan.append(MainWindow::_34901A_sample_da);
     this_->hp34970Hack.setScan(scan);
-    this_->hp34970Hack.init();
 
     return true;
 }
@@ -648,7 +646,6 @@ bool MainWindow::stepSampleMeasPrepare_ac(MainWindow *this_)
     HP34970hack::Channels_t scan;
     scan.append(MainWindow::_34901A_sample_ac);
     this_->hp34970Hack.setScan(scan);
-    this_->hp34970Hack.init();
 
     return true;
 }
@@ -658,7 +655,6 @@ bool MainWindow::stepSampleMeasPrepare_bd(MainWindow *this_)
     HP34970hack::Channels_t scan;
     scan.append(MainWindow::_34901A_sample_bd);
     this_->hp34970Hack.setScan(scan);
-    this_->hp34970Hack.init();
 
     return true;
 }
@@ -788,7 +784,6 @@ bool MainWindow::stepMeasHallProbePrepare(MainWindow *this_)
     HP34970hack::Channels_t scan;
     scan.append(MainWindow::_34901A_hall_probe);
     this_->hp34970Hack.setScan(scan);
-    this_->hp34970Hack.init();
 
     this_->ps622Hack.setOutput(true);
 

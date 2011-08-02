@@ -18,7 +18,7 @@ public:
     ~HP34970hack();
     void close();
     void init();
-    bool open(QString port);
+    bool open(const QString &port);
     QStringList read();
     void setRoute(Channels_t closeChannels, int offs);
     void setScan(Channels_t channels);
@@ -26,10 +26,11 @@ public:
     void setup();
 
 protected:
-    void sendCmd(QString cmd, long timeout = 0);
-    void sendCmd(QString cmd, const Channels_t &channels, long timeout = 0);
-    QString sendQuery(QString cmd, long timeout = 0);
-    QString sendQuery(QString cmd, const Channels_t &channels, long timeout = 0);
+    QString formatCmd(const QString &cmd, const Channels_t &channels);
+    void sendCmd(const QString &cmd, long timeout = 0);
+    void sendCmd(const QString &cmd, const Channels_t &channels, long timeout = 0);
+    QString sendQuery(const QString &cmd, long timeout = 0);
+    QString sendQuery(const QString &cmd, const Channels_t &channels, long timeout = 0);
 
 private:
 
