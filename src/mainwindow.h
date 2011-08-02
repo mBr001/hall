@@ -101,7 +101,6 @@ private:
         csvColTime = 0,
         csvColHallProbeI,
         csvColHallProbeU,
-        csvColHallProbeB,
         csvColSampleI,
         csvColSampleUacF,
         csvColSampleUacB,
@@ -111,7 +110,13 @@ private:
         csvColSampleUcdB,
         csvColSampleUdaF,
         csvColSampleUdaB,
-        /** csvColEnd is number of columns we have. */
+        csvColEmpty,
+        csvColHallProbeB,
+        csvColSampleUac,
+        csvColSampleUbd,
+        csvColSampleUcd,
+        csvColSampleUda,
+        /** csvColEnd is number of columns we have not a real column. */
         csvColEnd,
     };
     /** Fully automated measurement in progress */
