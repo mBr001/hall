@@ -437,20 +437,34 @@ bool MainWindow::openDevs()
         goto file_err;
 
     csvFile.resize(csvColEnd);
-    csvFile[csvColTime] = "Time (UTC)";
-    csvFile[csvColHallProbeI] = "Hall proble I [A]";
-    csvFile[csvColHallProbeU] = "Hall proble U [V]";
-    csvFile[csvColHallProbeB] = "Hall proble B [T]";
-    csvFile[csvColSampleI] = "sample I [A]";
-    csvFile[csvColSampleUacF] = "sample Uac/+- [V]";
-    csvFile[csvColSampleUacB] = "sample Uac/-+ [V]";
-    csvFile[csvColSampleUbdF] = "sample Ubd/+- [V]";
-    csvFile[csvColSampleUbdB] = "sample Ubd/-+ [V]";
-    csvFile[csvColSampleUcdF] = "sample Ucd/+- [V]";
-    csvFile[csvColSampleUcdB] = "sample Ucd/-+ [V]";
-    csvFile[csvColSampleUdaF] = "sample Uda/+- [V]";
-    csvFile[csvColSampleUdaB] = "sample Uda/-+ [V]";
+    csvFile[csvColTime] = "Time";
+    csvFile[csvColHallProbeI] = "Hall proble";
+    csvFile[csvColHallProbeU] = "Hall proble";
+    csvFile[csvColHallProbeB] = "Hall proble";
+    csvFile[csvColSampleI] = "sample";
+    csvFile[csvColSampleUacF] = "sample";
+    csvFile[csvColSampleUacB] = "sample";
+    csvFile[csvColSampleUbdF] = "sample";
+    csvFile[csvColSampleUbdB] = "sample";
+    csvFile[csvColSampleUcdF] = "sample";
+    csvFile[csvColSampleUcdB] = "sample";
+    csvFile[csvColSampleUdaF] = "sample";
+    csvFile[csvColSampleUdaB] = "sample";
+    csvFile.write();
 
+    csvFile[csvColTime] = "(UTC)";
+    csvFile[csvColHallProbeI] = "I [A]";
+    csvFile[csvColHallProbeU] = "U [V]";
+    csvFile[csvColHallProbeB] = "B [T]";
+    csvFile[csvColSampleI] = "I [A]";
+    csvFile[csvColSampleUacF] = "Uac/+- [V]";
+    csvFile[csvColSampleUacB] = "Uac/-+ [V]";
+    csvFile[csvColSampleUbdF] = "Ubd/+- [V]";
+    csvFile[csvColSampleUbdB] = "Ubd/-+ [V]";
+    csvFile[csvColSampleUcdF] = "Ucd/+- [V]";
+    csvFile[csvColSampleUcdB] = "Ucd/-+ [V]";
+    csvFile[csvColSampleUdaF] = "Uda/+- [V]";
+    csvFile[csvColSampleUdaB] = "Uda/-+ [V]";
     csvFile.write();
 
     // Open and setup HP34970 device
