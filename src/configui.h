@@ -2,7 +2,7 @@
 #define CONFIGUI_H
 
 #include <QDialog>
-#include <QSettings>
+#include "config.h"
 
 namespace Ui {
     class ConfigUI;
@@ -16,13 +16,6 @@ public:
     explicit ConfigUI(QWidget *parent = 0);
     ~ConfigUI();
 
-    /* Names of configuration options */
-    static const char cfg_agilentPort[];
-    static const char cfg_fileName[];
-    static const char cfg_powerSupplyPort[];
-    static const char cfg_polSwitchPort[];
-    static const char cfg_samplePSPort[];
-
 private slots:
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
@@ -31,7 +24,7 @@ private slots:
 private:
 
     Ui::ConfigUI *ui;
-    QSettings settings;
+    Config config;
 };
 
 #endif // CONFIGUI_H

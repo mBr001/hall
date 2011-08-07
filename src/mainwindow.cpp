@@ -370,7 +370,7 @@ bool MainWindow::openDevs()
     QString s;
     int err;
 
-    s = settings.value(ConfigUI::cfg_powerSupplyPort).toString();
+    s = config.msdpPort();
     err = sdp_open(&sdp, s.toLocal8Bit().constData(), SDP_DEV_ADDR_MIN);
     if (err < 0)
         goto sdp_err0;
@@ -409,7 +409,7 @@ bool MainWindow::openDevs()
     ui->coilPowerCheckBox->setChecked(lcd_info.output);
 
     // Open polarity switch device
-    s = settings.value(ConfigUI::cfg_polSwitchPort).toString();
+    s = config.polSwitchPort();
     if (!pwrPolSwitch.open(s.toLocal8Bit().constData())) {
         err = errno;
         goto mag_pwr_switch_err;
@@ -420,7 +420,7 @@ bool MainWindow::openDevs()
     ui->coilPolCrossCheckBox->setChecked(cross);
 
     // Open sample power source
-    s = settings.value(ConfigUI::cfg_samplePSPort).toString();
+    s = config.ps6220Port();
     if (!ps622Hack.open(s.toLocal8Bit().constData()))
     {
         err = errno;
@@ -431,7 +431,7 @@ bool MainWindow::openDevs()
     ui->samplePowerCheckBox->setChecked(ps622Hack.output());
 
     // Open CSV file to save data
-    s = settings.value(ConfigUI::cfg_fileName).toString();
+    s = config.dataFileName();
     csvFile.setFileName(s);
     if (!csvFile.open())
         goto file_err;
@@ -468,7 +468,7 @@ bool MainWindow::openDevs()
     csvFile.write();
 
     // Open and setup HP34970 device
-    s = settings.value(ConfigUI::cfg_agilentPort).toString();
+    s = config.hp34970Port();
     if (!hp34970Hack.open(s)) {
         err = errno;
         goto hp34970hack_err;

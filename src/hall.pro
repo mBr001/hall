@@ -32,7 +32,8 @@ SOURCES += main.cpp\
     hp34970hack.cpp \
     qserial.cpp \
     qcsvfile.cpp \
-    experiment.cpp
+    experiment.cpp \
+    config.cpp
 
 HEADERS  += mainwindow.h \
     configui.h \
@@ -41,7 +42,8 @@ HEADERS  += mainwindow.h \
     hp34970hack.h \
     qserial.h \
     qcsvfile.h \
-    experiment.h
+    experiment.h \
+    config.h
 
 FORMS    += mainwindow.ui \
     configui.ui

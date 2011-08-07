@@ -142,8 +142,8 @@ private:
     static const char pol_np[];
     /** Mansons SDP power supply driver. */
     sdp_t sdp;
-    /** Application settings */
-    QSettings settings;
+    /** Application configuration */
+    Config config;
     /** Timer used to adjust current trought magnet in specified time. */
     QTimer coilTimer;
     /** Delay betwen current value update [ms].

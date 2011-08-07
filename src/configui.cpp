@@ -4,34 +4,17 @@
 #include "configui.h"
 #include "ui_configui.h"
 
-const char ConfigUI::cfg_agilentPort[] = "Agilent Port";
-const char ConfigUI::cfg_fileName[] = "File name";
-const char ConfigUI::cfg_powerSupplyPort[] = "Power Supply Port";
-const char ConfigUI::cfg_polSwitchPort[] = "Switch Port";
-const char ConfigUI::cfg_samplePSPort[] = "Sample PS K6220";
-
 ConfigUI::ConfigUI(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ConfigUI)
 {
-    QString s;
-
     ui->setupUi(this);
 
-    s = settings.value(cfg_agilentPort, QString()).toString();
-    ui->agilentPortComboBox->setEditText(s);
-
-    s = settings.value(cfg_powerSupplyPort, QString()).toString();
-    ui->powerSupplyPortComboBox->setEditText(s);
-
-    s = settings.value(cfg_polSwitchPort, QString()).toString();
-    ui->switchPortComboBox->setEditText(s);
-
-    s = settings.value(cfg_samplePSPort, QString()).toString();
-    ui->samplePowerPortComboBox->setEditText(s);
-
-    s = settings.value(cfg_fileName, QString()).toString();
-    ui->fileNameLineEdit->setText(s);
+    ui->agilentPortComboBox->setEditText(config.hp34970Port());
+    ui->powerSupplyPortComboBox->setEditText(config.msdpPort());
+    ui->switchPortComboBox->setEditText(config.polSwitchPort());
+    ui->samplePowerPortComboBox->setEditText(config.ps6220Port());
+    ui->fileNameLineEdit->setText(config.dataFileName());
 }
 
 ConfigUI::~ConfigUI()
@@ -41,33 +24,23 @@ ConfigUI::~ConfigUI()
 
 void ConfigUI::on_buttonBox_accepted()
 {
-    QString s;
+    config.setHp34970Port(ui->agilentPortComboBox->currentText());
+    config.setMsdpPort(ui->powerSupplyPortComboBox->currentText());
+    config.setPs6220Port(ui->samplePowerPortComboBox->currentText());
+    config.setPolSwitchPort(ui->switchPortComboBox->currentText());
 
-    s = ui->agilentPortComboBox->currentText();
-    settings.setValue(cfg_agilentPort, s);
-
-    s = ui->powerSupplyPortComboBox->currentText();
-    settings.setValue(cfg_powerSupplyPort, s);
-
-    s = ui->samplePowerPortComboBox->currentText();
-    settings.setValue(cfg_samplePSPort, s);
-
-    s = ui->switchPortComboBox->currentText();
-    settings.setValue(cfg_polSwitchPort, s);
-
-    s = ui->fileNameLineEdit->text();
-    QFile f(s);
+    QFile f(ui->fileNameLineEdit->text());
     if (f.exists()) {
         QString msg("File \n\n%1\n\n already exists, relly owerwrite this file?");
 
-        msg = msg.arg(s);
+        msg = msg.arg(f.fileName());
         if (QMessageBox::question(
                     this, "File already exists.", msg,
                     QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)
             return;
         f.remove();
     }
-    settings.setValue(cfg_fileName, s);
+    config.setDataFileName(f.fileName());
 
     this->accept();
 }
