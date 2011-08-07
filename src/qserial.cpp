@@ -10,7 +10,6 @@
 
 #include "qserial.h"
 
-
 const QSerial::BaudeRate_t QSerial::Baude9600 = B9600;
 const QSerial::BaudeRate_t QSerial::Baude19200 = B19200;
 
@@ -19,7 +18,6 @@ void stdError(std::string str)
     int err = errno;
 
     std::string err_str(strerror(err));
-
     throw new std::runtime_error(str + err_str);
 }
 
@@ -43,7 +41,7 @@ void QSerial::close()
 
 bool QSerial::isOpen()
 {
-    return (fd >= 0);
+    return (fd != -1);
 }
 
 bool QSerial::isLine(const char *buf, ssize_t size)
@@ -75,21 +73,13 @@ QStringList QSerial::list()
     return ports;
 }
 
-/**
- * Open serial port and set parameters as defined for SDP power source.
- * @param port File name of serial port.
- * @param bauderate bauderate of serial port.
- * @param timeout Time reserved for reading [usec].
- * @param timeoutPerChar Increase reading time timeout per recieved character [us].
- * @return       File descriptor on success, negative number (err no.) on error.
- */
 bool QSerial::open(const char *port, BaudeRate_t bauderate, long timeout,
                    long timeoutPerChar)
 {
     struct termios tio;
 
     fd = ::open(port, O_RDWR | O_NONBLOCK);
-    if (fd < 0)
+    if (fd == -1)
          return false;
 
     memset(&tio, 0, sizeof(tio));
@@ -112,22 +102,19 @@ bool QSerial::open(const char *port, BaudeRate_t bauderate, long timeout,
     return fd;
 }
 
-bool QSerial::open(QString port, BaudeRate_t bauderate, long timeout,
+bool QSerial::open(const QString &port, BaudeRate_t bauderate, long timeout,
                    long timeoutPerChar)
 {
-    const char *port_str;
-
-    port_str = qPrintable(port);
-    return open(port_str, bauderate, timeout, timeoutPerChar);
+    return open(qPrintable(port), bauderate, timeout, timeoutPerChar);
 }
 
 QString QSerial::readLine(ssize_t count, long timeout = 0)
 {
-    char buf[count];
+    char buf[count + 1];
     ssize_t len;
 
-    len = readLine(buf, sizeof(buf), timeout);
-    if (len <= 0)
+    len = readLine(buf, count, timeout);
+    if (len == -1)
         stdError("QSerial::readLine read failed.");
     buf[len] = 0;
 
@@ -160,20 +147,22 @@ ssize_t QSerial::readLine(char *buf, ssize_t count, long timeout)
         ssize_t size_;
 
         ret = select(fd + 1, &readfds, NULL, NULL, &timeout_s);
-        if (ret <= 0) {
+        if (ret == -1) {
                 return -1;
         }
         size_ = ::read(fd, buf, count);
-        if (size_ < 0)
-                return size;
+        if (size_ == -1) {
+            return size;
+        }
         timeout_s.tv_usec += timeoutPerChar * size_;
         timeout_s.tv_sec += timeout_s.tv_usec / 1000000l;
         timeout_s.tv_usec %= 1000000l;
         size += size_;
         count -= size_;
         buf += size_;
-        if (isLine(buf_, size))
-                return size;
+        if (isLine(buf_, size)) {
+            return size;
+        }
     } while (count > 0);
 
     errno = ERANGE;
@@ -186,21 +175,10 @@ void QSerial::write(const char *str)
         stdError("Failed to write to serial port");
 }
 
-void QSerial::write(QString str)
+void QSerial::write(const QString &str)
 {
-    QByteArray bytes;
+    QByteArray bytes(str.toUtf8());
 
-    bytes = str.toLocal8Bit();
     if (::write(fd, bytes.constData(), bytes.length()) < 0)
-        stdError("Failed to write to serial port");
-}
-
-void QSerial::write(int i)
-{
-    QVariant v(i);
-    QByteArray b;
-
-    b = v.toString().toLocal8Bit();
-    if (::write(fd, b.constData(), b.length()) < 0)
         stdError("Failed to write to serial port");
 }

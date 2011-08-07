@@ -16,15 +16,33 @@ public:
     ~QSerial();
     void close();
     bool isOpen();
+    /** List all available serial ports. */
     static QStringList list();
+    /**
+     * Open serial port and set parameters as defined for SDP power source.
+     * @param serial port name.
+     * @param bauderate bauderate of serial port.
+     * @param timeout Time reserved for reading [usec].
+     * @param timeoutPerChar Increase reading time timeout per recieved character [us].
+     * @return       File descriptor on success, negative number (err no.) on error.
+     */
     bool open(const char *port, BaudeRate_t bauderate, long timeoutOffs,
               long timeoutPerChar);
-    bool open(QString port, BaudeRate_t bauderate, long timeoutOffs,
+    /**
+     * Open serial port and set parameters as defined for SDP power source.
+     * @param serial port name.
+     * @param bauderate bauderate of serial port.
+     * @param timeout Time reserved for reading [usec].
+     * @param timeoutPerChar Increase reading time timeout per recieved character [us].
+     * @return       File descriptor on success, negative number (err no.) on error.
+     */
+    bool open(const QString &port, BaudeRate_t bauderate, long timeoutOffs,
               long timeoutPerChar);
     
+    /** Write null terminated string into serial line. */
     void write(const char *str);
-    void write(QString str);
-    void write(int i);
+    /** Write UTF-8 string into serial line. */
+    void write(const QString &str);
     QString readLine(ssize_t count);
     QString readLine(ssize_t count, long timeout);
 private:
@@ -35,4 +53,4 @@ private:
     ssize_t readLine(char *buf, ssize_t count, long timeout);
 };
 
-#endif // PS6220HACK_H
+#endif // QSERAL_H
