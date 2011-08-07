@@ -61,12 +61,14 @@ QStringList QSerial::list()
     QStringList ports;
 
 #ifdef __linux__
-    QDir dir("/dev");
+    QString root("/dev/");
+    QDir dir(root);
     QStringList filters;
     filters << "ttyS*" << "ttyUSB*";
 
     dir.setNameFilters(filters);
     ports = dir.entryList(QDir::System, QDir::Name | QDir::LocaleAware);
+    ports.replaceInStrings(QRegExp("^"), root);
 #else
 #error "Not implemented!"
 #endif

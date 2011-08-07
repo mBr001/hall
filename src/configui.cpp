@@ -16,11 +16,13 @@ ConfigUI::ConfigUI(QWidget *parent) :
     ui->powerSupplyPortComboBox->addItems(ports);
     ui->samplePowerPortComboBox->addItems(ports);
 
-    QDir dir("/dev");
+    QString root("/dev/");
+    QDir dir(root);
     QStringList filters;
     filters << "parport*";
     dir.setNameFilters(filters);
     ports = dir.entryList(QDir::System, QDir::Name | QDir::LocaleAware);
+    ports.replaceInStrings(QRegExp("^"), root);
     ui->switchPortComboBox->addItems(ports);
 
     ui->agilentPortComboBox->setEditText(config.hp34970Port());
