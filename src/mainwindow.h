@@ -7,6 +7,7 @@
 #include <msdp2xxx.h>
 
 #include "configui.h"
+#include "experiment.h"
 #include "hp34970hack.h"
 #include "powpolswitch.h"
 #include "ps6220hack.h"

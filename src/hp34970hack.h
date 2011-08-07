@@ -9,7 +9,9 @@ class HP34970hack : protected QSerial
 {
 public:
     typedef const char *Sense_t;
-    typedef QList<int> Channels_t;
+    typedef int Channel_t;
+    typedef QList<Channel_t> Channels_t;
+    bool HP34903ClosedChannels[20];
 
     static Sense_t SenseVolt;
     static Sense_t SenseRes;

@@ -156,6 +156,7 @@ HP34970hack::Sense_t HP34970hack::SenseRes = "CONF:RES";
 HP34970hack::HP34970hack() :
     QSerial()
 {
+    memset(HP34903ClosedChannels, 0, sizeof(HP34903ClosedChannels));
 }
 
 HP34970hack::~HP34970hack()
@@ -262,16 +263,27 @@ QString HP34970hack::sendQuery(const QString &cmd, const Channels_t &channels, l
 void HP34970hack::setRoute(Channels_t closeChannels, int offs)
 {
     Channels_t openChannels;
+    Channels_t _closeChannels_;
 
-    for (int x(offs + 1); x <= offs + 20; ++x) {
-        if (!closeChannels.contains(x)) {
-            openChannels << x;
+    // channel = x + 1 + offs;
+    ++offs;
+    for (int x(0); x <= 19; ++x) {
+        bool c(HP34903ClosedChannels[x]);
+        Channel_t channel = x + offs;
+        bool cw(closeChannels.count(channel));
+
+        if (c && !cw) {
+            openChannels.append(channel);
+        } else
+        if (!c && cw) {
+            _closeChannels_.append(channel);
         }
     }
 
-    sendCmd("ROUT:OPEN", openChannels);
-    if (!closeChannels.empty())
-        sendCmd("ROUT:CLOS", closeChannels);
+    if(!openChannels.isEmpty())
+        sendCmd("ROUT:OPEN", openChannels);
+    if (!closeChannels.isEmpty())
+        sendCmd("ROUT:CLOS", _closeChannels_);
 }
 
 void HP34970hack::setScan(Channels_t channels)
