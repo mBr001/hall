@@ -274,9 +274,11 @@ void HP34970hack::setRoute(Channels_t closeChannels, int offs)
 
         if (c && !cw) {
             openChannels.append(channel);
+            HP34903ClosedChannels[x] = false;
         } else
         if (!c && cw) {
             _closeChannels_.append(channel);
+            HP34903ClosedChannels[x] = true;
         }
     }
 
