@@ -31,11 +31,12 @@ public slots:
     void show();
 
 private slots:
-    void on_measTimer_timeout();
     void on_coilCurrDoubleSpinBox_valueChanged(double );
     void on_coilPolCrossCheckBox_toggled(bool checked);
     void on_coilPowerCheckBox_toggled(bool checked);
-    void on_currentTimer_timeout();
+    void on_coilTimer_timeout();
+    void on_experiment_measurementComleted();
+    void on_measTimer_timeout();
     void on_measurePushButton_clicked();
     void on_sampleCurrDoubleSpinBox_valueChanged(double );
     void on_samplePolCrossCheckBox_toggled(bool checked);
@@ -109,18 +110,18 @@ private:
     Steps_t::const_iterator stepLoopMark;
     /** Timer used for fully automated testing process. */
     QTimer measTimer;
-    /** Configuration dialog. */
-    ConfigUI configUI;
     /** HTML string to show colored "+ -". */
     static const char pol_pn[];
     /** HTML string to show colored "- +". */
     static const char pol_np[];
     /** Mansons SDP power supply driver. */
     sdp_t sdp;
-    /** Application configuration */
-    Config config;
     /** Timer used to adjust current trought magnet in specified time. */
     QTimer coilTimer;
+    /** Application configuration */
+    Config config;
+    /** Configuration dialog. */
+    ConfigUI configUI;
     /** Delay betwen current value update [ms].
      * BAD CODE INSIDE, DO NOT CHANGE! */
     static const int currentDwell = 1000;

@@ -1,15 +1,18 @@
 #ifndef EXPERIMENT_H
 #define EXPERIMENT_H
 
+#include <QObject>
 #include <msdp2xxx.h>
+
 #include "config.h"
-#include "hp34970hack.h"
-#include "powpolswitch.h"
-#include "ps6220hack.h"
+//#include "hp34970hack.h"
+//#include "powpolswitch.h"
+//#include "ps6220hack.h"
 #include "qcsvfile.h"
 
-class Experiment
+class Experiment : public QObject
 {
+    Q_OBJECT
 public:
     /** Indexes of columns in CSV file with data from experiment. */
     enum {
@@ -31,11 +34,12 @@ public:
         csvColSampleUbd,
         csvColSampleUcd,
         csvColSampleUda,
-        /** csvColEnd is number of columns we have not a real column. */
+        /** csvColEnd equeals to a number of columns, it is not a column at all. */
         csvColEnd,
     };
 
-    Experiment();
+    explicit Experiment(QObject *parent = 0);
+
     void close();
     void open();
 
@@ -60,13 +64,26 @@ public:
     QString MSDPPort();
     void setMSDPPort(QString port);
 
-    // TODO: až to bude přeportované přepnout na protexted
+    /** Return time data for last measurement as string. */
+    QString strDataTime();
+
+    // TODO: tohle budou interní funkce, převážně přijdou odstranit
+    void _csvFileWrite();
+    void _csvFileGetTime();
+
+    // TODO: až to bude přeportované přepnout na protected
 public:
     /** File to save measured data. */
     QCSVFile csvFile;
 
+signals:
+    void measurementComleted();
+
+public slots:
+
 private:
     Config config;
+    QString _strDataTime_;
 };
 
 #endif // EXPERIMENT_H

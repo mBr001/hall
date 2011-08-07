@@ -91,22 +91,24 @@ MainWindow::Steps_t::Steps_t(const Step_t *begin, const Step_t *end)
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     measRunning(false),
+    measTimer(this),
+    coilTimer(this),
     configUI(),
+    experiment(this),
     ui(new Ui::MainWindow)
 {
+    coilTimer.setObjectName("coilTimer");
+    coilTimer.setInterval(currentDwell);
+    coilTimer.setSingleShot(false);
+
+    experiment.setObjectName("experiment");
+
+    measTimer.setObjectName("measTimer");
+    measTimer.setSingleShot(true);
 
     ui->setupUi(this);
 
     QObject::connect(&configUI, SIGNAL(accepted()), this, SLOT(show()));
-
-    coilTimer.setInterval(currentDwell);
-    coilTimer.setSingleShot(false);
-    QObject::connect(&coilTimer, SIGNAL(timeout()), this,
-                     SLOT(on_currentTimer_timeout()));
-
-    measTimer.setSingleShot(true);
-    QObject::connect(&measTimer, SIGNAL(timeout()), this,
-                     SLOT(on_measTimer_timeout()));
 }
 
 MainWindow::~MainWindow()
@@ -193,7 +195,7 @@ void MainWindow::on_coilPowerCheckBox_toggled(bool)
     ui->sweepingWidget->setEnabled(true);
 }
 
-void MainWindow::on_currentTimer_timeout()
+void MainWindow::on_coilTimer_timeout()
 {
     sdp_lcd_info_t lcd_info;
 
@@ -294,6 +296,20 @@ void MainWindow::on_currentTimer_timeout()
     sdp_set_curr(&sdp, fabs(procI));
 }
 
+void MainWindow::on_experiment_measurementComleted()
+{
+    ui->dataTableWidget->insertRow(0);
+
+    QString time(experiment.strDataTime());
+    ui->dataTableWidget->setItem(0, 3, new QTableWidgetItem(time));
+
+    /*val = ui->coilCurrMeasDoubleSpinBox->value();
+    ui->dataTableWidget->setItem(0, 0, new QTableWidgetItem(s));
+
+    val = ui->sampleCurrDoubleSpinBox->value();
+    ui->dataTableWidget->setItem(0, 1, new QTableWidgetItem(s));*/
+}
+
 void MainWindow::on_measTimer_timeout()
 {
     if (stepCurrent != stepsRunning.end()) {
@@ -309,8 +325,6 @@ void MainWindow::on_measTimer_timeout()
 
 void MainWindow::on_measurePushButton_clicked()
 {
-    ui->dataTableWidget->insertRow(0);
-
     stepsRunning = Steps_t(
                 stepsMeasure,
                 stepsMeasure + ARRAY_SIZE(stepsMeasure));
@@ -319,12 +333,6 @@ void MainWindow::on_measurePushButton_clicked()
     measureStart();
 
     return;
-
-    /*val = ui->coilCurrMeasDoubleSpinBox->value();
-    ui->dataTableWidget->setItem(0, 0, new QTableWidgetItem(s));
-
-    val = ui->sampleCurrDoubleSpinBox->value();
-    ui->dataTableWidget->setItem(0, 1, new QTableWidgetItem(s));*/
 }
 
 void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
@@ -704,17 +712,14 @@ bool MainWindow::stepCreateLoopMark(MainWindow *this_)
 
 bool MainWindow::stepFinish(MainWindow *this_)
 {
-    this_->experiment.csvFile.write();
+    this_->experiment._csvFileWrite();
 
     return true;
 }
 
 bool MainWindow::stepGetTime(MainWindow *this_)
 {
-    QString s;
-
-    s = this_->experiment.csvFile.setAt(Experiment::csvColTime, QDateTime::currentDateTimeUtc());
-    this_->ui->dataTableWidget->setItem(0, 3, new QTableWidgetItem(s));
+    this_->experiment._csvFileGetTime();
 
     return true;
 }

@@ -1,13 +1,20 @@
 #include "error.h"
 #include "experiment.h"
 
-Experiment::Experiment()
+Experiment::Experiment(QObject *parent) :
+    QObject(parent)
 {
 }
 
 void Experiment::close()
 {
     csvFile.close();
+}
+
+void Experiment::_csvFileWrite()
+{
+    csvFile.write();
+    emit measurementComleted();
 }
 
 void Experiment::open()
@@ -57,4 +64,14 @@ void Experiment::open()
         throw new Error("Failed to write header into data file",
                         csvFile.errorString());
     }
+}
+
+QString Experiment::strDataTime()
+{
+    return _strDataTime_;
+}
+
+void Experiment::_csvFileGetTime()
+{
+    _strDataTime_ = csvFile.setAt(csvColTime, QDateTime::currentDateTimeUtc());
 }
