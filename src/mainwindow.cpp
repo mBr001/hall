@@ -319,22 +319,11 @@ void MainWindow::on_measurePushButton_clicked()
 
     return;
 
-    QString s;
-    double val;
-
-    val = ui->coilCurrMeasDoubleSpinBox->value();
-    s = csvFile.setAt(1, val);
+    /*val = ui->coilCurrMeasDoubleSpinBox->value();
     ui->dataTableWidget->setItem(0, 0, new QTableWidgetItem(s));
 
-    val = ui->coilVoltMeasDoubleSpinBox->value();
-    csvFile.setAt(2, val);
-
-    val = ui->coilCurrDoubleSpinBox->value();
-    csvFile.setAt(3, val);
-
     val = ui->sampleCurrDoubleSpinBox->value();
-    s = csvFile.setAt(4, val);
-    ui->dataTableWidget->setItem(0, 1, new QTableWidgetItem(s));
+    ui->dataTableWidget->setItem(0, 1, new QTableWidgetItem(s));*/
 }
 
 void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
