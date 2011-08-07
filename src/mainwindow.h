@@ -11,8 +11,6 @@
 #include "hp34970hack.h"
 #include "powpolswitch.h"
 #include "ps6220hack.h"
-#include "qcsvfile.h"
-
 
 namespace Ui {
     class MainWindow;
@@ -97,29 +95,6 @@ private:
     /** 34903A: hall probe - pin 2 <-> current source (+) */
     static const int _34903A_hall_probe_2_pwr_p;
 
-    /** Indexes of columns in CSV file with data from experiment. */
-    enum {
-        csvColTime = 0,
-        csvColHallProbeI,
-        csvColHallProbeU,
-        csvColSampleI,
-        csvColSampleUacF,
-        csvColSampleUacB,
-        csvColSampleUbdF,
-        csvColSampleUbdB,
-        csvColSampleUcdF,
-        csvColSampleUcdB,
-        csvColSampleUdaF,
-        csvColSampleUdaB,
-        csvColEmpty,
-        csvColHallProbeB,
-        csvColSampleUac,
-        csvColSampleUbd,
-        csvColSampleUcd,
-        csvColSampleUda,
-        /** csvColEnd is number of columns we have not a real column. */
-        csvColEnd,
-    };
     /** Fully automated measurement in progress */
     bool measRunning;
     /** Array of steps for fully automatized Hall measurement. */
@@ -153,12 +128,12 @@ private:
     static const float currentSlope = 0.01;
     /** Power source output current limit. */
     float currentMax;
+    /** Experiment driving class. */
+    Experiment experiment;
     /** Power polarity switch handler. */
     PwrPolSwitch pwrPolSwitch;
     /** Keithlay PS 6220 hacky class. */
     PS6220Hack ps622Hack;
-    /** File to save measured data. */
-    QCSVFile csvFile;
     /** HP 34970A device to measure voltage and resistivity. */
     HP34970hack hp34970Hack;
     /** User interface widgets */

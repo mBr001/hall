@@ -33,7 +33,8 @@ SOURCES += main.cpp\
     qserial.cpp \
     qcsvfile.cpp \
     experiment.cpp \
-    config.cpp
+    config.cpp \
+    error.cpp
 
 HEADERS  += mainwindow.h \
     configui.h \
@@ -43,7 +44,8 @@ HEADERS  += mainwindow.h \
     qserial.h \
     qcsvfile.h \
     experiment.h \
-    config.h
+    config.h \
+    error.h
 
 FORMS    += mainwindow.ui \
     configui.ui

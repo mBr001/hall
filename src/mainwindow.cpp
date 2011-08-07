@@ -6,12 +6,13 @@
 #include <stdexcept>
 #include <vector>
 
+#include "error.h"
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
 #endif
-
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
 
 const char MainWindow::pol_pn[] =
         "<span style='font-weight:600;'><span style='color:#ff0000;'>+</span> <span style='color:#0000ff;'>-</span></span>";
@@ -117,7 +118,7 @@ void MainWindow::closeDevs()
 {
     coilTimer.stop();
     ui->sweepingWidget->setEnabled(false);
-    csvFile.close();
+    experiment.close();
     hp34970Hack.close();
     ps622Hack.close();
     pwrPolSwitch.close();
@@ -359,6 +360,23 @@ bool MainWindow::openDevs()
     QString s;
     int err;
 
+    // Open CSV file to save data
+    // TODO: exception raising and handling
+    try {
+        experiment.open();
+    }
+    catch(Error &e)
+    {
+        err_title = e.description();
+        err_text = e.longDescription();
+
+        err_text = QString("%1:\n\n%2").arg(err_title).arg(err_text);
+        QMessageBox::critical(this, err_title, err_text);
+        statusBar()->showMessage(err_title);
+
+        return false;
+    }
+
     s = config.msdpPort();
     err = sdp_open(&sdp, s.toLocal8Bit().constData(), SDP_DEV_ADDR_MIN);
     if (err < 0)
@@ -419,43 +437,6 @@ bool MainWindow::openDevs()
     ui->sampleCurrDoubleSpinBox->setValue(ps622Hack.current());
     ui->samplePowerCheckBox->setChecked(ps622Hack.output());
 
-    // Open CSV file to save data
-    s = config.dataFileName();
-    csvFile.setFileName(s);
-    if (!csvFile.open())
-        goto file_err;
-
-    csvFile.resize(csvColEnd);
-    csvFile[csvColTime] = "Time";
-    csvFile[csvColHallProbeI] = "Hall proble";
-    csvFile[csvColHallProbeU] = "Hall proble";
-    csvFile[csvColHallProbeB] = "Hall proble";
-    csvFile[csvColSampleI] = "sample";
-    csvFile[csvColSampleUacF] = "sample";
-    csvFile[csvColSampleUacB] = "sample";
-    csvFile[csvColSampleUbdF] = "sample";
-    csvFile[csvColSampleUbdB] = "sample";
-    csvFile[csvColSampleUcdF] = "sample";
-    csvFile[csvColSampleUcdB] = "sample";
-    csvFile[csvColSampleUdaF] = "sample";
-    csvFile[csvColSampleUdaB] = "sample";
-    csvFile.write();
-
-    csvFile[csvColTime] = "(UTC)";
-    csvFile[csvColHallProbeI] = "I [A]";
-    csvFile[csvColHallProbeU] = "U [V]";
-    csvFile[csvColHallProbeB] = "B [T]";
-    csvFile[csvColSampleI] = "I [A]";
-    csvFile[csvColSampleUacF] = "Uac/+- [V]";
-    csvFile[csvColSampleUacB] = "Uac/-+ [V]";
-    csvFile[csvColSampleUbdF] = "Ubd/+- [V]";
-    csvFile[csvColSampleUbdB] = "Ubd/-+ [V]";
-    csvFile[csvColSampleUcdF] = "Ucd/+- [V]";
-    csvFile[csvColSampleUcdB] = "Ucd/-+ [V]";
-    csvFile[csvColSampleUdaF] = "Uda/+- [V]";
-    csvFile[csvColSampleUdaB] = "Uda/-+ [V]";
-    csvFile.write();
-
     // Open and setup HP34970 device
     s = config.hp34970Port();
     if (!hp34970Hack.open(s)) {
@@ -469,8 +450,6 @@ bool MainWindow::openDevs()
 
     return true;
 
-    // hp34970Hack.close();
-
 hp34970hack_err:
     if (err_title.isEmpty()) {
         err_title = QString::fromLocal8Bit(
@@ -478,13 +457,7 @@ hp34970hack_err:
         err_text = QString::fromLocal8Bit(strerror(err));
     }
 
-file_err:
     ps622Hack.close();
-    if (err_title.isEmpty()) {
-        err_title = QString::fromLocal8Bit(
-                    "Failed to open output file");
-        err_text = csvFile.errorString();
-    }
 
 sample_pwr_err:
     pwrPolSwitch.close();
@@ -551,7 +524,8 @@ void MainWindow::startApp()
 bool MainWindow::stepSampleMeas_cd(MainWindow *this_)
 {
     double val(this_->readSingle());
-    this_->csvFile.setAt(csvColSampleUcdF, val);
+
+    this_->experiment.csvFile.setAt(Experiment::csvColSampleUcdF, val);
 
     return stepOpenAllRoutes(this_);
 }
@@ -559,7 +533,7 @@ bool MainWindow::stepSampleMeas_cd(MainWindow *this_)
 bool MainWindow::stepSampleMeas_cdRev(MainWindow *this_)
 {
     double val(this_->readSingle());
-    this_->csvFile.setAt(csvColSampleUcdB, val);
+    this_->experiment.csvFile.setAt(Experiment::csvColSampleUcdB, val);
 
     return stepOpenAllRoutes(this_);
 }
@@ -567,7 +541,7 @@ bool MainWindow::stepSampleMeas_cdRev(MainWindow *this_)
 bool MainWindow::stepSampleMeas_da(MainWindow *this_)
 {
     double val(this_->readSingle());
-    this_->csvFile.setAt(csvColSampleUdaF, val);
+    this_->experiment.csvFile.setAt(Experiment::csvColSampleUdaF, val);
 
     return stepOpenAllRoutes(this_);
 }
@@ -575,7 +549,7 @@ bool MainWindow::stepSampleMeas_da(MainWindow *this_)
 bool MainWindow::stepSampleMeas_daRev(MainWindow *this_)
 {
     double val(this_->readSingle());
-    this_->csvFile.setAt(csvColSampleUdaB, val);
+    this_->experiment.csvFile.setAt(Experiment::csvColSampleUdaB, val);
 
     return stepOpenAllRoutes(this_);
 }
@@ -583,7 +557,7 @@ bool MainWindow::stepSampleMeas_daRev(MainWindow *this_)
 bool MainWindow::stepSampleMeas_ac(MainWindow *this_)
 {
     double val(this_->readSingle());
-    this_->csvFile.setAt(csvColSampleUacF, val);
+    this_->experiment.csvFile.setAt(Experiment::csvColSampleUacF, val);
 
     return stepOpenAllRoutes(this_);
 }
@@ -591,7 +565,7 @@ bool MainWindow::stepSampleMeas_ac(MainWindow *this_)
 bool MainWindow::stepSampleMeas_acRev(MainWindow *this_)
 {
     double val(this_->readSingle());
-    this_->csvFile.setAt(csvColSampleUacB, val);
+    this_->experiment.csvFile.setAt(Experiment::csvColSampleUacB, val);
 
     return stepOpenAllRoutes(this_);
 }
@@ -599,7 +573,7 @@ bool MainWindow::stepSampleMeas_acRev(MainWindow *this_)
 bool MainWindow::stepSampleMeas_bd(MainWindow *this_)
 {
     double val(this_->readSingle());
-    this_->csvFile.setAt(csvColSampleUbdF, val);
+    this_->experiment.csvFile.setAt(Experiment::csvColSampleUbdF, val);
 
     return stepOpenAllRoutes(this_);
 }
@@ -607,7 +581,7 @@ bool MainWindow::stepSampleMeas_bd(MainWindow *this_)
 bool MainWindow::stepSampleMeas_bdRev(MainWindow *this_)
 {
     double val(this_->readSingle());
-    this_->csvFile.setAt(csvColSampleUbdB, val);
+    this_->experiment.csvFile.setAt(Experiment::csvColSampleUbdB, val);
 
     return stepOpenAllRoutes(this_);
 }
@@ -664,7 +638,7 @@ bool MainWindow::stepSamplePower_pm(MainWindow *this_)
 
     double val(this_->ui->sampleCurrDoubleSpinBox->value());
     this_->ps622Hack.setCurrent(val);
-    this_->csvFile.setAt(csvColSampleI, val);
+    this_->experiment.csvFile.setAt(Experiment::csvColSampleI, val);
 
     return true;
 }
@@ -730,7 +704,7 @@ bool MainWindow::stepCreateLoopMark(MainWindow *this_)
 
 bool MainWindow::stepFinish(MainWindow *this_)
 {
-    this_->csvFile.write();
+    this_->experiment.csvFile.write();
 
     return true;
 }
@@ -739,7 +713,7 @@ bool MainWindow::stepGetTime(MainWindow *this_)
 {
     QString s;
 
-    s = this_->csvFile.setAt(csvColTime, QDateTime::currentDateTimeUtc());
+    s = this_->experiment.csvFile.setAt(Experiment::csvColTime, QDateTime::currentDateTimeUtc());
     this_->ui->dataTableWidget->setItem(0, 3, new QTableWidgetItem(s));
 
     return true;
@@ -749,11 +723,11 @@ bool MainWindow::stepMeasHallProbe(MainWindow *this_)
 {
     double val(this_->readSingle());
 
-    this_->csvFile.setAt(csvColHallProbeU, val);
+    this_->experiment.csvFile.setAt(Experiment::csvColHallProbeU, val);
     // Some math magic to get B
     val = -30.588 + sqrt(934.773 + 392.163 * val);
     this_->ui->coilBDoubleSpinBox->setValue(val);
-    this_->csvFile.setAt(csvColHallProbeB, val);
+    this_->experiment.csvFile.setAt(Experiment::csvColHallProbeB, val);
 
     return stepOpenAllRoutes(this_);
 }
@@ -763,7 +737,7 @@ bool MainWindow::stepMeasHallProbePrepare(MainWindow *this_)
     const double hallProbeI = 0.001;
     /* set current to 1mA, open probe current source */
     this_->ps622Hack.setCurrent(hallProbeI);
-    this_->csvFile.setAt(csvColHallProbeI, hallProbeI);
+    this_->experiment.csvFile.setAt(Experiment::csvColHallProbeI, hallProbeI);
 
     HP34970hack::Channels_t closeChannels;
     closeChannels.append(_34903A_hall_probe_1_pwr_m);
