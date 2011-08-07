@@ -150,26 +150,26 @@ begin
 end;
 */
 
-HP34970hack::Sense_t HP34970hack::SenseVolt = "CONF:VOLT";
-HP34970hack::Sense_t HP34970hack::SenseRes = "CONF:RES";
+HP34970Hack::Sense_t HP34970Hack::SenseVolt = "CONF:VOLT";
+HP34970Hack::Sense_t HP34970Hack::SenseRes = "CONF:RES";
 
-HP34970hack::HP34970hack() :
+HP34970Hack::HP34970Hack() :
     QSerial()
 {
     memset(HP34903ClosedChannels, 0, sizeof(HP34903ClosedChannels));
 }
 
-HP34970hack::~HP34970hack()
+HP34970Hack::~HP34970Hack()
 {
     close();
 }
 
-void HP34970hack::close()
+void HP34970Hack::close()
 {
     QSerial::close();
 }
 
-QString HP34970hack::formatCmd(const QString &cmd, const Channels_t &channels)
+QString HP34970Hack::formatCmd(const QString &cmd, const Channels_t &channels)
 {
     if (!channels.size()) {
         return cmd;
@@ -185,12 +185,12 @@ QString HP34970hack::formatCmd(const QString &cmd, const Channels_t &channels)
     return format.arg(cmd).arg(ch.join(","));
 }
 
-void HP34970hack::init()
+void HP34970Hack::init()
 {
     sendCmd("INIT", 2000000);
 }
 
-bool HP34970hack::open(const QString &port)
+bool HP34970Hack::open(const QString &port)
 {
     const long timeout = (10l * 1000000l) / 9600l;
 
@@ -206,7 +206,7 @@ bool HP34970hack::open(const QString &port)
     return true;
 }
 
-QStringList HP34970hack::read()
+QStringList HP34970Hack::read()
 {
     QString s;
     QStringList data;
@@ -221,7 +221,7 @@ QStringList HP34970hack::read()
     return data;
 }
 
-void HP34970hack::sendCmd(const QString &cmd, long timeout)
+void HP34970Hack::sendCmd(const QString &cmd, long timeout)
 {
     QString s;
 
@@ -230,7 +230,7 @@ void HP34970hack::sendCmd(const QString &cmd, long timeout)
         throw new std::runtime_error("P34970hack::cmd response not empty.");
 }
 
-void HP34970hack::sendCmd(const QString &cmd, const Channels_t &channels, long timeout)
+void HP34970Hack::sendCmd(const QString &cmd, const Channels_t &channels, long timeout)
 {
     QString s;
 
@@ -239,7 +239,7 @@ void HP34970hack::sendCmd(const QString &cmd, const Channels_t &channels, long t
         throw new std::runtime_error("P34970hack::cmd response not empty.");
 }
 
-QString HP34970hack::sendQuery(const QString &cmd, long timeout)
+QString HP34970Hack::sendQuery(const QString &cmd, long timeout)
 {
     QString _cmd(cmd + ";*OPC?\n");
     write(_cmd);
@@ -253,14 +253,14 @@ QString HP34970hack::sendQuery(const QString &cmd, long timeout)
     throw new std::runtime_error("P34970hack::sendQuery failed read response.");
 }
 
-QString HP34970hack::sendQuery(const QString &cmd, const Channels_t &channels, long timeout)
+QString HP34970Hack::sendQuery(const QString &cmd, const Channels_t &channels, long timeout)
 {
     QString _cmd(formatCmd(cmd, channels));
 
     return sendQuery(_cmd, timeout);
 }
 
-void HP34970hack::setRoute(Channels_t closeChannels, int offs)
+void HP34970Hack::setRoute(Channels_t closeChannels, int offs)
 {
     Channels_t openChannels;
     Channels_t _closeChannels_;
@@ -286,7 +286,7 @@ void HP34970hack::setRoute(Channels_t closeChannels, int offs)
         sendCmd("ROUT:CLOS", _closeChannels_);
 }
 
-void HP34970hack::setScan(Channels_t channels)
+void HP34970Hack::setScan(Channels_t channels)
 {
     QString cmd("ROUT:SCAN");
 
@@ -295,17 +295,7 @@ void HP34970hack::setScan(Channels_t channels)
     sendCmd(cmd);
 }
 
-void HP34970hack::setSense(Sense_t sense, Channels_t channels)
+void HP34970Hack::setSense(Sense_t sense, Channels_t channels)
 {
     sendCmd(sense, channels);
 }
-
-void HP34970hack::setup()
-{
-    Channels_t channels;
-
-    channels << 101 << 102 << 103 << 104 << 114;
-    setSense(SenseVolt, channels);
-    init();
-}
-

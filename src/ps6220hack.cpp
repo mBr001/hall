@@ -61,7 +61,7 @@ bool PS6220Hack::isline(const char *buf, ssize_t size)
 
 bool PS6220Hack::open(const char *fname)
 {
-    const char cmd_rem[] ="syst:rem\n";
+    const char cmd_rem[] ="SYST:REM\n";
 
     close();
 
@@ -79,7 +79,7 @@ err:
 
 bool PS6220Hack::output()
 {
-    QString cmd("outp?\n");
+    QString cmd("OUTP?\n");
     char buf[256];
     ssize_t size;
 
@@ -173,26 +173,37 @@ ssize_t PS6220Hack::serial_read(char *buf, ssize_t count)
         errno = ERANGE;
         return -1;
 }
+#include <stdexcept>
 
 void PS6220Hack::setCurrent(double current)
 {
-    QString cmd("curr %1\n");
+    QString cmd("SOUR:CURR %1;*OPC?\n");
 
     cmd = cmd.arg(current).replace(",", ".");
-
     write(fd, cmd.toAscii().constData(), cmd.toAscii().size());
+
+    // TODO: just hack to wain for "1" (result form *opc?)
+    char buf[16];
+    serial_read(buf, sizeof(buf));
+    if (buf[0] != '1')
+        throw new std::runtime_error("setCurrent");
 }
 
 void PS6220Hack::setOutput(bool out)
 {
     if (out) {
-        const char cmd_out_on[] = "OUTP ON\n";
+        const char cmd_out_on[] = "OUTP 1;*OPC?\n";
 
         write(fd, cmd_out_on, sizeof(cmd_out_on) - 1);
     }
     else {
-        const char cmd_out_on[] = "OUTP OFF\n";
+        const char cmd_out_on[] = "OUTP 0;*OPC?\n";
 
         write(fd, cmd_out_on, sizeof(cmd_out_on) - 1);
     }
+    // TODO: just hack to wain for "1" (result form *opc?)
+    char buf[16];
+    serial_read(buf, sizeof(buf));
+    if (buf[0] != '1')
+        throw new std::runtime_error("setOutput");
 }

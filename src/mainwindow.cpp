@@ -1,5 +1,3 @@
-#include <errno.h>
-#include <math.h>
 #include <QCloseEvent>
 #include <QDateTime>
 #include <QMessageBox>
@@ -10,105 +8,22 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#ifndef ARRAY_SIZE
-#define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
-#endif
-
-const char MainWindow::pol_pn[] =
-        "<span style='font-weight:600;'><span style='color:#ff0000;'>+</span> <span style='color:#0000ff;'>-</span></span>";
-const char MainWindow::pol_np[] =
-        "<span style='font-weight:600;'><span style='color:#0000ff;'>-</span> <span style='color:#ff0000;'>+</span></span>";
-
-const int MainWindow::_34901A = 100;
-const int MainWindow::_34901A_sample_cd = _34901A + 1;
-const int MainWindow::_34901A_sample_da = _34901A + 2;
-const int MainWindow::_34901A_sample_bd = _34901A + 3;
-const int MainWindow::_34901A_sample_ac = _34901A + 4;
-const int MainWindow::_34901A_hall_probe = _34901A + 14;
-
-const int MainWindow::_34903A = 200;
-const int MainWindow::_34903A_sample_a_pwr_m = _34903A + 1;
-const int MainWindow::_34903A_sample_b_pwr_p = _34903A + 2;
-const int MainWindow::_34903A_sample_c_pwr_sw1 = _34903A + 3;
-const int MainWindow::_34903A_sample_d_pwr_m = _34903A + 4;
-const int MainWindow::_34903A_pwr_sw1_pwr_m = _34903A + 5;
-const int MainWindow::_34903A_pwr_sw1_pwr_p = _34903A + 6;
-const int MainWindow::_34903A_hall_probe_1_pwr_m = _34903A + 9;
-const int MainWindow::_34903A_hall_probe_2_pwr_p = _34903A + 10;
-
-const MainWindow::Step_t MainWindow::stepsAll[] = {
-    {   stepAbort, 0,    },
-};
-
-const MainWindow::Step_t MainWindow::stepsMeasure[] = {
-    {   stepOpenAllRoutes, 10, },
-    {   stepGetTime, 0 },
-    {   stepMeasHallProbePrepare, 10 },
-    {   stepMeasHallProbe, 0 },
-
-    {   stepSamplePower_pm, 10 },
-    {   stepSamplePower_bd, 10 },
-    {   stepSampleMeasPrepare_ac, 10 },
-    {   stepSampleMeas_ac, 10 },
-    {   stepSamplePower_ca, 10 },
-    {   stepSampleMeasPrepare_bd, 10 },
-    {   stepSampleMeas_bd, 10 },
-
-    {   stepSamplePower_ba, 10 },
-    {   stepSampleMeasPrepare_cd, 10 },
-    {   stepSampleMeas_cd, 10 },
-    {   stepSamplePower_bc, 10 },
-    {   stepSampleMeasPrepare_da, 10 },
-    {   stepSampleMeas_da, 10 },
-
-    {   stepSamplePower_mp, 10 },
-    {   stepSamplePower_bd, 10 },
-    {   stepSampleMeasPrepare_ac, 10 },
-    {   stepSampleMeas_acRev, 10 },
-    {   stepSamplePower_ca, 10 },
-    {   stepSampleMeasPrepare_bd, 10 },
-    {   stepSampleMeas_bdRev, 10 },
-
-    {   stepSamplePower_ba, 10 },
-    {   stepSampleMeasPrepare_cd, 10 },
-    {   stepSampleMeas_cdRev, 10 },
-    {   stepSamplePower_bc, 10 },
-    {   stepSampleMeasPrepare_da, 10 },
-    {   stepSampleMeas_daRev, 10 },
-
-    {   stepFinish, 0 },
-    {   stepAbort, 0 },
-};
-
-MainWindow::Steps_t::Steps_t(const Step_t *begin, const Step_t *end)
-{
-    reserve(end - begin);
-    for (; begin < end; ++begin) {
-        append(*begin);
-    }
-}
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    measRunning(false),
-    measTimer(this),
-    coilTimer(this),
+    config(),
     configUI(),
     experiment(this),
     ui(new Ui::MainWindow)
 {
-    coilTimer.setObjectName("coilTimer");
-    coilTimer.setInterval(currentDwell);
-    coilTimer.setSingleShot(false);
-
     experiment.setObjectName("experiment");
-
-    measTimer.setObjectName("measTimer");
-    measTimer.setSingleShot(true);
-
     ui->setupUi(this);
-
     QObject::connect(&configUI, SIGNAL(accepted()), this, SLOT(show()));
+    QObject::connect(&experiment, SIGNAL(coilBMeasured(double)),
+                     ui->coilBDoubleSpinBox, SLOT(setValue(double)));
+    QObject::connect(&experiment, SIGNAL(coilIMeasured(double)),
+                     ui->coilCurrMeasDoubleSpinBox, SLOT(setValue(double)));
+    QObject::connect(&experiment, SIGNAL(coilUMeasured(double)),
+                     ui->coilVoltMeasDoubleSpinBox, SLOT(setValue(double)));
 }
 
 MainWindow::~MainWindow()
@@ -116,25 +31,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::closeDevs()
-{
-    coilTimer.stop();
-    ui->sweepingWidget->setEnabled(false);
-    experiment.close();
-    hp34970Hack.close();
-    ps622Hack.close();
-    pwrPolSwitch.close();
-    sdp_close(&sdp);
-}
-
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (configUI.isHidden() && configUI.result() == QDialog::Accepted) {
         event->ignore();
-        if (ui->coilPowerCheckBox->isChecked() ||
-                ui->coilPolCrossCheckBox->isChecked() ||
-                ui->samplePowerCheckBox->isChecked()) {
-            // TODO: kontrolovat skutečný stav
+        if (experiment.coilI() != 0) {
             if (QMessageBox::warning(
                         this, "Power is still on!",
                         "Power is still on and should be turned (slowly!) "
@@ -145,164 +46,51 @@ void MainWindow::closeEvent(QCloseEvent *event)
                 return;
             }
         }
-        closeDevs();
+        experiment.close();
         hide();
         configUI.show();
-
         return;
     }
 
     QMainWindow::closeEvent(event);
 }
 
-void MainWindow::measureAbort()
+void MainWindow::measure(bool single)
 {
-    measTimer.stop();
-    measRunning = false;
-    ui->coilGroupBox->setEnabled(true);
-    ui->sampleGroupBox->setEnabled(true);
-    ui->measurePushButton->setEnabled(true);
-    ui->startPushButton->setText("Start");
-}
-
-void MainWindow::measureStart()
-{
-    measTimer.start(0);
-    measRunning = true;
+    experiment.measure(single);
     ui->coilGroupBox->setEnabled(false);
-    ui->sampleGroupBox->setEnabled(false);
     ui->measurePushButton->setEnabled(false);
+    ui->sampleGroupBox->setEnabled(false);
     ui->startPushButton->setText("Abort");
 }
 
-void MainWindow::on_coilCurrDoubleSpinBox_valueChanged(double )
+void MainWindow::on_coilCurrDoubleSpinBox_valueChanged(double value)
+{
+    if (ui->coilPowerCheckBox->isChecked()) {
+        ui->sweepingWidget->setEnabled(true);
+        experiment.setCoilI(value);
+    }
+}
+
+void MainWindow::on_coilPowerCheckBox_toggled(bool checked)
 {
     ui->sweepingWidget->setEnabled(true);
+    if (checked) {
+        experiment.setCoilI(ui->coilCurrDoubleSpinBox->value());
+    }
+    else {
+        experiment.setCoilI(0);
+    }
 }
 
-void MainWindow::on_coilPolCrossCheckBox_toggled(bool checked)
-{
-    ui->sweepingWidget->setEnabled(true);
-
-    if (checked)
-        ui->polarityLabel->setText(pol_np);
-    else
-        ui->polarityLabel->setText(pol_pn);
-}
-
-void MainWindow::on_coilPowerCheckBox_toggled(bool)
-{
-    ui->sweepingWidget->setEnabled(true);
-}
-
-void MainWindow::on_coilTimer_timeout()
-{
-    sdp_lcd_info_t lcd_info;
-
-    if (sdp_get_lcd_info(&sdp, &lcd_info) < 0) {
-        throw new std::runtime_error(
-                "on_currentTimer_timeout - sdp_get_lcd_info");
-        return;
-    }
-
-    ui->coilCurrMeasDoubleSpinBox->setValue(lcd_info.read_A);
-    ui->coilVoltMeasDoubleSpinBox->setValue(lcd_info.read_V);
-
-    // update coil current
-    if (!ui->sweepingWidget->isEnabled())
-        return;
-
-    /** Curent trought coil */
-    double procI, wantI;
-    /** Coil power state, on/off */
-    bool procCoilPower, wantCoilPower;
-    /** Coil power switch state direct/cross */
-    PwrPolSwitch::state_t procCoilSwitchState, wantCoilSwitchState;
-
-    /* Get all values necesary for process decisions. */
-    // wanted values
-    if (ui->coilPolCrossCheckBox->isChecked())
-        wantCoilSwitchState = PwrPolSwitch::cross;
-    else
-        wantCoilSwitchState = PwrPolSwitch::direct;
-
-    wantCoilPower = ui->coilPowerCheckBox->isChecked();
-
-    if (wantCoilPower) {
-        wantI = ui->coilCurrDoubleSpinBox->value();
-        if (wantCoilSwitchState == PwrPolSwitch::cross)
-            wantI = -wantI;
-    }
-    else
-        wantI = 0;
-
-    // process values
-    procCoilSwitchState = pwrPolSwitch.polarity();
-
-    procCoilPower = lcd_info.output;
-    procI = lcd_info.set_A;
-    if (procCoilSwitchState == PwrPolSwitch::cross)
-        procI = -procI;
-
-    ui->plainTextEdit->appendPlainText(QString(
-                "procI: %1, procCoilSwitchState: %2, procCoilPower: %3")
-            .arg(procI).arg(procCoilSwitchState).arg(procCoilPower));
-    ui->plainTextEdit->appendPlainText(QString(
-                "wantI: %1, wantCoilSwitchState: %2, wantCoilPower: %3\n")
-            .arg(wantI).arg(wantCoilSwitchState).arg(wantCoilPower));
-
-    /* Make process decision. */
-    // Need switch polarity?
-    if (procCoilSwitchState != wantCoilSwitchState) {
-        // Is polarity switch posible? (power is off)
-        if (!procCoilPower) {
-            pwrPolSwitch.setPolarity(wantCoilSwitchState);
-            return;
-        }
-
-        // Is posible power-off in order to swich polarity?
-        if (fabs(procI) < currentSlope) {
-            sdp_set_output(&sdp, 0);
-            return;
-        }
-
-        // set current near to zero before polarity switching
-    }
-
-    // Target reach, finish job
-    if (fabs(procI - wantI) < currentSlope) {
-        ui->sweepingWidget->setEnabled(false);
-        if (!wantCoilPower && fabs(procI) <= currentSlope && procCoilPower) {
-            if (sdp_set_output(&sdp, 0) < 0)
-                throw new std::runtime_error("timer - sdp_set_output");
-        }
-
-        return;
-    }
-
-    // want current but power is off -> set power on at current 0.0 A
-    if (procCoilPower != wantCoilPower && wantCoilPower) {
-        sdp_set_curr(&sdp, 0.0);
-        sdp_set_output(&sdp, 1);
-        return;
-    }
-
-    // power is on, but current neet to be adjusted, do one step
-    if (procI > wantI)
-        procI -= currentSlope;
-    else
-        procI += currentSlope;
-
-    sdp_set_curr(&sdp, fabs(procI));
-}
-
-void MainWindow::on_experiment_measurementComleted()
+void MainWindow::on_experiment_measured()
 {
     ui->dataTableWidget->insertRow(0);
 
     QString time(experiment.strDataTime());
     ui->dataTableWidget->setItem(0, 3, new QTableWidgetItem(time));
 
+    // TODO
     /*val = ui->coilCurrMeasDoubleSpinBox->value();
     ui->dataTableWidget->setItem(0, 0, new QTableWidgetItem(s));
 
@@ -310,216 +98,73 @@ void MainWindow::on_experiment_measurementComleted()
     ui->dataTableWidget->setItem(0, 1, new QTableWidgetItem(s));*/
 }
 
-void MainWindow::on_measTimer_timeout()
+void MainWindow::on_experiment_measurementCompleted()
 {
-    if (stepCurrent != stepsRunning.end()) {
-        if (stepCurrent->func(this)) {
-            measTimer.start(stepCurrent->delay);
-            ++stepCurrent;
-            return;
-        }
-    }
-    measureAbort();
+    ui->coilGroupBox->setEnabled(true);
+    ui->sampleGroupBox->setEnabled(true);
+    ui->measurePushButton->setEnabled(true);
+    ui->startPushButton->setText("Start");
 }
 
+void MainWindow::on_experiment_sweepingCompleted()
+{
+    ui->sweepingWidget->setEnabled(false);
+}
 
 void MainWindow::on_measurePushButton_clicked()
 {
-    stepsRunning = Steps_t(
-                stepsMeasure,
-                stepsMeasure + ARRAY_SIZE(stepsMeasure));
-    stepCurrent = stepsRunning.begin();
-
-    measureStart();
-
-    return;
+    measure(true);
 }
 
 void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
 {
-    ps622Hack.setCurrent(value);
-}
-
-void MainWindow::on_samplePolCrossCheckBox_toggled(bool )
-{
-
-}
-
-void MainWindow::on_samplePowerCheckBox_toggled(bool checked)
-{
-    ps622Hack.setOutput(checked);
+    experiment.setSampleI(value);
 }
 
 void MainWindow::on_startPushButton_clicked()
 {
-    if (measRunning) {
-        measureAbort();
+    if (experiment.isMeasuring()) {
+        experiment.measurementStop();
     }
     else {
         // TODO
-        //measureStart();
+        //experiment.measurementStartIntervall();
+        measure(false);
     }
-}
-
-bool MainWindow::openDevs()
-{
-    /** Text and title shown in error message box */
-    QString err_text, err_title;
-    QString s;
-    int err;
-
-    // Open CSV file to save data
-    // TODO: exception raising and handling
-    try {
-        experiment.open();
-    }
-    catch(Error &e)
-    {
-        err_title = e.description();
-        err_text = e.longDescription();
-
-        err_text = QString("%1:\n\n%2").arg(err_title).arg(err_text);
-        QMessageBox::critical(this, err_title, err_text);
-        statusBar()->showMessage(err_title);
-
-        return false;
-    }
-
-    s = config.msdpPort();
-    err = sdp_open(&sdp, s.toLocal8Bit().constData(), SDP_DEV_ADDR_MIN);
-    if (err < 0)
-        goto sdp_err0;
-
-    /* Set value limit in current input spin box. */
-    sdp_va_t limits;
-    err = sdp_get_va_maximums(&sdp, &limits);
-    if (err < 0)
-        goto sdp_err;
-    ui->coilCurrDoubleSpinBox->setMaximum(limits.curr);
-
-    /* Set actual current value as wanted value, avoiding unwanted hickups. */
-    sdp_va_data_t va_data;
-    err = sdp_get_va_data(&sdp, &va_data);
-    if (err < 0)
-        goto sdp_err;
-
-    ui->coilCurrDoubleSpinBox->setValue(va_data.curr);
-    err = sdp_set_curr(&sdp, va_data.curr);
-    if (err < 0)
-        goto sdp_err;
-
-    /* Set voltage to maximum, we drive only current. */
-    err = sdp_set_volt_limit(&sdp, limits.volt);
-    if (err < 0)
-        goto sdp_err;
-
-    err = sdp_set_volt(&sdp, limits.volt);
-    if (err < 0)
-        goto sdp_err;
-
-    sdp_lcd_info_t lcd_info;
-    sdp_get_lcd_info(&sdp, &lcd_info); // TODO check
-    if (err < 0)
-        goto sdp_err;
-    ui->coilPowerCheckBox->setChecked(lcd_info.output);
-
-    // Open polarity switch device
-    s = config.polSwitchPort();
-    if (!pwrPolSwitch.open(s.toLocal8Bit().constData())) {
-        err = errno;
-        goto mag_pwr_switch_err;
-    }
-
-    bool cross;
-    cross = (pwrPolSwitch.polarity() == PwrPolSwitch::cross);
-    ui->coilPolCrossCheckBox->setChecked(cross);
-
-    // Open sample power source
-    s = config.ps6220Port();
-    if (!ps622Hack.open(s.toLocal8Bit().constData()))
-    {
-        err = errno;
-        goto sample_pwr_err;
-    }
-
-    ui->sampleCurrDoubleSpinBox->setValue(ps622Hack.current());
-    ui->samplePowerCheckBox->setChecked(ps622Hack.output());
-
-    // Open and setup HP34970 device
-    s = config.hp34970Port();
-    if (!hp34970Hack.open(s)) {
-        err = errno;
-        goto hp34970hack_err;
-    }
-    hp34970Hack.setup();
-
-    ui->sweepingWidget->setEnabled(true);
-    coilTimer.start();
-
-    return true;
-
-hp34970hack_err:
-    if (err_title.isEmpty()) {
-        err_title = QString::fromLocal8Bit(
-                    "Failed to open HP34970 device");
-        err_text = QString::fromLocal8Bit(strerror(err));
-    }
-
-    ps622Hack.close();
-
-sample_pwr_err:
-    pwrPolSwitch.close();
-    if (err_title.isEmpty()) {
-        err_title = QString::fromLocal8Bit(
-                    "Failed to open sample power supply (Keithaly 6220)");
-        err_text = QString::fromLocal8Bit(strerror(err));
-    }
-
-mag_pwr_switch_err:
-    if (err_title.isEmpty()) {
-        err_title = QString::fromLocal8Bit(
-                    "Failed to open power supply switch");
-        err_text = QString::fromLocal8Bit(strerror(err));
-    }
-
-sdp_err:
-    sdp_close(&sdp);
-
-sdp_err0:
-    if (err_title.isEmpty()) {
-        err_title = QString::fromLocal8Bit(
-                    "Failed to open Manson SDP power supply");
-        err_text = QString::fromLocal8Bit(sdp_strerror(err));
-    }
-
-    err_text = QString("%1:\n\n%2").arg(err_title).arg(err_text);
-    QMessageBox::critical(this, err_title, err_text);
-    statusBar()->showMessage(err_title);
-
-    return false;
-}
-
-double MainWindow::readSingle()
-{
-    QStringList data(hp34970Hack.read());
-    if (data.size() != 1) {
-        throw new std::runtime_error("Could not get B data.");
-    }
-
-    bool ok;
-    double val(QVariant(data[0]).toDouble(&ok));
-    if (!ok)
-        return NAN;
-    return val;
 }
 
 void MainWindow::show()
 {
-    if (!openDevs()) {
+    try {
+        experiment.open();
+        experiment.setCoefficients(-30.588, 934.773, 392.163);
+    }
+    catch(Error &e)
+    {
+        QString err_title(e.description());
+        QString err_text("%1:\n\n%2");
+
+        err_text = err_text.arg(err_title).arg(e.longDescription());
+        QMessageBox::critical(this, err_title, err_text);
+        statusBar()->showMessage(err_title);
+
         configUI.show();
 
         return;
     }
+
+    double val;
+
+    val = experiment.coilI();
+    ui->coilCurrDoubleSpinBox->setValue(val);
+    ui->coilPowerCheckBox->setChecked(val != 0);
+
+    val = experiment.sampleI();
+    ui->sampleCurrDoubleSpinBox->setValue(val);
+
+    val = experiment.coilMaxI();
+    ui->coilCurrDoubleSpinBox->setMaximum(val);
+    ui->coilCurrDoubleSpinBox->setMinimum(-val);
 
     QWidget::show();
 }
@@ -529,241 +174,3 @@ void MainWindow::startApp()
     configUI.show();
 }
 
-bool MainWindow::stepSampleMeas_cd(MainWindow *this_)
-{
-    double val(this_->readSingle());
-
-    this_->experiment.csvFile.setAt(Experiment::csvColSampleUcdF, val);
-
-    return stepOpenAllRoutes(this_);
-}
-
-bool MainWindow::stepSampleMeas_cdRev(MainWindow *this_)
-{
-    double val(this_->readSingle());
-    this_->experiment.csvFile.setAt(Experiment::csvColSampleUcdB, val);
-
-    return stepOpenAllRoutes(this_);
-}
-
-bool MainWindow::stepSampleMeas_da(MainWindow *this_)
-{
-    double val(this_->readSingle());
-    this_->experiment.csvFile.setAt(Experiment::csvColSampleUdaF, val);
-
-    return stepOpenAllRoutes(this_);
-}
-
-bool MainWindow::stepSampleMeas_daRev(MainWindow *this_)
-{
-    double val(this_->readSingle());
-    this_->experiment.csvFile.setAt(Experiment::csvColSampleUdaB, val);
-
-    return stepOpenAllRoutes(this_);
-}
-
-bool MainWindow::stepSampleMeas_ac(MainWindow *this_)
-{
-    double val(this_->readSingle());
-    this_->experiment.csvFile.setAt(Experiment::csvColSampleUacF, val);
-
-    return stepOpenAllRoutes(this_);
-}
-
-bool MainWindow::stepSampleMeas_acRev(MainWindow *this_)
-{
-    double val(this_->readSingle());
-    this_->experiment.csvFile.setAt(Experiment::csvColSampleUacB, val);
-
-    return stepOpenAllRoutes(this_);
-}
-
-bool MainWindow::stepSampleMeas_bd(MainWindow *this_)
-{
-    double val(this_->readSingle());
-    this_->experiment.csvFile.setAt(Experiment::csvColSampleUbdF, val);
-
-    return stepOpenAllRoutes(this_);
-}
-
-bool MainWindow::stepSampleMeas_bdRev(MainWindow *this_)
-{
-    double val(this_->readSingle());
-    this_->experiment.csvFile.setAt(Experiment::csvColSampleUbdB, val);
-
-    return stepOpenAllRoutes(this_);
-}
-
-bool MainWindow::stepSampleMeasPrepare_cd(MainWindow *this_)
-{
-    HP34970hack::Channels_t scan;
-    scan.append(MainWindow::_34901A_sample_cd);
-    this_->hp34970Hack.setScan(scan);
-
-    return true;
-}
-
-bool MainWindow::stepSampleMeasPrepare_da(MainWindow *this_)
-{
-    HP34970hack::Channels_t scan;
-    scan.append(MainWindow::_34901A_sample_da);
-    this_->hp34970Hack.setScan(scan);
-
-    return true;
-}
-
-bool MainWindow::stepSampleMeasPrepare_ac(MainWindow *this_)
-{
-    HP34970hack::Channels_t scan;
-    scan.append(MainWindow::_34901A_sample_ac);
-    this_->hp34970Hack.setScan(scan);
-
-    return true;
-}
-
-bool MainWindow::stepSampleMeasPrepare_bd(MainWindow *this_)
-{
-    HP34970hack::Channels_t scan;
-    scan.append(MainWindow::_34901A_sample_bd);
-    this_->hp34970Hack.setScan(scan);
-
-    return true;
-}
-
-bool MainWindow::stepSamplePower_mp(MainWindow *this_)
-{
-    this_->ps622Hack.setOutput(false);
-
-    double val(this_->ui->sampleCurrDoubleSpinBox->value());
-    this_->ps622Hack.setCurrent(-val);
-
-    return true;
-}
-
-bool MainWindow::stepSamplePower_pm(MainWindow *this_)
-{
-    this_->ps622Hack.setOutput(false);
-
-    double val(this_->ui->sampleCurrDoubleSpinBox->value());
-    this_->ps622Hack.setCurrent(val);
-    this_->experiment.csvFile.setAt(Experiment::csvColSampleI, val);
-
-    return true;
-}
-
-
-bool MainWindow::stepSamplePower_ba(MainWindow *this_)
-{
-    HP34970hack::Channels_t channels;
-    channels.append(_34903A_sample_a_pwr_m);
-    channels.append(_34903A_sample_b_pwr_p);
-    this_->hp34970Hack.setRoute(channels, _34903A);
-    this_->ps622Hack.setOutput(true);
-
-    return true;
-}
-
-bool MainWindow::stepSamplePower_bc(MainWindow *this_)
-{
-    HP34970hack::Channels_t channels;
-    channels.append(_34903A_sample_b_pwr_p);
-    channels.append(_34903A_sample_c_pwr_sw1);
-    channels.append(_34903A_pwr_sw1_pwr_m);
-    this_->hp34970Hack.setRoute(channels, _34903A);
-    this_->ps622Hack.setOutput(true);
-
-    return true;
-}
-
-bool MainWindow::stepSamplePower_bd(MainWindow *this_)
-{
-    HP34970hack::Channels_t channels;
-    channels.append(_34903A_sample_b_pwr_p);
-    channels.append(_34903A_sample_d_pwr_m);
-    this_->hp34970Hack.setRoute(channels, _34903A);
-    this_->ps622Hack.setOutput(true);
-
-    return true;
-}
-
-bool MainWindow::stepSamplePower_ca(MainWindow *this_)
-{
-    HP34970hack::Channels_t channels;
-    channels.append(_34903A_sample_a_pwr_m);
-    channels.append(_34903A_sample_c_pwr_sw1);
-    channels.append(_34903A_pwr_sw1_pwr_p);
-    this_->hp34970Hack.setRoute(channels, _34903A);
-    this_->ps622Hack.setOutput(true);
-
-    return true;
-}
-
-bool MainWindow::stepAbort(MainWindow *)
-{
-    return false;
-}
-
-bool MainWindow::stepCreateLoopMark(MainWindow *this_)
-{
-    this_->stepLoopMark = this_->stepCurrent + 1;
-
-    return true;
-}
-
-bool MainWindow::stepFinish(MainWindow *this_)
-{
-    this_->experiment._csvFileWrite();
-
-    return true;
-}
-
-bool MainWindow::stepGetTime(MainWindow *this_)
-{
-    this_->experiment._csvFileGetTime();
-
-    return true;
-}
-
-bool MainWindow::stepMeasHallProbe(MainWindow *this_)
-{
-    double val(this_->readSingle());
-
-    this_->experiment.csvFile.setAt(Experiment::csvColHallProbeU, val);
-    // Some math magic to get B
-    val = -30.588 + sqrt(934.773 + 392.163 * val);
-    this_->ui->coilBDoubleSpinBox->setValue(val);
-    this_->experiment.csvFile.setAt(Experiment::csvColHallProbeB, val);
-
-    return stepOpenAllRoutes(this_);
-}
-
-bool MainWindow::stepMeasHallProbePrepare(MainWindow *this_)
-{
-    const double hallProbeI = 0.001;
-    /* set current to 1mA, open probe current source */
-    this_->ps622Hack.setCurrent(hallProbeI);
-    this_->experiment.csvFile.setAt(Experiment::csvColHallProbeI, hallProbeI);
-
-    HP34970hack::Channels_t closeChannels;
-    closeChannels.append(_34903A_hall_probe_1_pwr_m);
-    closeChannels.append(_34903A_hall_probe_2_pwr_p);
-    this_->hp34970Hack.setRoute(closeChannels, _34903A);
-
-    HP34970hack::Channels_t scan;
-    scan.append(MainWindow::_34901A_hall_probe);
-    this_->hp34970Hack.setScan(scan);
-
-    this_->ps622Hack.setOutput(true);
-
-    return true;
-}
-
-bool MainWindow::stepOpenAllRoutes(MainWindow *this_)
-{
-    HP34970hack::Channels_t closeChannels;
-
-    this_->hp34970Hack.setRoute(closeChannels, _34903A);
-    this_->ps622Hack.setOutput(false);
-
-    return true;
-}

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>839</width>
-    <height>657</height>
+    <width>800</width>
+    <height>615</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -153,16 +153,6 @@
              </property>
             </widget>
            </item>
-           <item row="6" column="0" colspan="3">
-            <widget class="QCheckBox" name="coilPolCrossCheckBox">
-             <property name="toolTip">
-              <string>Cross polarity on coil input.</string>
-             </property>
-             <property name="text">
-              <string>Polarity Reversed</string>
-             </property>
-            </widget>
-           </item>
            <item row="5" column="3">
             <widget class="QLabel" name="label_13">
              <property name="text">
@@ -186,17 +176,6 @@
              </property>
             </widget>
            </item>
-           <item row="6" column="3">
-            <widget class="QLabel" name="polarityLabel">
-             <property name="text">
-              <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Cantarell'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; color:#ff0000;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; &lt;/span&gt;&lt;span style=&quot; font-weight:600; color:#0000ff;&quot;&gt;-&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-            </widget>
-           </item>
           </layout>
          </widget>
         </item>
@@ -216,13 +195,6 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="singleStep">
               <double>0.000100000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QCheckBox" name="samplePowerCheckBox">
-             <property name="text">
-              <string>Power</string>
              </property>
             </widget>
            </item>

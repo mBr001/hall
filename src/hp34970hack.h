@@ -5,7 +5,7 @@
 #include <qlist.h>
 #include <qstringlist.h>
 
-class HP34970hack : protected QSerial
+class HP34970Hack : protected QSerial
 {
 public:
     typedef const char *Sense_t;
@@ -16,8 +16,8 @@ public:
     static Sense_t SenseVolt;
     static Sense_t SenseRes;
 
-    HP34970hack();
-    ~HP34970hack();
+    HP34970Hack();
+    ~HP34970Hack();
     void close();
     void init();
     bool open(const QString &port);
@@ -25,7 +25,6 @@ public:
     void setRoute(Channels_t closeChannels, int offs);
     void setScan(Channels_t channels);
     void setSense(Sense_t sense, Channels_t channels);
-    void setup();
 
 protected:
     QString formatCmd(const QString &cmd, const Channels_t &channels);
