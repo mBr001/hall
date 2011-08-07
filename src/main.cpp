@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setApplicationName("Hall");
     a.setOrganizationDomain("www.vscht.cz");
-    a.setOrganizationName("VSCHT");
+    a.setOrganizationName(QString::fromLocal8Bit("VŠCHT"));
 
     MainWindow w;
     w.startApp();
