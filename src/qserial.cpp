@@ -58,6 +58,23 @@ bool QSerial::isLine(const char *buf, ssize_t size)
     return false;
 }
 
+QStringList QSerial::list()
+{
+    QStringList ports;
+
+#ifdef __linux__
+    QDir dir("/dev");
+    QStringList filters;
+    filters << "ttyS*" << "ttyUSB*";
+
+    dir.setNameFilters(filters);
+    ports = dir.entryList(QDir::System, QDir::Name | QDir::LocaleAware);
+#else
+#error "Not implemented!"
+#endif
+    return ports;
+}
+
 /**
  * Open serial port and set parameters as defined for SDP power source.
  * @param port File name of serial port.

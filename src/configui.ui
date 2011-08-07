@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>453</width>
-    <height>177</height>
+    <width>553</width>
+    <height>229</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Magnet power switch port:</string>
+      <string>Coil polarity switch port:</string>
      </property>
     </widget>
    </item>
@@ -35,17 +35,12 @@
      <property name="minimumContentsLength">
       <number>14</number>
      </property>
-     <item>
-      <property name="text">
-       <string>LPT1</string>
-      </property>
-     </item>
     </widget>
    </item>
    <item row="1" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Magnet power source port:</string>
+      <string>Coil power supply port (SDP 2xxx):</string>
      </property>
     </widget>
    </item>
@@ -60,17 +55,32 @@
      <property name="minimumContentsLength">
       <number>14</number>
      </property>
-     <item>
-      <property name="text">
-       <string>COM1</string>
-      </property>
-     </item>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Sample power supply port: (K6220)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QComboBox" name="samplePowerPortComboBox">
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QComboBox::AdjustToContents</enum>
+     </property>
+     <property name="minimumContentsLength">
+      <number>14</number>
+     </property>
     </widget>
    </item>
    <item row="3" column="0">
     <widget class="QLabel" name="label_3">
      <property name="text">
-      <string>Agilent port:</string>
+      <string>HP34970 port:</string>
      </property>
     </widget>
    </item>
@@ -85,17 +95,12 @@
      <property name="minimumContentsLength">
       <number>14</number>
      </property>
-     <item>
-      <property name="text">
-       <string>GPIB1</string>
-      </property>
-     </item>
     </widget>
    </item>
    <item row="4" column="0">
     <widget class="QLabel" name="label_4">
      <property name="text">
-      <string>Save file:</string>
+      <string>Data save file:</string>
      </property>
     </widget>
    </item>
@@ -117,26 +122,6 @@
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Sample power source port:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QComboBox" name="samplePowerPortComboBox">
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-     <property name="sizeAdjustPolicy">
-      <enum>QComboBox::AdjustToContents</enum>
-     </property>
-     <property name="minimumContentsLength">
-      <number>14</number>
      </property>
     </widget>
    </item>

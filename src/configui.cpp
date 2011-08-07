@@ -2,6 +2,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include "configui.h"
+#include "qserial.h"
 #include "ui_configui.h"
 
 ConfigUI::ConfigUI(QWidget *parent) :
@@ -10,11 +11,23 @@ ConfigUI::ConfigUI(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    QStringList ports(QSerial::list());
+    ui->agilentPortComboBox->addItems(ports);
+    ui->powerSupplyPortComboBox->addItems(ports);
+    ui->samplePowerPortComboBox->addItems(ports);
+
+    QDir dir("/dev");
+    QStringList filters;
+    filters << "parport*";
+    dir.setNameFilters(filters);
+    ports = dir.entryList(QDir::System, QDir::Name | QDir::LocaleAware);
+    ui->switchPortComboBox->addItems(ports);
+
     ui->agilentPortComboBox->setEditText(config.hp34970Port());
-    ui->powerSupplyPortComboBox->setEditText(config.msdpPort());
-    ui->switchPortComboBox->setEditText(config.polSwitchPort());
-    ui->samplePowerPortComboBox->setEditText(config.ps6220Port());
     ui->fileNameLineEdit->setText(config.dataFileName());
+    ui->powerSupplyPortComboBox->setEditText(config.msdpPort());
+    ui->samplePowerPortComboBox->setEditText(config.ps6220Port());
+    ui->switchPortComboBox->setEditText(config.polSwitchPort());
 }
 
 ConfigUI::~ConfigUI()

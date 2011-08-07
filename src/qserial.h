@@ -16,6 +16,7 @@ public:
     ~QSerial();
     void close();
     bool isOpen();
+    static QStringList list();
     bool open(const char *port, BaudeRate_t bauderate, long timeoutOffs,
               long timeoutPerChar);
     bool open(QString port, BaudeRate_t bauderate, long timeoutOffs,
