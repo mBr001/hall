@@ -1,6 +1,9 @@
 #ifndef QSERAL_H
 #define QSERAL_H
 
+#include <QtCore>
+
+
 class QSerial
 {
 public:
