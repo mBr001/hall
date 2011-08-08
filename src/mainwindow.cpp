@@ -43,6 +43,11 @@ MainWindow::MainWindow(QWidget *parent) :
     qwtPlotCurveResistivity.setStyle(QwtPlotCurve::NoCurve);
     symbol.setStyle(QwtSymbol::Star1);
     qwtPlotCurveResistivity.setSymbol(symbol);
+
+    ui->hallProbeNameComboBox->addItems(config.hallProbes());
+    // TODO: selekce konstant naposledy vybrané hallovi sondy
+    // experiment.setCoefficients(-30.588, 934.773, 392.163);
+    // Inicializace sampleI - zkontrolovat
 }
 
 MainWindow::~MainWindow()
@@ -145,6 +150,34 @@ void MainWindow::on_measurePushButton_clicked()
     measure(true);
 }
 
+void MainWindow::on_hallProbeAddToolButton_clicked()
+{
+    double B1(ui->hallB1DoubleSpinBox->value());
+    double B2(ui->hallB2DoubleSpinBox->value());
+    double B3(ui->hallB3DoubleSpinBox->value());
+    QString name(ui->hallProbeNameComboBox->currentText());
+
+    config.setHallProbeBn(name, 1, B1);
+    config.setHallProbeBn(name, 2, B2);
+    config.setHallProbeBn(name, 3, B3);
+
+    experiment.setCoefficients(B1, B2, B3);
+}
+
+void MainWindow::on_hallProbeNameComboBox_currentIndexChanged(const QString &arg1)
+{
+    double B1(config.hallProbeBn(arg1, 1));
+    double B2(config.hallProbeBn(arg1, 2));
+    double B3(config.hallProbeBn(arg1, 3));
+
+    ui->hallB1DoubleSpinBox->setValue(B1);
+    ui->hallB2DoubleSpinBox->setValue(B2);
+    ui->hallB3DoubleSpinBox->setValue(B3);
+
+    experiment.setCoefficients(B1, B2, B3);
+}
+
+
 void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
 {
     experiment.setSampleI(value);
@@ -166,7 +199,6 @@ void MainWindow::show()
 {
     try {
         experiment.open();
-        experiment.setCoefficients(-30.588, 934.773, 392.163);
     }
     catch(Error &e)
     {
@@ -202,4 +234,3 @@ void MainWindow::startApp()
 {
     configUI.show();
 }
-
