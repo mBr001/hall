@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     pointsHallU(),
     pointsResistivity(),
     qwtPlotCurveHallU("Hall U"),
+    qwtPlotCurveResistivity("Resistivity"),
     ui(new Ui::MainWindow)
 {
     experiment.setObjectName("experiment");
@@ -30,11 +31,18 @@ MainWindow::MainWindow(QWidget *parent) :
                      ui->coilVoltMeasDoubleSpinBox, SLOT(setValue(double)));
     pointsHallU.reserve(1024);
     pointsResistivity.reserve(1024);
+
     qwtPlotCurveHallU.attach(ui->qwtPlot);
+    QwtSymbol symbol(QwtSymbol::XCross, qwtPlotCurveHallU.brush(),
+            qwtPlotCurveHallU.pen(), QSize(6, 6));
+    //symbol.setColor(QColor(255, 0, 0));
     qwtPlotCurveHallU.setStyle(QwtPlotCurve::NoCurve);
-    QwtSymbol symbol = qwtPlotCurveHallU.symbol();
-    symbol.setStyle(QwtSymbol::XCross);
     qwtPlotCurveHallU.setSymbol(symbol);
+
+    qwtPlotCurveResistivity.attach(ui->qwtPlot);
+    qwtPlotCurveResistivity.setStyle(QwtPlotCurve::NoCurve);
+    symbol.setStyle(QwtSymbol::Star1);
+    qwtPlotCurveResistivity.setSymbol(symbol);
 }
 
 MainWindow::~MainWindow()
@@ -115,6 +123,7 @@ void MainWindow::on_experiment_measured(const QString &time, double B,
     pointsHallU.append(QPointF(B, hallU));
     pointsResistivity.append(QPointF(B, resistivity));
     qwtPlotCurveHallU.setData(pointsHallU);
+    qwtPlotCurveResistivity.setData(pointsResistivity);
     ui->qwtPlot->replot();
 }
 

@@ -43,10 +43,11 @@ private:
     ConfigUI configUI;
     /** Experiment driving class. */
     Experiment experiment;
-    /** List of point for graph */
+
     QVector<QPointF> pointsHallU;
     QVector<QPointF> pointsResistivity;
     QwtPlotCurve qwtPlotCurveHallU;
+    QwtPlotCurve qwtPlotCurveResistivity;
     /** User interface widgets */
     Ui::MainWindow *ui;
 
