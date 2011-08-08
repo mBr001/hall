@@ -13,6 +13,9 @@ MainWindow::MainWindow(QWidget *parent) :
     config(),
     configUI(),
     experiment(this),
+    pointsHallU(),
+    pointsResistivity(),
+    qwtPlotCurveHallU("Hall U"),
     ui(new Ui::MainWindow)
 {
     experiment.setObjectName("experiment");
@@ -24,6 +27,9 @@ MainWindow::MainWindow(QWidget *parent) :
                      ui->coilCurrMeasDoubleSpinBox, SLOT(setValue(double)));
     QObject::connect(&experiment, SIGNAL(coilUMeasured(double)),
                      ui->coilVoltMeasDoubleSpinBox, SLOT(setValue(double)));
+    pointsHallU.reserve(1024);
+    pointsResistivity.reserve(1024);
+    qwtPlotCurveHallU.attach(ui->qwtPlot);
 }
 
 MainWindow::~MainWindow()
@@ -96,6 +102,15 @@ void MainWindow::on_experiment_measured(const QString &time, double B,
                 0, 2, new QTableWidgetItem(QVariant(hallU).toString()));
     ui->dataTableWidget->setItem(
                 0, 3, new QTableWidgetItem(time));
+    if (pointsHallU.size() == pointsHallU.capacity()) {
+        int reserve(pointsHallU.capacity() * 2);
+        pointsHallU.reserve(reserve);
+        pointsResistivity.reserve(reserve);
+    }
+    pointsHallU.append(QPointF(B, hallU));
+    pointsResistivity.append(QPointF(B, resistivity));
+    qwtPlotCurveHallU.setData(pointsHallU);
+    ui->qwtPlot->replot();
 }
 
 void MainWindow::on_experiment_measurementCompleted()
