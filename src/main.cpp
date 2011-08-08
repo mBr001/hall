@@ -1,4 +1,6 @@
 #include <QtGui/QApplication>
+#include <QMessageBox>
+#include "error.h"
 #include "mainwindow.h"
 
 int main(int argc, char *argv[])
@@ -11,5 +13,15 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.startApp();
 
-    return a.exec();
+    try {
+        return a.exec();
+    }
+    catch(Error &e)
+    {
+        QMessageBox::critical(0, e.description(), e.longDescription());
+    }
+    catch(std::runtime_error &e)
+    {
+        QMessageBox::critical(0, e.what(), e.what());
+    }
 }
