@@ -511,7 +511,7 @@ QString Experiment::strDataTime()
 void Experiment::stepSampleMeas_cd(Experiment *this_)
 {
     double val(this_->readSingle());
-
+    this_->dataUcd = val;
     this_->csvFile.setAt(Experiment::csvColSampleUcdF, val);
 
     stepOpenAllRoutes(this_);
@@ -520,6 +520,7 @@ void Experiment::stepSampleMeas_cd(Experiment *this_)
 void Experiment::stepSampleMeas_cdRev(Experiment *this_)
 {
     double val(this_->readSingle());
+    this_->dataUdc = val;
     this_->csvFile.setAt(Experiment::csvColSampleUcdB, val);
 
     stepOpenAllRoutes(this_);
@@ -528,6 +529,7 @@ void Experiment::stepSampleMeas_cdRev(Experiment *this_)
 void Experiment::stepSampleMeas_da(Experiment *this_)
 {
     double val(this_->readSingle());
+    this_->dataUda = val;
     this_->csvFile.setAt(Experiment::csvColSampleUdaF, val);
 
     stepOpenAllRoutes(this_);
@@ -536,6 +538,7 @@ void Experiment::stepSampleMeas_da(Experiment *this_)
 void Experiment::stepSampleMeas_daRev(Experiment *this_)
 {
     double val(this_->readSingle());
+    this_->dataUad = val;
     this_->csvFile.setAt(Experiment::csvColSampleUdaB, val);
 
     stepOpenAllRoutes(this_);
@@ -544,6 +547,7 @@ void Experiment::stepSampleMeas_daRev(Experiment *this_)
 void Experiment::stepSampleMeas_ac(Experiment *this_)
 {
     double val(this_->readSingle());
+    this_->dataUac = val;
     this_->csvFile.setAt(Experiment::csvColSampleUacF, val);
 
     stepOpenAllRoutes(this_);
@@ -552,6 +556,7 @@ void Experiment::stepSampleMeas_ac(Experiment *this_)
 void Experiment::stepSampleMeas_acRev(Experiment *this_)
 {
     double val(this_->readSingle());
+    this_->dataUca = val;
     this_->csvFile.setAt(Experiment::csvColSampleUacB, val);
 
     stepOpenAllRoutes(this_);
@@ -560,6 +565,7 @@ void Experiment::stepSampleMeas_acRev(Experiment *this_)
 void Experiment::stepSampleMeas_bd(Experiment *this_)
 {
     double val(this_->readSingle());
+    this_->dataUbd = val;
     this_->csvFile.setAt(Experiment::csvColSampleUbdF, val);
 
     stepOpenAllRoutes(this_);
@@ -568,6 +574,7 @@ void Experiment::stepSampleMeas_bd(Experiment *this_)
 void Experiment::stepSampleMeas_bdRev(Experiment *this_)
 {
     double val(this_->readSingle());
+    this_->dataUdb = val;
     this_->csvFile.setAt(Experiment::csvColSampleUbdB, val);
 
     stepOpenAllRoutes(this_);
@@ -660,8 +667,16 @@ void Experiment::stepAbort(Experiment *this_)
 
 void Experiment::stepFinish(Experiment *this_)
 {
+    this_->_dataHallU_ = ((this_->dataUca - this_->dataUac) +
+                          (this_->dataUbd - this_->dataUdb)) / 2;;
+    this_->_dataResistivity_ = ((this_->dataUcd - this_->dataUdc) +
+                                (this_->dataUda - this_->dataUad)) / 2 / this_->_sampleI_;
+
+    this_->csvFile.setAt(Experiment::csvColSampleHallU, this_->_dataHallU_);
+    this_->csvFile.setAt(Experiment::csvColSampleResistivity, this_->_dataResistivity_);
     this_->csvFile.write();
-    emit this_->measured();
+    emit this_->measured(this_->_strDataTime_, this_->_dataB_,
+                         this_->_dataHallU_, this_->_dataResistivity_);
 }
 
 void Experiment::stepGetTime(Experiment *this_)
@@ -675,7 +690,8 @@ void Experiment::stepMeasHallProbe(Experiment *this_)
     double val(this_->readSingle());
 
     this_->csvFile.setAt(Experiment::csvColHallProbeU, val);
-    this_->csvFile.setAt(Experiment::csvColHallProbeB, this_->computeB(val));
+    this_->_dataB_ = this_->computeB(val);
+    this_->csvFile.setAt(Experiment::csvColHallProbeB, this_->_dataB_);
 
     stepOpenAllRoutes(this_);
 }

@@ -211,8 +211,7 @@ protected:
     static void stepSamplePower_pm(Experiment *this_);
 
 signals:
-    void measured();
-    // void measured(QString time, double B, double hallU, double resistivity);
+    void measured(QString time, double B, double hallU, double resistivity);
     void measurementCompleted();
     void sweepingCompleted();
     void coilBMeasured(double B);
@@ -228,7 +227,10 @@ private:
     double B1, B2, B3;
     double _coilMaxI_;
     Config config;
-    /** I for hall probe measurement. */
+    double dataUcd, dataUdc, dataUda, dataUad;
+    double dataUac, dataUca, dataUbd, dataUdb;
+    double _dataB_, _dataHallU_, _dataResistivity_;
+    /** I for hall probe to measure B. */
     static const double hallProbeI;
     double _sampleI_;
     QString _strDataTime_;

@@ -83,19 +83,19 @@ void MainWindow::on_coilPowerCheckBox_toggled(bool checked)
     }
 }
 
-void MainWindow::on_experiment_measured()
+void MainWindow::on_experiment_measured(const QString &time, double B,
+                                        double hallU, double resistivity)
 {
     ui->dataTableWidget->insertRow(0);
 
-    QString time(experiment.strDataTime());
-    ui->dataTableWidget->setItem(0, 3, new QTableWidgetItem(time));
-
-    // TODO
-    /*val = ui->coilCurrMeasDoubleSpinBox->value();
-    ui->dataTableWidget->setItem(0, 0, new QTableWidgetItem(s));
-
-    val = ui->sampleCurrDoubleSpinBox->value();
-    ui->dataTableWidget->setItem(0, 1, new QTableWidgetItem(s));*/
+    ui->dataTableWidget->setItem(
+                0, 0, new QTableWidgetItem(QVariant(B).toString()));
+    ui->dataTableWidget->setItem(
+                0, 1, new QTableWidgetItem(QVariant(resistivity).toString()));
+    ui->dataTableWidget->setItem(
+                0, 2, new QTableWidgetItem(QVariant(hallU).toString()));
+    ui->dataTableWidget->setItem(
+                0, 3, new QTableWidgetItem(time));
 }
 
 void MainWindow::on_experiment_measurementCompleted()

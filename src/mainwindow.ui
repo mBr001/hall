@@ -310,12 +310,12 @@
             </attribute>
             <column>
              <property name="text">
-              <string>Coil curr. [A]</string>
+              <string>Coil B [T]</string>
              </property>
             </column>
             <column>
              <property name="text">
-              <string>Sample curr. [A]</string>
+              <string>Resistivity. [Ohm]</string>
              </property>
             </column>
             <column>
