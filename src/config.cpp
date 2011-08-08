@@ -1,5 +1,7 @@
 #include "config.h"
+#include <math.h>
 
+const char Config::cfg_hallProbe[] = "hall probes";
 const char Config::cfg_hp34970Port[] = "experiment/HP34970 port";
 const char Config::cfg_dataFileName[] = "experiment/data file name";
 const char Config::cfg_msdpPort[] = "experiment/coil PS port";
@@ -8,6 +10,25 @@ const char Config::cfg_ps6220Port[] = "experiment/sample PS port";
 
 Config::Config()
 {
+}
+
+double Config::hallProbeBn(const QString &name, int idx)
+{
+    QString _name_(name + "-" + QVariant(idx).toString());
+    settings.beginGroup(cfg_hallProbe);
+    double Bn(settings.value(_name_, NAN).toDouble());
+    settings.endGroup();
+
+    return Bn;
+}
+
+QStringList Config::hallProbes()
+{
+    settings.beginGroup(cfg_hallProbe);
+    QStringList hallProbes(settings.childKeys());
+    settings.endGroup();
+
+    return hallProbes.replaceInStrings(QRegExp("-[0-9]+$"), QString());
 }
 
 QString Config::dataFileName()
@@ -38,6 +59,14 @@ QString Config::ps6220Port()
 void Config::setDataFileName(const QString &port)
 {
     settings.setValue(cfg_dataFileName, port);
+}
+
+void Config::setHallProbeBn(const QString &name, int idx, double Bn)
+{
+    QString _name_(name + "-" + QVariant(idx).toString());
+    settings.beginGroup(cfg_hallProbe);
+    settings.setValue(_name_, Bn);
+    settings.endGroup();
 }
 
 void Config::setHp34970Port(const QString &port)
