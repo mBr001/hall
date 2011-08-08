@@ -1,6 +1,7 @@
 #include <QCloseEvent>
 #include <QDateTime>
 #include <QMessageBox>
+#include <qwt_symbol.h>
 #include <stdexcept>
 #include <vector>
 
@@ -30,6 +31,10 @@ MainWindow::MainWindow(QWidget *parent) :
     pointsHallU.reserve(1024);
     pointsResistivity.reserve(1024);
     qwtPlotCurveHallU.attach(ui->qwtPlot);
+    qwtPlotCurveHallU.setStyle(QwtPlotCurve::NoCurve);
+    QwtSymbol symbol = qwtPlotCurveHallU.symbol();
+    symbol.setStyle(QwtSymbol::XCross);
+    qwtPlotCurveHallU.setSymbol(symbol);
 }
 
 MainWindow::~MainWindow()
