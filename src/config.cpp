@@ -28,7 +28,9 @@ QStringList Config::hallProbes()
     QStringList hallProbes(settings.childKeys());
     settings.endGroup();
 
-    return hallProbes.replaceInStrings(QRegExp("-[0-9]+$"), QString());
+    hallProbes.replaceInStrings(QRegExp("-[0-9]+$"), QString()).removeDuplicates();
+
+    return hallProbes;
 }
 
 QString Config::dataFileName()
