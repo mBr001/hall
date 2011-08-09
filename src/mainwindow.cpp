@@ -33,8 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
     pointsResistivity.reserve(1024);
 
     ui->qwtPlot->enableAxis(QwtPlot::yRight, true);
-    ui->qwtPlot->setAxisTitle(QwtPlot::yRight, tr("(×) Resistivity [Ω]"));
-    ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, "(*) hall U [V]");
+    ui->qwtPlot->setAxisTitle(QwtPlot::yRight, tr("(*) Resistivity [Ω]"));
+    ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, "(×) hall U [V]");
     ui->qwtPlot->setAxisTitle(QwtPlot::xBottom, "B [T]");
     qwtPlotCurveHallU.attach(ui->qwtPlot);
     QwtSymbol symbol(QwtSymbol::XCross, qwtPlotCurveHallU.brush(),
@@ -127,11 +127,17 @@ void MainWindow::on_experiment_measured(const QString &time, double B,
         pointsHallU.reserve(reserve);
         pointsResistivity.reserve(reserve);
     }
-    pointsHallU.append(QPointF(B, hallU));
-    pointsResistivity.append(QPointF(B, resistivity));
-    qwtPlotCurveHallU.setData(pointsHallU);
-    qwtPlotCurveResistivity.setData(pointsResistivity);
-    ui->qwtPlot->replot();
+
+    if (!isnan(B)) {
+        if (!isnan(resistivity)) {
+            pointsResistivity.append(QPointF(B, resistivity));
+            qwtPlotCurveResistivity.setData(pointsResistivity);
+        }
+        if (!isnan(hallU))
+            pointsHallU.append(QPointF(B, hallU));
+            qwtPlotCurveHallU.setData(pointsHallU);
+        ui->qwtPlot->replot();
+    }
 }
 
 void MainWindow::on_experiment_measurementCompleted()
@@ -191,7 +197,7 @@ void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
 
 void MainWindow::on_sampleThicknessDoubleSpinBox_valueChanged(double value)
 {
-    experiment.setSampleThickness(value);
+    experiment.setSampleThickness(value/1000000.);
 }
 
 void MainWindow::on_startPushButton_clicked()
