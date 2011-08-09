@@ -94,6 +94,9 @@ void MainWindow::on_coilCurrDoubleSpinBox_valueChanged(double value)
 {
     if (ui->coilPowerCheckBox->isChecked()) {
         ui->sweepingWidget->setEnabled(true);
+        ui->measurePushButton->setEnabled(false);
+        ui->startPushButton->setEnabled(false);
+
         experiment.setCoilI(value);
     }
 }
@@ -101,6 +104,8 @@ void MainWindow::on_coilCurrDoubleSpinBox_valueChanged(double value)
 void MainWindow::on_coilPowerCheckBox_toggled(bool checked)
 {
     ui->sweepingWidget->setEnabled(true);
+    ui->measurePushButton->setEnabled(false);
+    ui->startPushButton->setEnabled(false);
     if (checked) {
         experiment.setCoilI(ui->coilCurrDoubleSpinBox->value());
     }
@@ -151,6 +156,8 @@ void MainWindow::on_experiment_measurementCompleted()
 void MainWindow::on_experiment_sweepingCompleted()
 {
     ui->sweepingWidget->setEnabled(false);
+    ui->measurePushButton->setEnabled(true);
+    ui->startPushButton->setEnabled(true);
 }
 
 void MainWindow::on_measurePushButton_clicked()
