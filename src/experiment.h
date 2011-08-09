@@ -230,11 +230,16 @@ private:
     Config config;
     double dataUcd, dataUdc, dataUda, dataUad;
     double dataUac, dataUca, dataUbd, dataUdb;
-    double _dataB_, _dataRHall_, _dataResistivity_, _dataResSpec_;
-    double _sampleThickness_;
+    double _dataB_;
+    /** Hall U [V] at B = 0T */
+    double _dataHallU0_;
+    double _dataRHall_;
+    double _dataResistivity_;
+    double _dataResSpec_;
     /** I for hall probe to measure B. */
     static const double hallProbeI;
     double _sampleI_;
+    double _sampleThickness_;
 };
 
 #endif // EXPERIMENT_H

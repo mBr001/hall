@@ -86,8 +86,10 @@ Experiment::Experiment(QObject *parent) :
     measTimer(this),
     _measuring_(false),
     _sweeping_(false),
-    B1(0),
-    B2(0),
+    B1(NAN),
+    B2(NAN),
+    B3(NAN),
+    _dataHallU0_(NAN),
     _sampleI_(0)
 {
     coilTimer.setObjectName("coilTimer");
@@ -142,7 +144,10 @@ double Experiment::coilMaxI()
 
 double Experiment::computeB(double U)
 {
-    double B(B1 + sqrt(B2 + B3 * fabs(U)));
+    double B(B1 + sqrt(B2 + B3 * fabs(U) / _sampleI_));
+    // alternativní vzorec a čísla
+    // U /= I; B = U(A+sqrt(U)*(B+C*sqrt(U)))-D;
+    // A=5.97622E-4 B=1.591394E-6 C=-9.24701E-11 D=-0.015
 
     return U > 0 ? B : -B;
 }
@@ -402,8 +407,8 @@ void Experiment::open()
         csvFile[csvColSampleUdaB] = "Uda/-+ [V]";
         csvFile[csvColSampleResistivity] = "R [ohm]";
         csvFile[csvColSampleResSpec] = "Rspec [ohm*m]";
-        csvFile[csvColSampleRHall] = "Rhall [?]";
-        csvFile[csvColSampleDrift] = "drift [?]";
+        csvFile[csvColSampleRHall] = "Rhall [m^3*C^-1]";
+        csvFile[csvColSampleDrift] = "drift [m^2*V^-1*s^-1]";
         csvFile.write();
         if (!csvFile.write()) {
             throw new Error("Failed to write header into data file",
@@ -675,7 +680,9 @@ void Experiment::stepFinish(Experiment *this_)
     this_->_dataResSpec_ = M_PI * this_->_sampleThickness_ / M_LN2 * this_->_dataResistivity_;
 
     this_->_dataRHall_ = ((this_->dataUca - this_->dataUac) +
-                          (this_->dataUbd - this_->dataUdb)) / 4;
+                          (this_->dataUbd - this_->dataUdb)) / 4 - this_->_dataHallU0_;
+
+    this_->_dataRHall_ = this_->_sampleThickness_ * (this_->_dataRHall_) / this_->_dataB_;
 
     this_->csvFile.setAt(Experiment::csvColSampleResistivity, this_->_dataResistivity_);
     this_->csvFile.setAt(Experiment::csvColSampleResSpec, this_->_dataResSpec_);
@@ -698,6 +705,8 @@ void Experiment::stepMeasHallProbe(Experiment *this_)
     this_->csvFile.setAt(Experiment::csvColHallProbeU, val);
     this_->_dataB_ = this_->computeB(val);
     this_->csvFile.setAt(Experiment::csvColHallProbeB, this_->_dataB_);
+    if (this_->_coilWantI_ == 0)
+        this_->_dataHallU0_ = this_->_dataB_;
 
     stepOpenAllRoutes(this_);
 }
