@@ -60,8 +60,10 @@ public:
         csvColSampleUdaB,
         csvColEmpty,
         csvColHallProbeB,
-        csvColSampleHallU,
         csvColSampleResistivity,
+        csvColSampleResSpec,
+        csvColSampleRHall,
+        csvColSampleDrift,
         /** csvColEnd equeals to a number of columns, it is not a column at all. */
         csvColEnd,
     };

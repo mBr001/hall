@@ -383,8 +383,10 @@ void Experiment::open()
         csvFile[csvColSampleUcdB] = "sample";
         csvFile[csvColSampleUdaF] = "sample";
         csvFile[csvColSampleUdaB] = "sample";
-        csvFile[csvColSampleHallU] = "sample";
         csvFile[csvColSampleResistivity] = "sample";
+        csvFile[csvColSampleResSpec] = "sample";
+        csvFile[csvColSampleRHall] = "sample";
+        csvFile[csvColSampleDrift] = "sample";
         if (!csvFile.write()) {
             throw new Error("Failed to write header into data file",
                             csvFile.errorString());
@@ -403,8 +405,10 @@ void Experiment::open()
         csvFile[csvColSampleUcdB] = "Ucd/-+ [V]";
         csvFile[csvColSampleUdaF] = "Uda/+- [V]";
         csvFile[csvColSampleUdaB] = "Uda/-+ [V]";
-        csvFile[csvColSampleHallU] = "Uhall [V]";
         csvFile[csvColSampleResistivity] = "R [ohm]";
+        csvFile[csvColSampleResSpec] = "Rspec [ohm*m]";
+        csvFile[csvColSampleRHall] = "Rhall [?]";
+        csvFile[csvColSampleDrift] = "drift [?]";
         csvFile.write();
         if (!csvFile.write()) {
             throw new Error("Failed to write header into data file",
@@ -667,7 +671,7 @@ void Experiment::stepFinish(Experiment *this_)
     this_->_dataResistivity_ = ((this_->dataUcd - this_->dataUdc) +
                                 (this_->dataUda - this_->dataUad)) / 2 / this_->_sampleI_;
 
-    this_->csvFile.setAt(Experiment::csvColSampleHallU, this_->_dataHallU_);
+    this_->csvFile.setAt(Experiment::csvColSampleRHall, this_->_dataHallU_);
     this_->csvFile.setAt(Experiment::csvColSampleResistivity, this_->_dataResistivity_);
     emit this_->measured(this_->csvFile.at(Experiment::csvColTime),
                          this_->_dataB_, this_->_dataHallU_, this_->_dataResistivity_);
