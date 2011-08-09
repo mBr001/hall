@@ -32,13 +32,15 @@ MainWindow::MainWindow(QWidget *parent) :
     pointsHallU.reserve(1024);
     pointsResistivity.reserve(1024);
 
+    ui->qwtPlot->enableAxis(QwtPlot::yRight, true);
     qwtPlotCurveHallU.attach(ui->qwtPlot);
     QwtSymbol symbol(QwtSymbol::XCross, qwtPlotCurveHallU.brush(),
-            qwtPlotCurveHallU.pen(), QSize(6, 6));
+            qwtPlotCurveHallU.pen(), QSize(8, 8));
     //symbol.setColor(QColor(255, 0, 0));
     qwtPlotCurveHallU.setStyle(QwtPlotCurve::NoCurve);
     qwtPlotCurveHallU.setSymbol(symbol);
 
+    qwtPlotCurveResistivity.setYAxis(QwtPlot::yRight);
     qwtPlotCurveResistivity.attach(ui->qwtPlot);
     qwtPlotCurveResistivity.setStyle(QwtPlotCurve::NoCurve);
     symbol.setStyle(QwtSymbol::Star1);
