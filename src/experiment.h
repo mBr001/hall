@@ -130,9 +130,6 @@ public:
     QString MSDPPort();
     void setMSDPPort(QString port);
 
-    /** Return time data for last measurement as string. */
-    QString strDataTime();
-
 protected:
     /** File to save measured data. */
     QCSVFile csvFile;
@@ -233,7 +230,6 @@ private:
     /** I for hall probe to measure B. */
     static const double hallProbeI;
     double _sampleI_;
-    QString _strDataTime_;
 };
 
 #endif // EXPERIMENT_H

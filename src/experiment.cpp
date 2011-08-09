@@ -503,11 +503,6 @@ void Experiment::setSampleI(double value)
     _sampleI_ = value;
 }
 
-QString Experiment::strDataTime()
-{
-    return _strDataTime_;
-}
-
 void Experiment::stepSampleMeas_cd(Experiment *this_)
 {
     double val(this_->readSingle());
@@ -674,15 +669,14 @@ void Experiment::stepFinish(Experiment *this_)
 
     this_->csvFile.setAt(Experiment::csvColSampleHallU, this_->_dataHallU_);
     this_->csvFile.setAt(Experiment::csvColSampleResistivity, this_->_dataResistivity_);
+    emit this_->measured(this_->csvFile.at(Experiment::csvColTime),
+                         this_->_dataB_, this_->_dataHallU_, this_->_dataResistivity_);
     this_->csvFile.write();
-    emit this_->measured(this_->_strDataTime_, this_->_dataB_,
-                         this_->_dataHallU_, this_->_dataResistivity_);
 }
 
 void Experiment::stepGetTime(Experiment *this_)
 {
-    this_->_strDataTime_ = this_->csvFile.setAt(
-                csvColTime, QDateTime::currentDateTimeUtc());
+    this_->csvFile.setAt(csvColTime, QDateTime::currentDateTimeUtc());
 }
 
 void Experiment::stepMeasHallProbe(Experiment *this_)
