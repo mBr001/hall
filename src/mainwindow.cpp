@@ -183,7 +183,7 @@ void MainWindow::on_hallProbeNameComboBox_currentIndexChanged(const QString &arg
 
 void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
 {
-    experiment.setSampleI(value);
+    experiment.setSampleI(value/1000.);
 }
 
 void MainWindow::on_startPushButton_clicked()
@@ -224,7 +224,7 @@ void MainWindow::show()
     ui->coilPowerCheckBox->setChecked(val != 0);
 
     val = experiment.sampleI();
-    ui->sampleCurrDoubleSpinBox->setValue(val);
+    ui->sampleCurrDoubleSpinBox->setValue(val*1000.);
 
     val = experiment.coilMaxI();
     ui->coilCurrDoubleSpinBox->setMaximum(val);
