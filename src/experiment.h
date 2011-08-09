@@ -175,8 +175,6 @@ protected:
     static void stepFinish(Experiment *this_);
     /** Get current time and put in into measurement data. */
     static void stepGetTime(Experiment *this_);
-    /** Open all routes (clean up). */
-    static void stepOpenAllRoutes(Experiment *this_);
     /** Prepare measurement on hall probe. */
     static void stepMeasHallProbePrepare(Experiment *this_);
     /** Do measurement on hall probe. */

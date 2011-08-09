@@ -162,7 +162,8 @@ void Experiment::measurementStop()
 
     // Set up measurement to measure B at coil by default
     // used for periodical B measurement when idle
-    ps622Hack.setOutput(false);
+    if (ps622Hack.output())
+        ps622Hack.setOutput(false);
 
     HP34970Hack::Channels_t closeChannels;
     closeChannels.append(_34903A_hall_probe_1_pwr_m);
@@ -519,7 +520,7 @@ void Experiment::stepSampleMeas_cd(Experiment *this_)
     this_->dataUcd = val;
     this_->csvFile.setAt(Experiment::csvColSampleUcdF, val);
 
-    stepOpenAllRoutes(this_);
+    this_->ps622Hack.setOutput(false);
 }
 
 void Experiment::stepSampleMeas_cdRev(Experiment *this_)
@@ -528,7 +529,7 @@ void Experiment::stepSampleMeas_cdRev(Experiment *this_)
     this_->dataUdc = val;
     this_->csvFile.setAt(Experiment::csvColSampleUcdB, val);
 
-    stepOpenAllRoutes(this_);
+    this_->ps622Hack.setOutput(false);
 }
 
 void Experiment::stepSampleMeas_da(Experiment *this_)
@@ -537,7 +538,7 @@ void Experiment::stepSampleMeas_da(Experiment *this_)
     this_->dataUda = val;
     this_->csvFile.setAt(Experiment::csvColSampleUdaF, val);
 
-    stepOpenAllRoutes(this_);
+    this_->ps622Hack.setOutput(false);
 }
 
 void Experiment::stepSampleMeas_daRev(Experiment *this_)
@@ -546,7 +547,7 @@ void Experiment::stepSampleMeas_daRev(Experiment *this_)
     this_->dataUad = val;
     this_->csvFile.setAt(Experiment::csvColSampleUdaB, val);
 
-    stepOpenAllRoutes(this_);
+    this_->ps622Hack.setOutput(false);
 }
 
 void Experiment::stepSampleMeas_ac(Experiment *this_)
@@ -555,7 +556,7 @@ void Experiment::stepSampleMeas_ac(Experiment *this_)
     this_->dataUac = val;
     this_->csvFile.setAt(Experiment::csvColSampleUacF, val);
 
-    stepOpenAllRoutes(this_);
+    this_->ps622Hack.setOutput(false);
 }
 
 void Experiment::stepSampleMeas_acRev(Experiment *this_)
@@ -564,7 +565,7 @@ void Experiment::stepSampleMeas_acRev(Experiment *this_)
     this_->dataUca = val;
     this_->csvFile.setAt(Experiment::csvColSampleUacB, val);
 
-    stepOpenAllRoutes(this_);
+    this_->ps622Hack.setOutput(false);
 }
 
 void Experiment::stepSampleMeas_bd(Experiment *this_)
@@ -573,7 +574,7 @@ void Experiment::stepSampleMeas_bd(Experiment *this_)
     this_->dataUbd = val;
     this_->csvFile.setAt(Experiment::csvColSampleUbdF, val);
 
-    stepOpenAllRoutes(this_);
+    this_->ps622Hack.setOutput(false);
 }
 
 void Experiment::stepSampleMeas_bdRev(Experiment *this_)
@@ -582,7 +583,7 @@ void Experiment::stepSampleMeas_bdRev(Experiment *this_)
     this_->dataUdb = val;
     this_->csvFile.setAt(Experiment::csvColSampleUbdB, val);
 
-    stepOpenAllRoutes(this_);
+    this_->ps622Hack.setOutput(false);
 }
 
 void Experiment::stepSampleMeasPrepare_cd(Experiment *this_)
@@ -607,14 +608,11 @@ void Experiment::stepSampleMeasPrepare_bd(Experiment *this_)
 
 void Experiment::stepSamplePower_mp(Experiment *this_)
 {
-    this_->ps622Hack.setOutput(false);
     this_->ps622Hack.setCurrent(-(this_->_sampleI_));
 }
 
 void Experiment::stepSamplePower_pm(Experiment *this_)
 {
-    this_->ps622Hack.setOutput(false);
-
     this_->ps622Hack.setCurrent(this_->_sampleI_);
     this_->csvFile.setAt(Experiment::csvColSampleI, this_->_sampleI_);
 }
@@ -678,6 +676,7 @@ void Experiment::stepFinish(Experiment *this_)
     this_->csvFile.setAt(Experiment::csvColSampleResSpec, this_->_dataResSpec_);
     this_->csvFile.setAt(Experiment::csvColSampleRHall, this_->_dataRHall_);
     //this_->csvFile.setAt(Experiment::csvColSampleDrift, this_->_dataDrift_);
+    this_->csvFile.setAt(Experiment::csvColSampleDrift, "TODO");
     emit this_->measured(this_->csvFile.at(Experiment::csvColTime),
                          this_->_dataB_, this_->_dataResistivity_, hallU);
     this_->csvFile.write();
@@ -699,7 +698,7 @@ void Experiment::stepMeasHallProbe(Experiment *this_)
     if (this_->_coilWantI_ == 0)
         this_->_dataHallU0_ = this_->_dataB_;
 
-    stepOpenAllRoutes(this_);
+    this_->ps622Hack.setOutput(false);
 }
 
 void Experiment::stepMeasHallProbePrepare(Experiment *this_)
@@ -717,10 +716,3 @@ void Experiment::stepMeasHallProbePrepare(Experiment *this_)
     this_->ps622Hack.setOutput(true);
 }
 
-void Experiment::stepOpenAllRoutes(Experiment *this_)
-{
-    HP34970Hack::Channels_t closeChannels;
-
-    this_->hp34970Hack.setRoute(closeChannels, _34903A);
-    this_->ps622Hack.setOutput(false);
-}
