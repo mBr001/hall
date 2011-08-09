@@ -33,6 +33,9 @@ MainWindow::MainWindow(QWidget *parent) :
     pointsResistivity.reserve(1024);
 
     ui->qwtPlot->enableAxis(QwtPlot::yRight, true);
+    ui->qwtPlot->setAxisTitle(QwtPlot::yRight, tr("(×) Resistivity [Ω]"));
+    ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, "(*) hall U [V]");
+    ui->qwtPlot->setAxisTitle(QwtPlot::xBottom, "B [T]");
     qwtPlotCurveHallU.attach(ui->qwtPlot);
     QwtSymbol symbol(QwtSymbol::XCross, qwtPlotCurveHallU.brush(),
             qwtPlotCurveHallU.pen(), QSize(8, 8));

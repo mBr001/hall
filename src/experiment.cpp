@@ -144,12 +144,12 @@ double Experiment::coilMaxI()
 
 double Experiment::computeB(double U)
 {
-    double B(B1 + sqrt(B2 + B3 * fabs(U) / _sampleI_));
+    double B(B1 + sqrt(B2 + B3 * fabs(U / hallProbeI)));
     // alternativní vzorec a čísla
     // U /= I; B = U(A+sqrt(U)*(B+C*sqrt(U)))-D;
     // A=5.97622E-4 B=1.591394E-6 C=-9.24701E-11 D=-0.015
 
-    return U > 0 ? B : -B;
+    return (U / hallProbeI) > 0 ? B : -B;
 }
 
 void Experiment::measurementStop()
