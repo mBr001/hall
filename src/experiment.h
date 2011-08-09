@@ -118,6 +118,8 @@ public:
 
     double sampleI();
     void setSampleI(double value);
+    double sampleThickness();
+    void setSampleThickness(double value);
 
     bool isMeasuring();
     /** Start single or multiple measurements for defined coilWantI (<min, max>). */
@@ -228,7 +230,8 @@ private:
     Config config;
     double dataUcd, dataUdc, dataUda, dataUad;
     double dataUac, dataUca, dataUbd, dataUdb;
-    double _dataB_, _dataHallU_, _dataResistivity_;
+    double _dataB_, _dataRHall_, _dataResistivity_, _dataResSpec_;
+    double _sampleThickness_;
     /** I for hall probe to measure B. */
     static const double hallProbeI;
     double _sampleI_;

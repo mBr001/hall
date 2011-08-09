@@ -186,6 +186,11 @@ void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
     experiment.setSampleI(value/1000.);
 }
 
+void MainWindow::on_sampleThicknessDoubleSpinBox_valueChanged(double value)
+{
+    experiment.setSampleThickness(value);
+}
+
 void MainWindow::on_startPushButton_clicked()
 {
     if (experiment.isMeasuring()) {

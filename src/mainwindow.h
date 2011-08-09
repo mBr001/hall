@@ -36,6 +36,7 @@ private slots:
     void on_hallProbeNameComboBox_currentIndexChanged(const QString &arg1);
     void on_measurePushButton_clicked();
     void on_sampleCurrDoubleSpinBox_valueChanged(double );
+    void on_sampleThicknessDoubleSpinBox_valueChanged(double );
     void on_startPushButton_clicked();
 
 private:

@@ -142,7 +142,9 @@ double Experiment::coilMaxI()
 
 double Experiment::computeB(double U)
 {
-    return B1 + sqrt(B2 + B3 * U);
+    double B(B1 + sqrt(B2 + B3 * fabs(U)));
+
+    return U > 0 ? B : -B;
 }
 
 void Experiment::measurementStop()
@@ -236,13 +238,6 @@ void Experiment::on_coilTimer_timeout()
     procI = lcd_info.set_A;
     if (procCoilSwitchState == PwrPolSwitch::cross)
         procI = -procI;
-
-    /*ui->plainTextEdit->appendPlainText(QString(
-                "procI: %1, procCoilSwitchState: %2, procCoilPower: %3")
-            .arg(procI).arg(procCoilSwitchState).arg(procCoilPower));
-    ui->plainTextEdit->appendPlainText(QString(
-                "wantI: %1, wantCoilSwitchState: %2, wantCoilPower: %3\n")
-            .arg(wantI).arg(wantCoilSwitchState).arg(wantCoilPower));*/
 
     /* Make process decision. */
     // Need switch polarity?
@@ -447,8 +442,6 @@ void Experiment::open()
 
         channels << 101 << 102 << 103 << 104 << 114;
         hp34970Hack.setSense(HP34970Hack::SenseVolt, channels);
-        hp34970Hack.init();
-
         // set up measurement of B
         measurementStop();
 
@@ -484,6 +477,11 @@ double Experiment::sampleI()
     return ps622Hack.current();
 }
 
+double Experiment::sampleThickness()
+{
+    return _sampleThickness_;
+}
+
 void Experiment::setCoefficients(double B1, double B2, double B3)
 {
     this->B1 = B1;
@@ -505,6 +503,11 @@ void Experiment::setCoilI(double value)
 void Experiment::setSampleI(double value)
 {
     _sampleI_ = value;
+}
+
+void Experiment::setSampleThickness(double value)
+{
+    _sampleThickness_ = value;
 }
 
 void Experiment::stepSampleMeas_cd(Experiment *this_)
@@ -666,15 +669,20 @@ void Experiment::stepAbort(Experiment *this_)
 
 void Experiment::stepFinish(Experiment *this_)
 {
-    this_->_dataHallU_ = ((this_->dataUca - this_->dataUac) +
-                          (this_->dataUbd - this_->dataUdb)) / 2;;
     this_->_dataResistivity_ = ((this_->dataUcd - this_->dataUdc) +
-                                (this_->dataUda - this_->dataUad)) / 2 / this_->_sampleI_;
+                                (this_->dataUda - this_->dataUad)) / 4 / this_->_sampleI_;
+    // TODO: kontrola rozptylu hodnot napětí
+    this_->_dataResSpec_ = M_PI * this_->_sampleThickness_ / M_LN2 * this_->_dataResistivity_;
 
-    this_->csvFile.setAt(Experiment::csvColSampleRHall, this_->_dataHallU_);
+    this_->_dataRHall_ = ((this_->dataUca - this_->dataUac) +
+                          (this_->dataUbd - this_->dataUdb)) / 4;
+
     this_->csvFile.setAt(Experiment::csvColSampleResistivity, this_->_dataResistivity_);
+    this_->csvFile.setAt(Experiment::csvColSampleResSpec, this_->_dataResSpec_);
+    this_->csvFile.setAt(Experiment::csvColSampleRHall, this_->_dataRHall_);
+    //this_->csvFile.setAt(Experiment::csvColSampleDrift, this_->_dataDrift_);
     emit this_->measured(this_->csvFile.at(Experiment::csvColTime),
-                         this_->_dataB_, this_->_dataHallU_, this_->_dataResistivity_);
+                         this_->_dataB_, this_->_dataRHall_, this_->_dataResistivity_);
     this_->csvFile.write();
 }
 
