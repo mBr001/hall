@@ -110,7 +110,7 @@ void MainWindow::on_coilPowerCheckBox_toggled(bool checked)
 }
 
 void MainWindow::on_experiment_measured(const QString &time, double B,
-                                        double hallU, double resistivity)
+                                        double resistivity, double hallU)
 {
     ui->dataTableWidget->insertRow(0);
 

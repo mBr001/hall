@@ -679,17 +679,17 @@ void Experiment::stepFinish(Experiment *this_)
     // TODO: kontrola rozptylu hodnot napětí
     this_->_dataResSpec_ = M_PI * this_->_sampleThickness_ / M_LN2 * this_->_dataResistivity_;
 
-    this_->_dataRHall_ = ((this_->dataUca - this_->dataUac) +
-                          (this_->dataUbd - this_->dataUdb)) / 4 - this_->_dataHallU0_;
+    double hallU(((this_->dataUca - this_->dataUac) +
+                  (this_->dataUbd - this_->dataUdb)) / 4 - this_->_dataHallU0_);
 
-    this_->_dataRHall_ = this_->_sampleThickness_ * (this_->_dataRHall_) / this_->_dataB_;
+    this_->_dataRHall_ = this_->_sampleThickness_ * hallU / this_->_dataB_;
 
     this_->csvFile.setAt(Experiment::csvColSampleResistivity, this_->_dataResistivity_);
     this_->csvFile.setAt(Experiment::csvColSampleResSpec, this_->_dataResSpec_);
     this_->csvFile.setAt(Experiment::csvColSampleRHall, this_->_dataRHall_);
     //this_->csvFile.setAt(Experiment::csvColSampleDrift, this_->_dataDrift_);
     emit this_->measured(this_->csvFile.at(Experiment::csvColTime),
-                         this_->_dataB_, this_->_dataRHall_, this_->_dataResistivity_);
+                         this_->_dataB_, this_->_dataResistivity_, hallU);
     this_->csvFile.write();
 }
 
