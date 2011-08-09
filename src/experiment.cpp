@@ -28,8 +28,14 @@ const int Experiment::_34903A_hall_probe_2_pwr_p = _34903A + 10;
 const double Experiment::hallProbeI = 0.001;
 
 const Experiment::Step_t Experiment::stepsAll[] = {
+    // set starting B (0) - large delay to cool down coil
+    // call measurement++ steps
     // {   stepMeasHallProbePrepare, 10 },
-    // {   stepMeasHallProbe, 0 },
+    // original measurement steps
+    // abort if target reached
+    // set new ratget B
+    // sweep to new target
+    // goto at begin for next measurement
     {   stepAbort, 0,    },
 };
 
