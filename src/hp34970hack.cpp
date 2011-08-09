@@ -148,12 +148,18 @@ void HP34970Hack::setRoute(Channels_t closeChannels, int offs)
         sendCmd("ROUT:CLOS", _closeChannels_);
 }
 
+void HP34970Hack::setScan(Channel_t channel)
+{
+    QString cmd("ROUT:SCAN (@%1);:INIT");
+
+    sendCmd(cmd.arg(channel), 2000000);
+}
+
 void HP34970Hack::setScan(Channels_t channels)
 {
     QString cmd("ROUT:SCAN");
 
     cmd = formatCmd(cmd, channels).append(";:INIT");
-
     sendCmd(cmd, 2000000);
 }
 

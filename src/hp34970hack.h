@@ -23,6 +23,7 @@ public:
     bool open(const QString &port);
     QStringList read();
     void setRoute(Channels_t closeChannels, int offs);
+    void setScan(Channel_t channel);
     void setScan(Channels_t channels);
     void setSense(Sense_t sense, Channels_t channels);
 

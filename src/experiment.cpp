@@ -28,12 +28,14 @@ const int Experiment::_34903A_hall_probe_2_pwr_p = _34903A + 10;
 const double Experiment::hallProbeI = 0.001;
 
 const Experiment::Step_t Experiment::stepsAll[] = {
+    // {   stepMeasHallProbePrepare, 10 },
+    // {   stepMeasHallProbe, 0 },
     {   stepAbort, 0,    },
 };
 
 const Experiment::Step_t Experiment::stepsMeasure[] = {
-    {   stepOpenAllRoutes, 10, },
     {   stepGetTime, 0 },
+    {   stepMeasHallProbe, 0 },
 
     {   stepSamplePower_pm, 10 },
     {   stepSamplePower_bd, 10 },
@@ -65,8 +67,6 @@ const Experiment::Step_t Experiment::stepsMeasure[] = {
     {   stepSampleMeasPrepare_da, 10 },
     {   stepSampleMeas_daRev, 10 },
 
-    {   stepMeasHallProbePrepare, 10 },
-    {   stepMeasHallProbe, 0 },
     {   stepFinish, 0 },
     {   stepAbort, 0 },
 };
@@ -169,9 +169,7 @@ void Experiment::measurementStop()
     closeChannels.append(_34903A_hall_probe_2_pwr_p);
     hp34970Hack.setRoute(closeChannels, _34903A);
 
-    HP34970Hack::Channels_t scan;
-    scan.append(Experiment::_34901A_hall_probe);
-    hp34970Hack.setScan(scan);
+    hp34970Hack.setScan(Experiment::_34901A_hall_probe);
 
     ps622Hack.setCurrent(hallProbeI);
     ps622Hack.setOutput(true);
@@ -589,30 +587,22 @@ void Experiment::stepSampleMeas_bdRev(Experiment *this_)
 
 void Experiment::stepSampleMeasPrepare_cd(Experiment *this_)
 {
-    HP34970Hack::Channels_t scan;
-    scan.append(Experiment::_34901A_sample_cd);
-    this_->hp34970Hack.setScan(scan);
+    this_->hp34970Hack.setScan(Experiment::_34901A_sample_cd);
 }
 
 void Experiment::stepSampleMeasPrepare_da(Experiment *this_)
 {
-    HP34970Hack::Channels_t scan;
-    scan.append(Experiment::_34901A_sample_da);
-    this_->hp34970Hack.setScan(scan);
+    this_->hp34970Hack.setScan(Experiment::_34901A_sample_da);
 }
 
 void Experiment::stepSampleMeasPrepare_ac(Experiment *this_)
 {
-    HP34970Hack::Channels_t scan;
-    scan.append(Experiment::_34901A_sample_ac);
-    this_->hp34970Hack.setScan(scan);
+    this_->hp34970Hack.setScan(Experiment::_34901A_sample_ac);
 }
 
 void Experiment::stepSampleMeasPrepare_bd(Experiment *this_)
 {
-    HP34970Hack::Channels_t scan;
-    scan.append(Experiment::_34901A_sample_bd);
-    this_->hp34970Hack.setScan(scan);
+    this_->hp34970Hack.setScan(Experiment::_34901A_sample_bd);
 }
 
 void Experiment::stepSamplePower_mp(Experiment *this_)
@@ -705,6 +695,7 @@ void Experiment::stepMeasHallProbe(Experiment *this_)
     this_->csvFile.setAt(Experiment::csvColHallProbeU, val);
     this_->_dataB_ = this_->computeB(val);
     this_->csvFile.setAt(Experiment::csvColHallProbeB, this_->_dataB_);
+    this_->csvFile.setAt(Experiment::csvColHallProbeI, hallProbeI);
     if (this_->_coilWantI_ == 0)
         this_->_dataHallU0_ = this_->_dataB_;
 
@@ -715,16 +706,13 @@ void Experiment::stepMeasHallProbePrepare(Experiment *this_)
 {
     /* set current to 1mA, open probe current source */
     this_->ps622Hack.setCurrent(hallProbeI);
-    this_->csvFile.setAt(Experiment::csvColHallProbeI, hallProbeI);
 
     HP34970Hack::Channels_t closeChannels;
     closeChannels.append(_34903A_hall_probe_1_pwr_m);
     closeChannels.append(_34903A_hall_probe_2_pwr_p);
     this_->hp34970Hack.setRoute(closeChannels, _34903A);
 
-    HP34970Hack::Channels_t scan;
-    scan.append(Experiment::_34901A_hall_probe);
-    this_->hp34970Hack.setScan(scan);
+    this_->hp34970Hack.setScan(Experiment::_34901A_hall_probe);
 
     this_->ps622Hack.setOutput(true);
 }
