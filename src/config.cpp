@@ -1,15 +1,40 @@
 #include "config.h"
 #include <math.h>
 
+const char Config::cfg_coilIRangeMax[] = "coil I range max";
+const char Config::cfg_coilIRangeMin[] = "coil I range min";
+const char Config::cfg_coilIRangeStep[] = "coil I range step";
+const char Config::cfg_dataFileName[] = "experiment/data file name";
 const char Config::cfg_hallProbe[] = "hall probes";
 const char Config::cfg_hp34970Port[] = "experiment/HP34970 port";
-const char Config::cfg_dataFileName[] = "experiment/data file name";
 const char Config::cfg_msdpPort[] = "experiment/coil PS port";
 const char Config::cfg_polSwitchPort[] = "experiment/polarity switch port";
 const char Config::cfg_ps6220Port[] = "experiment/sample PS port";
+const char Config::cfg_sampleI[] = "sample I";
+const char Config::cfg_sampleThickness[] = "sample thickness";
 
 Config::Config()
 {
+}
+
+double Config::coilIRangeMax()
+{
+    return settings.value(cfg_coilIRangeMax, 0).toDouble();
+}
+
+double Config::coilIRangeMin()
+{
+    return settings.value(cfg_coilIRangeMin, 0).toDouble();
+}
+
+double Config::coilIRangeStep()
+{
+    return settings.value(cfg_coilIRangeStep, 0).toDouble();
+}
+
+QString Config::dataFileName()
+{
+    return settings.value(cfg_dataFileName, QString()).toString();
 }
 
 double Config::hallProbeBn(const QString &name, int idx)
@@ -33,11 +58,6 @@ QStringList Config::hallProbes()
     return hallProbes;
 }
 
-QString Config::dataFileName()
-{
-    return settings.value(cfg_dataFileName, QString()).toString();
-}
-
 QString Config::hp34970Port()
 {
     return settings.value(cfg_hp34970Port, QString()).toString();
@@ -56,6 +76,31 @@ QString Config::polSwitchPort()
 QString Config::ps6220Port()
 {
     return settings.value(cfg_ps6220Port, QString()).toString();
+}
+
+double Config::sampleI()
+{
+    return settings.value(cfg_sampleI, 0).toDouble();
+}
+
+double Config::sampleThickness()
+{
+    return settings.value(cfg_sampleThickness, 0).toDouble();
+}
+
+void Config::setCoilIRangeMax(double IMax)
+{
+    settings.setValue(cfg_coilIRangeMax, IMax);
+}
+
+void Config::setCoilIRangeMin(double IMin)
+{
+    settings.setValue(cfg_coilIRangeMin, IMin);
+}
+
+void Config::setCoilIRangeStep(double IStep)
+{
+    settings.setValue(cfg_coilIRangeStep, IStep);
 }
 
 void Config::setDataFileName(const QString &port)
@@ -89,4 +134,14 @@ void Config::setPs6220Port(const QString &port)
 void Config::setMsdpPort(const QString &port)
 {
     settings.setValue(cfg_msdpPort, port);
+}
+
+void Config::setSampleI(double I)
+{
+    settings.setValue(cfg_sampleI, I);
+}
+
+void Config::setSampleThickness(double thickness)
+{
+    settings.setValue(cfg_sampleThickness, thickness);
 }

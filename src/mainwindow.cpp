@@ -73,6 +73,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
             }
         }
         experiment.close();
+        config.setCoilIRangeMax(ui->coilCurrMaxDoubleSpinBox->value());
+        config.setCoilIRangeMin(ui->coilCurrMinDoubleSpinBox->value());
+        config.setCoilIRangeStep(ui->coilCurrStepDoubleSpinBox->value());
+        config.setSampleI(ui->sampleCurrDoubleSpinBox->value());
+        config.setSampleThickness(ui->sampleThicknessDoubleSpinBox->value());
         hide();
         configUI.show();
         return;
@@ -274,7 +279,11 @@ void MainWindow::show()
     ui->coilCurrMinDoubleSpinBox->setMinimum(-val);
     ui->coilCurrStepDoubleSpinBox->setMaximum(val);
 
-    // načítat a ukládat do konfigurace
+    ui->coilCurrMaxDoubleSpinBox->setValue(config.coilIRangeMax());
+    ui->coilCurrMinDoubleSpinBox->setValue(config.coilIRangeMin());
+    ui->coilCurrStepDoubleSpinBox->setValue(config.coilIRangeStep());
+    ui->sampleCurrDoubleSpinBox->setValue(config.sampleI());
+    ui->sampleThicknessDoubleSpinBox->setValue(config.sampleThickness());
     experiment.setCoilIStep(ui->coilCurrStepDoubleSpinBox->value());
     QWidget::show();
 }

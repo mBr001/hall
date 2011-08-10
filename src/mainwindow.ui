@@ -144,6 +144,9 @@
            </item>
            <item row="4" column="2">
             <widget class="QDoubleSpinBox" name="coilDwellDoubleSpinBox">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="toolTip">
               <string>Dwell betwen coil current change and begin of new measurement.</string>
              </property>
@@ -267,6 +270,9 @@
            </item>
            <item row="2" column="1">
             <widget class="QDoubleSpinBox" name="sampleDwellDoubleSpinBox">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="toolTip">
               <string>Dwell betwen set current and measurement.</string>
              </property>
