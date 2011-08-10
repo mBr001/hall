@@ -274,6 +274,8 @@ void MainWindow::show()
     ui->coilCurrMinDoubleSpinBox->setMinimum(-val);
     ui->coilCurrStepDoubleSpinBox->setMaximum(val);
 
+    // načítat a ukládat do konfigurace
+    experiment.setCoilIStep(ui->coilCurrStepDoubleSpinBox->value());
     QWidget::show();
 }
 

@@ -151,7 +151,7 @@ double Experiment::computeB(double U)
     // U /= I; B = U(A+sqrt(U)*(B+C*sqrt(U)))-D;
     // A=5.97622E-4 B=1.591394E-6 C=-9.24701E-11 D=-0.015
 
-    return (U / hallProbeI) > 0 ? B : -B;
+    return (U / hallProbeI) > 0. ? B : -B;
 }
 
 bool Experiment::isMeasuring()
@@ -166,7 +166,18 @@ void Experiment::measure(bool single)
     _measuringRange_.clear();
     if (!single) {
         _measuringRange_.append(0);
-        // TODO, napočítat hodnoty
+
+        double I(_coilIRangeTop_);
+        for (; I >= 0 && I >= _coilIRangeBottom_; I -= _coilIStep_) {
+            _measuringRange_.append(I);
+        }
+        if (I < _coilIRangeBottom_ || I < 0.)
+            _measuringRange_.append(std::max(0., _coilIRangeBottom_));
+        for (I = _coilIRangeBottom_; I <= 0 && I <= _coilIRangeTop_; I += _coilIStep_) {
+            _measuringRange_.append(I);
+        }
+        if (I > _coilIRangeTop_ || I > 0.)
+            _measuringRange_.append(std::min(0., _coilIRangeTop_));
     }
     stepsRunning = Steps_t(
                 stepsMeasure,
