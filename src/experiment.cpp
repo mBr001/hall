@@ -27,21 +27,13 @@ const int Experiment::_34903A_hall_probe_2_pwr_p = _34903A + 10;
 
 const double Experiment::hallProbeI = 0.001;
 
-const Experiment::Step_t Experiment::stepsAll[] = {
-    // set wanted coil I to 0
-    // stepSweepeng
-    // set new target coilI if anny
-    // call measurement++ steps
-    // abort if target reached
-    // {   stepMeasHallProbePrepare, 10 },
-    // set new ratget B
-    // stepSweepeng
-    // set new target coilI if anny
-    // goto at begin of measurement++ for next measurement
-    {   stepAbort, 0,    },
-};
-
 const Experiment::Step_t Experiment::stepsMeasure[] = {
+    // for range measurement is wanted coil I already set to 0 by start rutine
+    // this step is necesary fro two reasons, 1) stepSweepeng does -- on stepCurrent
+    // 2) after stepRestart function is done ++ and first step is therefore skipped
+    {   NULL, 0 },
+    {   stepSweepeng, 500 },
+    {   stepSetNewTarget, 0 },
     {   stepGetTime, 0 },
     {   stepMeasHallProbe, 0 },
 
@@ -76,7 +68,9 @@ const Experiment::Step_t Experiment::stepsMeasure[] = {
     {   stepSampleMeas_daRev, 10 },
 
     {   stepFinish, 0 },
-    {   stepAbort, 0 },
+    {   stepAbortIfTargetReached, 0 },
+    {   stepMeasHallProbePrepare, 10 },
+    {   stepRestart, 0 },
 };
 
 Experiment::Steps_t::Steps_t(const Step_t *begin, const Step_t *end)
@@ -90,7 +84,8 @@ Experiment::Steps_t::Steps_t(const Step_t *begin, const Step_t *end)
 Experiment::Experiment(QObject *parent) :
     QObject(parent),
     coilTimer(this),
-    _coilWantI_(0),
+    _coilSetI_(0),
+    _coilWantI_(NAN),
     measTimer(this),
     _measuring_(false),
     _sweeping_(false),
@@ -172,16 +167,7 @@ void Experiment::measurementStop()
     // used for periodical B measurement when idle
     if (ps622Hack.output())
         ps622Hack.setOutput(false);
-
-    HP34970Hack::Channels_t closeChannels;
-    closeChannels.append(_34903A_hall_probe_1_pwr_m);
-    closeChannels.append(_34903A_hall_probe_2_pwr_p);
-    hp34970Hack.setRoute(closeChannels, _34903A);
-
-    hp34970Hack.setScan(Experiment::_34901A_hall_probe);
-
-    ps622Hack.setCurrent(hallProbeI);
-    ps622Hack.setOutput(true);
+    stepMeasHallProbePrepare(this);
 }
 
 bool Experiment::isMeasuring()
@@ -191,17 +177,13 @@ bool Experiment::isMeasuring()
 
 void Experiment::measure(bool single)
 {
-    if (single) {
-        stepsRunning = Steps_t(
-                    stepsMeasure,
-                    stepsMeasure + ARRAY_SIZE(stepsMeasure));
-        stepCurrent = stepsRunning.begin();
-    } else {
+    stepsRunning = Steps_t(
+                stepsMeasure,
+                stepsMeasure + ARRAY_SIZE(stepsMeasure));
+    stepCurrent = stepsRunning.begin();
+    if (!single) {
         _coilWantI_ = 0;
-        stepsRunning = Steps_t(
-                stepsAll,
-                stepsAll + ARRAY_SIZE(stepsAll));
-        stepCurrent = stepsRunning.begin();
+        _sweeping_ = true;
         throw new Error("Not implemented.");
     }
 
@@ -290,6 +272,7 @@ void Experiment::on_coilTimer_timeout()
     // want current but power is off -> set power on at current 0.0 A
     if (procCoilPower != wantCoilPower && wantCoilPower) {
         sdp_set_curr(&sdp, 0.0);
+        _coilSetI_ = 0;
         sdp_set_output(&sdp, 1);
         return;
     }
@@ -301,15 +284,19 @@ void Experiment::on_coilTimer_timeout()
         procI += currentSlope;
 
     sdp_set_curr(&sdp, fabs(procI));
+    _coilSetI_ = procI;
 }
 
 void Experiment::on_measTimer_timeout()
 {
     if (stepCurrent != stepsRunning.end()) {
-        stepCurrent->func(this);
+        if (stepCurrent->func != NULL) {
+            stepCurrent->func(this);
+        }
+        int delay(stepCurrent->delay);
+        ++stepCurrent;
         if (stepCurrent != stepsRunning.end()) {
-            measTimer.start(stepCurrent->delay);
-            ++stepCurrent;
+            measTimer.start(delay);
             return;
         }
     }
@@ -348,6 +335,7 @@ void Experiment::open()
         _coilWantI_ = va_data.curr;
 
         err = sdp_set_curr(&sdp, va_data.curr);
+        _coilSetI_ = va_data.curr;
         if (err < 0) {
             throw new Error("Manson SDP power supply operation failed",
                             QString::fromLocal8Bit(sdp_strerror(err)));
@@ -528,6 +516,12 @@ void Experiment::setSampleThickness(double value)
     _sampleThickness_ = value;
 }
 
+void Experiment::stepRestart(Experiment *this_)
+{
+    this_->_sweeping_ = true;
+    this_->stepCurrent = this_->stepsRunning.begin();
+}
+
 void Experiment::stepSampleMeas_cd(Experiment *this_)
 {
     double val(this_->readSingle());
@@ -669,9 +663,10 @@ void Experiment::stepSamplePower_ca(Experiment *this_)
     this_->ps622Hack.setOutput(true);
 }
 
-void Experiment::stepAbort(Experiment *this_)
+void Experiment::stepAbortIfTargetReached(Experiment *this_)
 {
-    this_->stepCurrent = this_->stepsRunning.end();
+    if (this_->_coilWantI_ == this_->_coilSetI_)
+        this_->stepCurrent = this_->stepsRunning.end();
 }
 
 void Experiment::stepFinish(Experiment *this_)
@@ -728,5 +723,17 @@ void Experiment::stepMeasHallProbePrepare(Experiment *this_)
     this_->hp34970Hack.setScan(Experiment::_34901A_hall_probe);
 
     this_->ps622Hack.setOutput(true);
+}
+
+void Experiment::stepSetNewTarget(Experiment *this_)
+{
+    // TODO
+}
+
+void Experiment::stepSweepeng(Experiment *this_)
+{
+    if (this_->_sweeping_) {
+        --(this_->stepCurrent);
+    }
 }
 

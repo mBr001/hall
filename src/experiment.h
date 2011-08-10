@@ -34,8 +34,6 @@ protected:
         Steps_t(const Step_t *begin, const Step_t *end);
     };
 
-    /** Array of steps for fully automatized Hall measurement. */
-    static const Step_t stepsAll[];
     /** Array of steps for single "hand made" measurement. */
     static const Step_t stepsMeasure[];
     /** Vector of steps to run, created from autoSteps. */
@@ -139,6 +137,8 @@ protected:
     QCSVFile csvFile;
     /** Timer used to adjust current trought magnet in specified time. */
     QTimer coilTimer;
+    /** Last set value of I on coil, used only for control purposes. */
+    double _coilSetI_;
     /** Wanted value of curr flowing trought coil. */
     double _coilWantI_;
     /** Delay betwen current value update [ms].
@@ -171,6 +171,8 @@ protected:
     /* Steps for Hall measurement automation */
     /** Abort process. */
     static void stepAbort(Experiment *this_);
+    /** Abort measurement if target coil I reached */
+    static void stepAbortIfTargetReached(Experiment *this_);
     /** Finish measurement, write data into file etc. . */
     static void stepFinish(Experiment *this_);
     /** Get current time and put in into measurement data. */
@@ -179,6 +181,8 @@ protected:
     static void stepMeasHallProbePrepare(Experiment *this_);
     /** Do measurement on hall probe. */
     static void stepMeasHallProbe(Experiment *this_);
+    /** Restart running measurement from begin. */
+    static void stepRestart(Experiment *this_);
 
     static void stepSampleMeas_cd(Experiment *this_);
     static void stepSampleMeas_cdRev(Experiment *this_);
@@ -208,6 +212,10 @@ protected:
     static void stepSamplePower_mp(Experiment *this_);
     /** Set sample power source power (reversed). */
     static void stepSamplePower_pm(Experiment *this_);
+    /** Set new coil target I, this I value will be put on coil in next round. */
+    static void stepSetNewTarget(Experiment *this_);
+    /** Wait until coil I is not set to wanted value */
+    static void stepSweepeng(Experiment *this_);
 
 signals:
     void measured(QString time, double B, double hallU, double resistivity);
