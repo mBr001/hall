@@ -134,6 +134,7 @@ void MainWindow::on_experiment_measured(const QString &time, double B,
     }
 
     if (!isnan(B)) {
+        ui->coilBDoubleSpinBox->setValue(B);
         if (!isnan(resistivity)) {
             pointsResistivity.append(QPointF(B, resistivity));
             qwtPlotCurveResistivity.setData(pointsResistivity);

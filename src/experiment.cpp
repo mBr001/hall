@@ -28,14 +28,16 @@ const int Experiment::_34903A_hall_probe_2_pwr_p = _34903A + 10;
 const double Experiment::hallProbeI = 0.001;
 
 const Experiment::Step_t Experiment::stepsAll[] = {
-    // set starting B (0) - large delay to cool down coil
+    // set wanted coil I to 0
+    // stepSweepeng
+    // set new target coilI if anny
     // call measurement++ steps
-    // {   stepMeasHallProbePrepare, 10 },
-    // original measurement steps
     // abort if target reached
+    // {   stepMeasHallProbePrepare, 10 },
     // set new ratget B
-    // sweep to new target
-    // goto at begin for next measurement
+    // stepSweepeng
+    // set new target coilI if anny
+    // goto at begin of measurement++ for next measurement
     {   stepAbort, 0,    },
 };
 
@@ -195,6 +197,11 @@ void Experiment::measure(bool single)
                     stepsMeasure + ARRAY_SIZE(stepsMeasure));
         stepCurrent = stepsRunning.begin();
     } else {
+        _coilWantI_ = 0;
+        stepsRunning = Steps_t(
+                stepsAll,
+                stepsAll + ARRAY_SIZE(stepsAll));
+        stepCurrent = stepsRunning.begin();
         throw new Error("Not implemented.");
     }
 
@@ -274,7 +281,8 @@ void Experiment::on_coilTimer_timeout()
                 throw new Error("timer - sdp_set_output");
         }
 
-        emit sweepingCompleted();
+        if (!_measuring_)
+            emit sweepingCompleted();
         _sweeping_ = false;
         return;
     }
