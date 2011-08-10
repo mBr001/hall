@@ -55,14 +55,14 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="0" colspan="2">
+           <item row="5" column="0" colspan="2">
             <widget class="QLabel" name="label_6">
              <property name="text">
               <string>Measured:</string>
              </property>
             </widget>
            </item>
-           <item row="3" column="2">
+           <item row="5" column="2">
             <widget class="QDoubleSpinBox" name="coilCurrMeasDoubleSpinBox">
              <property name="toolTip">
               <string>Measured value of current passing trought coil.</string>
@@ -78,14 +78,14 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="3">
+           <item row="5" column="3">
             <widget class="QLabel" name="label_8">
              <property name="text">
               <string>A</string>
              </property>
             </widget>
            </item>
-           <item row="4" column="2">
+           <item row="6" column="2">
             <widget class="QDoubleSpinBox" name="coilVoltMeasDoubleSpinBox">
              <property name="toolTip">
               <string>Measured value of voltage at coil.</string>
@@ -101,42 +101,42 @@
              </property>
             </widget>
            </item>
-           <item row="4" column="3">
+           <item row="6" column="3">
             <widget class="QLabel" name="label_2">
              <property name="text">
               <string>V</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="0" colspan="2">
+           <item row="3" column="0" colspan="2">
             <widget class="QLabel" name="label_11">
              <property name="text">
               <string>Step:</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="2">
-            <widget class="QDoubleSpinBox" name="coilStepDoubleSpinBox">
+           <item row="3" column="2">
+            <widget class="QDoubleSpinBox" name="coilCurrStepDoubleSpinBox">
              <property name="toolTip">
               <string>Step for current value for automated measurement.</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="3">
+           <item row="3" column="3">
             <widget class="QLabel" name="label_12">
              <property name="text">
               <string>A</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="0" colspan="2">
+           <item row="4" column="0" colspan="2">
             <widget class="QLabel" name="label_4">
              <property name="text">
               <string>Dwell</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="2">
+           <item row="4" column="2">
             <widget class="QDoubleSpinBox" name="coilDwellDoubleSpinBox">
              <property name="toolTip">
               <string>Dwell betwen coil current change and begin of new measurement.</string>
@@ -149,21 +149,21 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="3">
+           <item row="4" column="3">
             <widget class="QLabel" name="label_9">
              <property name="text">
               <string>sec</string>
              </property>
             </widget>
            </item>
-           <item row="5" column="3">
+           <item row="7" column="3">
             <widget class="QLabel" name="label_13">
              <property name="text">
               <string>T</string>
              </property>
             </widget>
            </item>
-           <item row="5" column="2">
+           <item row="7" column="2">
             <widget class="QDoubleSpinBox" name="coilBDoubleSpinBox">
              <property name="readOnly">
               <bool>true</bool>
@@ -182,6 +182,33 @@
              </property>
              <property name="maximum">
               <double>9.990000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>Range:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QDoubleSpinBox" name="coilCurrMinDoubleSpinBox"/>
+           </item>
+           <item row="2" column="2">
+            <widget class="QDoubleSpinBox" name="coilCurrMaxDoubleSpinBox"/>
+           </item>
+           <item row="1" column="3">
+            <widget class="QLabel" name="label_21">
+             <property name="text">
+              <string>A</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="3">
+            <widget class="QLabel" name="label_22">
+             <property name="text">
+              <string>A</string>
              </property>
             </widget>
            </item>

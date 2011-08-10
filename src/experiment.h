@@ -112,7 +112,8 @@ public:
     double coilI();
     double coilMaxI();
     void setCoilI(double value);
-    void setCoilIRange(double value);
+    void setCoilIRange(double val1, double val2);
+    void setCoilIStep(double val);
 
     double sampleI();
     void setSampleI(double value);
@@ -123,7 +124,7 @@ public:
     /** Start single or multiple measurements for defined coilWantI (<min, max>). */
     void measure(bool single = true);
     /** Stop measurement imediately. */
-    void measurementStop();
+    void measurementAbort();
 
     QString HP34970Port();
     void setHP34970Port(QString port);
@@ -135,6 +136,8 @@ public:
 protected:
     /** File to save measured data. */
     QCSVFile csvFile;
+    /** Step of I on coil used for automated measurement. */
+    double _coilIStep_;
     /** Timer used to adjust current trought magnet in specified time. */
     QTimer coilTimer;
     /** Wanted value of curr flowing trought coil. */
@@ -153,7 +156,7 @@ protected:
     /** Indicate whatever measurement is in progress. */
     bool _measuring_;
     /** Last set value of I on coil, used only for control purposes. */
-    bool _measuringRange_;
+    QList<double> _measuringRange_;
     /** Keithlay PS 6220 hacky class. */
     PS6220Hack ps622Hack;
     /** Power polarity switch handler. */
@@ -215,7 +218,7 @@ protected:
     /** Set new coil target I, this I value will be put on coil in next round. */
     static void stepSetNewTarget(Experiment *this_);
     /** Wait until coil I is not set to wanted value */
-    static void stepSweepeng(Experiment *this_);
+    static void stepSweeping(Experiment *this_);
 
 signals:
     void measured(QString time, double B, double hallU, double resistivity);
@@ -232,6 +235,7 @@ private slots:
 
 private:
     double B1, B2, B3;
+    double _coilIRangeBottom_, _coilIRangeTop_;
     double _coilMaxI_;
     Config config;
     double dataUcd, dataUdc, dataUda, dataUad;

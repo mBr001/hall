@@ -28,6 +28,9 @@ public slots:
 
 private slots:
     void on_coilCurrDoubleSpinBox_valueChanged(double );
+    void on_coilCurrMaxDoubleSpinBox_valueChanged(double );
+    void on_coilCurrMinDoubleSpinBox_valueChanged(double );
+    void on_coilCurrStepDoubleSpinBox_valueChanged(double );
     void on_coilPowerCheckBox_toggled(bool checked);
     void on_experiment_measured(const QString &time, double B, double hallU, double resistivity);
     void on_experiment_measurementCompleted();

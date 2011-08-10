@@ -101,6 +101,23 @@ void MainWindow::on_coilCurrDoubleSpinBox_valueChanged(double value)
     }
 }
 
+void MainWindow::on_coilCurrMaxDoubleSpinBox_valueChanged(double val1)
+{
+    double val2(ui->coilCurrMinDoubleSpinBox->value());
+    experiment.setCoilIRange(val1, val2);
+}
+
+void MainWindow::on_coilCurrMinDoubleSpinBox_valueChanged(double val1)
+{
+    double val2(ui->coilCurrMaxDoubleSpinBox->value());
+    experiment.setCoilIRange(val1, val2);
+}
+
+void MainWindow::on_coilCurrStepDoubleSpinBox_valueChanged(double val)
+{
+    experiment.setCoilIStep(val);
+}
+
 void MainWindow::on_coilPowerCheckBox_toggled(bool checked)
 {
     ui->sweepingWidget->setEnabled(true);
@@ -211,7 +228,7 @@ void MainWindow::on_sampleThicknessDoubleSpinBox_valueChanged(double value)
 void MainWindow::on_startPushButton_clicked()
 {
     if (experiment.isMeasuring()) {
-        experiment.measurementStop();
+        experiment.measurementAbort();
     }
     else {
         // TODO
@@ -251,6 +268,11 @@ void MainWindow::show()
     val = experiment.coilMaxI();
     ui->coilCurrDoubleSpinBox->setMaximum(val);
     ui->coilCurrDoubleSpinBox->setMinimum(-val);
+    ui->coilCurrMaxDoubleSpinBox->setMaximum(val);
+    ui->coilCurrMaxDoubleSpinBox->setMinimum(-val);
+    ui->coilCurrMinDoubleSpinBox->setMaximum(val);
+    ui->coilCurrMinDoubleSpinBox->setMinimum(-val);
+    ui->coilCurrStepDoubleSpinBox->setMaximum(val);
 
     QWidget::show();
 }

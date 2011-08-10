@@ -28,12 +28,11 @@ const int Experiment::_34903A_hall_probe_2_pwr_p = _34903A + 10;
 const double Experiment::hallProbeI = 0.001;
 
 const Experiment::Step_t Experiment::stepsMeasure[] = {
-    // for range measurement is wanted coil I already set to 0 by start rutine
-    // this step is necesary fro two reasons, 1) stepSweepeng does -- on stepCurrent
     // 2) after stepRestart function is done ++ and first step is therefore skipped
     {   NULL, 0 },
-    {   stepSweepeng, 500 },
     {   stepSetNewTarget, 0 },
+    {   stepSweeping, 500 },
+
     {   stepGetTime, 0 },
     {   stepMeasHallProbe, 0 },
 
@@ -83,6 +82,7 @@ Experiment::Steps_t::Steps_t(const Step_t *begin, const Step_t *end)
 
 Experiment::Experiment(QObject *parent) :
     QObject(parent),
+    _coilIStep_(NAN),
     coilTimer(this),
     _coilWantI_(NAN),
     measTimer(this),
@@ -154,7 +154,29 @@ double Experiment::computeB(double U)
     return (U / hallProbeI) > 0 ? B : -B;
 }
 
-void Experiment::measurementStop()
+bool Experiment::isMeasuring()
+{
+    return _measuring_;
+}
+
+void Experiment::measure(bool single)
+{
+    _measuring_ = true;
+
+    _measuringRange_.clear();
+    if (!single) {
+        _measuringRange_.append(0);
+        // TODO, napočítat hodnoty
+    }
+    stepsRunning = Steps_t(
+                stepsMeasure,
+                stepsMeasure + ARRAY_SIZE(stepsMeasure));
+    stepCurrent = stepsRunning.begin();
+
+    measTimer.start(0);
+}
+
+void Experiment::measurementAbort()
 {
     if (_measuring_) {
         _measuring_ = false;
@@ -167,27 +189,6 @@ void Experiment::measurementStop()
     if (ps622Hack.output())
         ps622Hack.setOutput(false);
     stepMeasHallProbePrepare(this);
-}
-
-bool Experiment::isMeasuring()
-{
-    return _measuring_;
-}
-
-void Experiment::measure(bool single)
-{
-    _measuring_ = true;
-    _measuringRange_ = !single;
-    if (!single) {
-        _coilWantI_ = 0;
-        _sweeping_ = true;
-    }
-    stepsRunning = Steps_t(
-                stepsMeasure,
-                stepsMeasure + ARRAY_SIZE(stepsMeasure));
-    stepCurrent = stepsRunning.begin();
-
-    measTimer.start(0);
 }
 
 void Experiment::on_coilTimer_timeout()
@@ -297,7 +298,7 @@ void Experiment::on_measTimer_timeout()
             return;
         }
     }
-    measurementStop();
+    measurementAbort();
 }
 
 void Experiment::open()
@@ -445,7 +446,7 @@ void Experiment::open()
         channels << 101 << 102 << 103 << 104 << 114;
         hp34970Hack.setSense(HP34970Hack::SenseVolt, channels);
         // set up measurement of B
-        measurementStop();
+        measurementAbort();
 
         coilTimer.start();
     }
@@ -497,10 +498,21 @@ void Experiment::setCoilI(double value)
     _sweeping_ = true;
 }
 
-/*void setCoilIRange(double min, double max)
+void Experiment::setCoilIRange(double val1, double val2)
 {
+    if (val1 < val2) {
+        _coilIRangeBottom_ = val1;
+        _coilIRangeTop_ = val2;
+    } else {
+        _coilIRangeBottom_ = val2;
+        _coilIRangeTop_ = val1;
+    }
+}
 
-}*/
+void Experiment::setCoilIStep(double val)
+{
+    _coilIStep_ = val;
+}
 
 void Experiment::setSampleI(double value)
 {
@@ -661,7 +673,7 @@ void Experiment::stepSamplePower_ca(Experiment *this_)
 
 void Experiment::stepAbortIfTargetReached(Experiment *this_)
 {
-    if (!this_->_measuringRange_)
+    if (!this_->_measuringRange_.size())
         this_->stepCurrent = this_->stepsRunning.end();
 }
 
@@ -723,11 +735,14 @@ void Experiment::stepMeasHallProbePrepare(Experiment *this_)
 
 void Experiment::stepSetNewTarget(Experiment *this_)
 {
-    // TODO
-    this_->_measuringRange_ = false;
+    if (this_->_measuringRange_.size()) {
+        this_->_coilWantI_ = this_->_measuringRange_.front();
+        this_->_measuringRange_.pop_front();
+        this_->_sweeping_ = true;
+    }
 }
 
-void Experiment::stepSweepeng(Experiment *this_)
+void Experiment::stepSweeping(Experiment *this_)
 {
     if (this_->_sweeping_) {
         --(this_->stepCurrent);
