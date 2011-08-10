@@ -137,8 +137,6 @@ protected:
     QCSVFile csvFile;
     /** Timer used to adjust current trought magnet in specified time. */
     QTimer coilTimer;
-    /** Last set value of I on coil, used only for control purposes. */
-    double _coilSetI_;
     /** Wanted value of curr flowing trought coil. */
     double _coilWantI_;
     /** Delay betwen current value update [ms].
@@ -154,6 +152,8 @@ protected:
     QTimer measTimer;
     /** Indicate whatever measurement is in progress. */
     bool _measuring_;
+    /** Last set value of I on coil, used only for control purposes. */
+    bool _measuringRange_;
     /** Keithlay PS 6220 hacky class. */
     PS6220Hack ps622Hack;
     /** Power polarity switch handler. */

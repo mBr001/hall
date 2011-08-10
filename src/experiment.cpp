@@ -84,7 +84,6 @@ Experiment::Steps_t::Steps_t(const Step_t *begin, const Step_t *end)
 Experiment::Experiment(QObject *parent) :
     QObject(parent),
     coilTimer(this),
-    _coilSetI_(0),
     _coilWantI_(NAN),
     measTimer(this),
     _measuring_(false),
@@ -177,17 +176,17 @@ bool Experiment::isMeasuring()
 
 void Experiment::measure(bool single)
 {
+    _measuring_ = true;
+    _measuringRange_ = !single;
+    if (!single) {
+        _coilWantI_ = 0;
+        _sweeping_ = true;
+    }
     stepsRunning = Steps_t(
                 stepsMeasure,
                 stepsMeasure + ARRAY_SIZE(stepsMeasure));
     stepCurrent = stepsRunning.begin();
-    if (!single) {
-        _coilWantI_ = 0;
-        _sweeping_ = true;
-        throw new Error("Not implemented.");
-    }
 
-    _measuring_ = true;
     measTimer.start(0);
 }
 
@@ -272,7 +271,6 @@ void Experiment::on_coilTimer_timeout()
     // want current but power is off -> set power on at current 0.0 A
     if (procCoilPower != wantCoilPower && wantCoilPower) {
         sdp_set_curr(&sdp, 0.0);
-        _coilSetI_ = 0;
         sdp_set_output(&sdp, 1);
         return;
     }
@@ -284,7 +282,6 @@ void Experiment::on_coilTimer_timeout()
         procI += currentSlope;
 
     sdp_set_curr(&sdp, fabs(procI));
-    _coilSetI_ = procI;
 }
 
 void Experiment::on_measTimer_timeout()
@@ -295,7 +292,7 @@ void Experiment::on_measTimer_timeout()
         }
         int delay(stepCurrent->delay);
         ++stepCurrent;
-        if (stepCurrent != stepsRunning.end()) {
+        if (stepCurrent < stepsRunning.end()) {
             measTimer.start(delay);
             return;
         }
@@ -335,7 +332,6 @@ void Experiment::open()
         _coilWantI_ = va_data.curr;
 
         err = sdp_set_curr(&sdp, va_data.curr);
-        _coilSetI_ = va_data.curr;
         if (err < 0) {
             throw new Error("Manson SDP power supply operation failed",
                             QString::fromLocal8Bit(sdp_strerror(err)));
@@ -665,7 +661,7 @@ void Experiment::stepSamplePower_ca(Experiment *this_)
 
 void Experiment::stepAbortIfTargetReached(Experiment *this_)
 {
-    if (this_->_coilWantI_ == this_->_coilSetI_)
+    if (!this_->_measuringRange_)
         this_->stepCurrent = this_->stepsRunning.end();
 }
 
@@ -728,6 +724,7 @@ void Experiment::stepMeasHallProbePrepare(Experiment *this_)
 void Experiment::stepSetNewTarget(Experiment *this_)
 {
     // TODO
+    this_->_measuringRange_ = false;
 }
 
 void Experiment::stepSweepeng(Experiment *this_)
@@ -736,4 +733,3 @@ void Experiment::stepSweepeng(Experiment *this_)
         --(this_->stepCurrent);
     }
 }
-
