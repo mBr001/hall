@@ -1,5 +1,5 @@
-#ifndef HP34970HACK_H
-#define HP34970HACK_H
+#ifndef SCPI_DEV_H
+#define SCPI_DEV_H
 
 #include "qserial.h"
 #include <qlist.h>
@@ -42,4 +42,4 @@ private:
 
 };
 
-#endif // HP34970HACK_H
+#endif // SCPI_DEV_H

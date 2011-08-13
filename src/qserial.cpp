@@ -8,17 +8,16 @@
 #include <QtCore>
 #include <stdexcept>
 
+#include "error.h"
 #include "qserial.h"
 
 const QSerial::BaudeRate_t QSerial::Baude9600 = B9600;
 const QSerial::BaudeRate_t QSerial::Baude19200 = B19200;
 
-void stdError(std::string str)
+void stdExcept(const QString &str, int err)
 {
-    int err = errno;
-
-    std::string err_str(strerror(err));
-    throw new std::runtime_error(str + err_str);
+    QString err_str(strerror(err));
+    throw new Error(str + err_str);
 }
 
 QSerial::QSerial() :
@@ -116,8 +115,10 @@ QString QSerial::readLine(ssize_t count, long timeout = 0)
     ssize_t len;
 
     len = readLine(buf, count, timeout);
-    if (len == -1)
-        stdError("QSerial::readLine read failed.");
+    if (len == -1) {
+        int err = errno;
+        stdExcept("QSerial::readLine read failed.", err);
+    }
     buf[len] = 0;
 
     return buf;
@@ -173,14 +174,18 @@ ssize_t QSerial::readLine(char *buf, ssize_t count, long timeout)
 
 void QSerial::write(const char *str)
 {
-    if (::write(fd, str, strlen(str)) < 0)
-        stdError("Failed to write to serial port");
+    if (::write(fd, str, strlen(str)) < 0) {
+        int err = errno;
+        stdExcept("Failed to write to serial port", err);
+    }
 }
 
 void QSerial::write(const QString &str)
 {
     QByteArray bytes(str.toUtf8());
 
-    if (::write(fd, bytes.constData(), bytes.length()) < 0)
-        stdError("Failed to write to serial port");
+    if (::write(fd, bytes.constData(), bytes.length()) < 0) {
+        int err = errno;
+        stdExcept("Failed to write to serial port", err);
+    }
 }

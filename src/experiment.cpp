@@ -207,8 +207,7 @@ void Experiment::on_coilTimer_timeout()
     sdp_lcd_info_t lcd_info;
 
     if (sdp_get_lcd_info(&sdp, &lcd_info) < 0) {
-        throw new std::runtime_error(
-                "on_currentTimer_timeout - sdp_get_lcd_info");
+        throw new Error("on_coilTimer_timeout - sdp_get_lcd_info");
         return;
     }
 
@@ -459,7 +458,7 @@ double Experiment::readSingle()
 {
     QStringList data(hp34970Dev.read());
     if (data.size() != 1) {
-        throw new std::runtime_error("Could not get B data.");
+        throw new Error("Could not get B data.");
     }
 
     bool ok;

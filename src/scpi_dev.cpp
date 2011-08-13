@@ -8,6 +8,7 @@
 #include <QtCore>
 #include <stdexcept>
 
+#include "error.h"
 #include "scpi_dev.h"
 
 ScpiDev::Sense_t ScpiDev::SenseVolt = "CONF:VOLT";
@@ -82,7 +83,7 @@ bool ScpiDev::output()
     if (out == "0")
         return false;
 
-    throw new std::runtime_error("HP34970Hack::output");
+    throw new Error("ScpiDev::output - invalid result");
 }
 
 QStringList ScpiDev::read()
@@ -106,7 +107,7 @@ void ScpiDev::sendCmd(const QString &cmd, long timeout)
 
     s = sendQuery(cmd, timeout);
     if (!s.isEmpty())
-        throw new std::runtime_error("HP34970Hack::cmd response not empty.");
+        throw new Error("ScpiDev::cmd response not empty.");
 }
 
 void ScpiDev::sendCmd(const QString &cmd, const Channels_t &channels, long timeout)
@@ -115,7 +116,7 @@ void ScpiDev::sendCmd(const QString &cmd, const Channels_t &channels, long timeo
 
     s = sendQuery(cmd, channels, timeout);
     if (!s.isEmpty())
-        throw new std::runtime_error("HP34970Hack::cmd response not empty.");
+        throw new Error("ScpiDev::cmd response not empty.");
 }
 
 QString ScpiDev::sendQuery(const QString &cmd, long timeout)
@@ -129,7 +130,7 @@ QString ScpiDev::sendQuery(const QString &cmd, long timeout)
     if (result.endsWith(";1"))
         return result.left(result.size() - 2);
 
-    throw new std::runtime_error("P34970hack::sendQuery failed read response.");
+    throw new Error("ScpiDev::sendQuery failed read response.");
 }
 
 QString ScpiDev::sendQuery(const QString &cmd, const Channels_t &channels, long timeout)

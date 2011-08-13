@@ -19,15 +19,5 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.startApp();
 
-    try {
-        return a.exec();
-    }
-    catch(Error &e)
-    {
-        QMessageBox::critical(0, e.description(), e.longDescription());
-    }
-    catch(std::runtime_error &e)
-    {
-        QMessageBox::critical(0, e.what(), e.what());
-    }
+    return a.exec();
 }
