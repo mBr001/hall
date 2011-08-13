@@ -153,7 +153,7 @@ protected:
     /** Power source output current limit. */
     float currentMax;
     /** HP 34970A device to measure voltage and resistivity. */
-    HP34970Hack hp34970Hack;
+    ScpiDev hp34970Dev;
     /** Timer used for fully automated testing process. */
     QTimer measTimer;
     /** Indicate whatever measurement is in progress. */
@@ -161,7 +161,7 @@ protected:
     /** Last set value of I on coil, used only for control purposes. */
     QList<double> _measuringRange_;
     /** Keithlay PS 6220 hacky class. */
-    HP34970Hack ps622Hack;
+    ScpiDev ps6220Dev;
     /** Power polarity switch handler. */
     PwrPolSwitch pwrPolSwitch;
     /** Mansons SDP power supply driver. */

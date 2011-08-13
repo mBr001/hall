@@ -5,7 +5,7 @@
 #include <qlist.h>
 #include <qstringlist.h>
 
-class HP34970Hack : protected QSerial
+class ScpiDev : protected QSerial
 {
 public:
     typedef const char *Sense_t;
@@ -16,8 +16,8 @@ public:
     static Sense_t SenseVolt;
     static Sense_t SenseRes;
 
-    HP34970Hack();
-    ~HP34970Hack();
+    ScpiDev();
+    ~ScpiDev();
     void close();
     double current();
     void init();

@@ -10,32 +10,32 @@
 
 #include "scpi_dev.h"
 
-HP34970Hack::Sense_t HP34970Hack::SenseVolt = "CONF:VOLT";
-HP34970Hack::Sense_t HP34970Hack::SenseRes = "CONF:RES";
+ScpiDev::Sense_t ScpiDev::SenseVolt = "CONF:VOLT";
+ScpiDev::Sense_t ScpiDev::SenseRes = "CONF:RES";
 
-HP34970Hack::HP34970Hack() :
+ScpiDev::ScpiDev() :
     QSerial()
 {
 }
 
-HP34970Hack::~HP34970Hack()
+ScpiDev::~ScpiDev()
 {
     close();
 }
 
-void HP34970Hack::close()
+void ScpiDev::close()
 {
     QSerial::close();
 }
 
-double HP34970Hack::current()
+double ScpiDev::current()
 {
     QString current(sendQuery("SOUR:CURR?"));
 
     return QVariant(current).toDouble();
 }
 
-QString HP34970Hack::formatCmd(const QString &cmd, const Channels_t &channels)
+QString ScpiDev::formatCmd(const QString &cmd, const Channels_t &channels)
 {
     if (!channels.size()) {
         return cmd;
@@ -51,12 +51,12 @@ QString HP34970Hack::formatCmd(const QString &cmd, const Channels_t &channels)
     return format.arg(cmd).arg(ch.join(","));
 }
 
-void HP34970Hack::init()
+void ScpiDev::init()
 {
     sendCmd("INIT", 2000000);
 }
 
-bool HP34970Hack::open(const QString &port)
+bool ScpiDev::open(const QString &port)
 {
     const long timeout = (10l * 1000000l) / 9600l;
 
@@ -73,7 +73,7 @@ bool HP34970Hack::open(const QString &port)
     return true;
 }
 
-bool HP34970Hack::output()
+bool ScpiDev::output()
 {
     QString out(sendQuery("OUTP?"));
 
@@ -85,7 +85,7 @@ bool HP34970Hack::output()
     throw new std::runtime_error("HP34970Hack::output");
 }
 
-QStringList HP34970Hack::read()
+QStringList ScpiDev::read()
 {
     QString s;
     QStringList data;
@@ -100,7 +100,7 @@ QStringList HP34970Hack::read()
     return data;
 }
 
-void HP34970Hack::sendCmd(const QString &cmd, long timeout)
+void ScpiDev::sendCmd(const QString &cmd, long timeout)
 {
     QString s;
 
@@ -109,7 +109,7 @@ void HP34970Hack::sendCmd(const QString &cmd, long timeout)
         throw new std::runtime_error("HP34970Hack::cmd response not empty.");
 }
 
-void HP34970Hack::sendCmd(const QString &cmd, const Channels_t &channels, long timeout)
+void ScpiDev::sendCmd(const QString &cmd, const Channels_t &channels, long timeout)
 {
     QString s;
 
@@ -118,7 +118,7 @@ void HP34970Hack::sendCmd(const QString &cmd, const Channels_t &channels, long t
         throw new std::runtime_error("HP34970Hack::cmd response not empty.");
 }
 
-QString HP34970Hack::sendQuery(const QString &cmd, long timeout)
+QString ScpiDev::sendQuery(const QString &cmd, long timeout)
 {
     QString _cmd(cmd + ";*OPC?\n");
     write(_cmd);
@@ -132,21 +132,21 @@ QString HP34970Hack::sendQuery(const QString &cmd, long timeout)
     throw new std::runtime_error("P34970hack::sendQuery failed read response.");
 }
 
-QString HP34970Hack::sendQuery(const QString &cmd, const Channels_t &channels, long timeout)
+QString ScpiDev::sendQuery(const QString &cmd, const Channels_t &channels, long timeout)
 {
     QString _cmd(formatCmd(cmd, channels));
 
     return sendQuery(_cmd, timeout);
 }
 
-void HP34970Hack::setCurrent(double current)
+void ScpiDev::setCurrent(double current)
 {
     QString cmd("SOUR:CURR %1");
 
     sendCmd(cmd.arg(current));
 }
 
-void HP34970Hack::setOutput(bool enabled)
+void ScpiDev::setOutput(bool enabled)
 {
     if (enabled)
         sendCmd("OUTP 1");
@@ -154,7 +154,7 @@ void HP34970Hack::setOutput(bool enabled)
         sendCmd("OUTP 0");
 }
 
-void HP34970Hack::setRoute(Channels_t closeChannels)
+void ScpiDev::setRoute(Channels_t closeChannels)
 {
     Channels_t openChannels(routeChannelsClosed);
     Channels_t closedChannels(closeChannels);
@@ -175,14 +175,14 @@ void HP34970Hack::setRoute(Channels_t closeChannels)
     routeChannelsClosed = closedChannels;
 }
 
-void HP34970Hack::setScan(Channel_t channel)
+void ScpiDev::setScan(Channel_t channel)
 {
     QString cmd("ROUT:SCAN (@%1);:INIT");
 
     sendCmd(cmd.arg(channel), 2000000);
 }
 
-void HP34970Hack::setScan(Channels_t channels)
+void ScpiDev::setScan(Channels_t channels)
 {
     QString cmd("ROUT:SCAN");
 
@@ -190,7 +190,7 @@ void HP34970Hack::setScan(Channels_t channels)
     sendCmd(cmd, 2000000);
 }
 
-void HP34970Hack::setSense(Sense_t sense, Channels_t channels)
+void ScpiDev::setSense(Sense_t sense, Channels_t channels)
 {
     sendCmd(sense, channels);
 }
