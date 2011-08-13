@@ -9,6 +9,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+const double sampleIUnit = 1000.;
+const double sampleThicknessUnit = 1000000.;
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     config(),
@@ -77,7 +80,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         config.setCoilIRangeMin(ui->coilCurrMinDoubleSpinBox->value());
         config.setCoilIRangeStep(ui->coilCurrStepDoubleSpinBox->value());
         config.setSampleI(ui->sampleCurrDoubleSpinBox->value());
-        config.setSampleThickness(ui->sampleThicknessDoubleSpinBox->value());
+        config.setSampleThickness(ui->sampleThicknessDoubleSpinBox->value()/sampleThicknessUnit);
         hide();
         configUI.show();
         return;
@@ -222,12 +225,12 @@ void MainWindow::on_hallProbeNameComboBox_currentIndexChanged(const QString &arg
 
 void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
 {
-    experiment.setSampleI(value/1000.);
+    experiment.setSampleI(value/sampleIUnit);
 }
 
 void MainWindow::on_sampleThicknessDoubleSpinBox_valueChanged(double value)
 {
-    experiment.setSampleThickness(value/1000000.);
+    experiment.setSampleThickness(value/sampleThicknessUnit);
 }
 
 void MainWindow::on_startPushButton_clicked()
@@ -268,7 +271,7 @@ void MainWindow::show()
     ui->coilPowerCheckBox->setChecked(val != 0);
 
     val = experiment.sampleI();
-    ui->sampleCurrDoubleSpinBox->setValue(val*1000.);
+    ui->sampleCurrDoubleSpinBox->setValue(val*sampleIUnit);
 
     val = experiment.coilMaxI();
     ui->coilCurrDoubleSpinBox->setMaximum(val);
@@ -283,7 +286,7 @@ void MainWindow::show()
     ui->coilCurrMinDoubleSpinBox->setValue(config.coilIRangeMin());
     ui->coilCurrStepDoubleSpinBox->setValue(config.coilIRangeStep());
     ui->sampleCurrDoubleSpinBox->setValue(config.sampleI());
-    ui->sampleThicknessDoubleSpinBox->setValue(config.sampleThickness());
+    ui->sampleThicknessDoubleSpinBox->setValue(config.sampleThickness()*sampleThicknessUnit);
     experiment.setCoilIStep(ui->coilCurrStepDoubleSpinBox->value());
     QWidget::show();
 }
