@@ -19,9 +19,13 @@ public:
     HP34970Hack();
     ~HP34970Hack();
     void close();
+    double current();
     void init();
     bool open(const QString &port);
+    bool output();
     QStringList read();
+    void setCurrent(double current);
+    void setOutput(bool enabled);
     void setRoute(Channels_t closeChannels);
     void setScan(Channel_t channel);
     void setScan(Channels_t channels);

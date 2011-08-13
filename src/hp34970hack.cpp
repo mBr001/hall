@@ -28,6 +28,13 @@ void HP34970Hack::close()
     QSerial::close();
 }
 
+double HP34970Hack::current()
+{
+    QString current(sendQuery("SOUR:CURR?"));
+
+    return QVariant(current).toDouble();
+}
+
 QString HP34970Hack::formatCmd(const QString &cmd, const Channels_t &channels)
 {
     if (!channels.size()) {
@@ -66,6 +73,18 @@ bool HP34970Hack::open(const QString &port)
     return true;
 }
 
+bool HP34970Hack::output()
+{
+    QString out(sendQuery("OUTP?"));
+
+    if (out == "1")
+        return true;
+    if (out == "0")
+        return false;
+
+    throw new std::runtime_error("HP34970Hack::output");
+}
+
 QStringList HP34970Hack::read()
 {
     QString s;
@@ -87,7 +106,7 @@ void HP34970Hack::sendCmd(const QString &cmd, long timeout)
 
     s = sendQuery(cmd, timeout);
     if (!s.isEmpty())
-        throw new std::runtime_error("P34970hack::cmd response not empty.");
+        throw new std::runtime_error("HP34970Hack::cmd response not empty.");
 }
 
 void HP34970Hack::sendCmd(const QString &cmd, const Channels_t &channels, long timeout)
@@ -96,7 +115,7 @@ void HP34970Hack::sendCmd(const QString &cmd, const Channels_t &channels, long t
 
     s = sendQuery(cmd, channels, timeout);
     if (!s.isEmpty())
-        throw new std::runtime_error("P34970hack::cmd response not empty.");
+        throw new std::runtime_error("HP34970Hack::cmd response not empty.");
 }
 
 QString HP34970Hack::sendQuery(const QString &cmd, long timeout)
@@ -118,6 +137,21 @@ QString HP34970Hack::sendQuery(const QString &cmd, const Channels_t &channels, l
     QString _cmd(formatCmd(cmd, channels));
 
     return sendQuery(_cmd, timeout);
+}
+
+void HP34970Hack::setCurrent(double current)
+{
+    QString cmd("SOUR:CURR %1");
+
+    sendCmd(cmd.arg(current));
+}
+
+void HP34970Hack::setOutput(bool enabled)
+{
+    if (enabled)
+        sendCmd("OUTP 1");
+    else
+        sendCmd("OUTP 0");
 }
 
 void HP34970Hack::setRoute(Channels_t closeChannels)
