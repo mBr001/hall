@@ -8,7 +8,7 @@
 #include <QtCore>
 #include <stdexcept>
 
-#include "hp34970hack.h"
+#include "scpi_dev.h"
 
 HP34970Hack::Sense_t HP34970Hack::SenseVolt = "CONF:VOLT";
 HP34970Hack::Sense_t HP34970Hack::SenseRes = "CONF:RES";

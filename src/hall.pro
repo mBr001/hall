@@ -28,25 +28,23 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     configui.cpp \
     powpolwitch.cpp \
-    ps6220hack.cpp \
-    hp34970hack.cpp \
     qserial.cpp \
     qcsvfile.cpp \
     config.cpp \
     error.cpp \
-    experiment.cpp
+    experiment.cpp \
+    scpi_dev.cpp
 
 HEADERS  += mainwindow.h \
     configui.h \
     powpolswitch.h \
-    ps6220hack.h \
-    hp34970hack.h \
     qserial.h \
     qcsvfile.h \
     experiment.h \
     config.h \
     error.h \
-    experiment.h
+    experiment.h \
+    scpi_dev.h
 
 FORMS    += mainwindow.ui \
     configui.ui

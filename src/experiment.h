@@ -5,10 +5,9 @@
 #include <msdp2xxx.h>
 
 #include "config.h"
-#include "hp34970hack.h"
 #include "powpolswitch.h"
-#include "ps6220hack.h"
 #include "qcsvfile.h"
+#include "scpi_dev.h"
 
 class Experiment : public QObject
 {
@@ -162,7 +161,7 @@ protected:
     /** Last set value of I on coil, used only for control purposes. */
     QList<double> _measuringRange_;
     /** Keithlay PS 6220 hacky class. */
-    PS6220Hack ps622Hack;
+    HP34970Hack ps622Hack;
     /** Power polarity switch handler. */
     PwrPolSwitch pwrPolSwitch;
     /** Mansons SDP power supply driver. */
