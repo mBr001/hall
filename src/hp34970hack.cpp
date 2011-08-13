@@ -68,7 +68,7 @@ bool HP34970Hack::open(const QString &port)
     write("\n");
     sendCmd("*RST;*CLS", 500000);
     sendCmd("SYST:REM");
-    HP34903ClosedChannels.clear();
+    routeChannelsClosed.clear();
 
     return true;
 }
@@ -156,14 +156,14 @@ void HP34970Hack::setOutput(bool enabled)
 
 void HP34970Hack::setRoute(Channels_t closeChannels)
 {
-    Channels_t openChannels(HP34903ClosedChannels);
+    Channels_t openChannels(routeChannelsClosed);
     Channels_t closedChannels(closeChannels);
 
     foreach (Channel_t ch, closeChannels) {
         openChannels.removeOne(ch);
     }
 
-    foreach (Channel_t ch, HP34903ClosedChannels) {
+    foreach (Channel_t ch, routeChannelsClosed) {
         closeChannels.removeOne(ch);
     }
 
@@ -172,7 +172,7 @@ void HP34970Hack::setRoute(Channels_t closeChannels)
     if (!closeChannels.isEmpty())
         sendCmd("ROUT:CLOS", closeChannels);
 
-    HP34903ClosedChannels = closedChannels;
+    routeChannelsClosed = closedChannels;
 }
 
 void HP34970Hack::setScan(Channel_t channel)

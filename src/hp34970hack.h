@@ -11,7 +11,7 @@ public:
     typedef const char *Sense_t;
     typedef int Channel_t;
     typedef QList<Channel_t> Channels_t;
-    Channels_t HP34903ClosedChannels;
+    Channels_t routeChannelsClosed;
 
     static Sense_t SenseVolt;
     static Sense_t SenseRes;
