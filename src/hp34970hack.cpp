@@ -16,7 +16,6 @@ HP34970Hack::Sense_t HP34970Hack::SenseRes = "CONF:RES";
 HP34970Hack::HP34970Hack() :
     QSerial()
 {
-    memset(HP34903ClosedChannels, 0, sizeof(HP34903ClosedChannels));
 }
 
 HP34970Hack::~HP34970Hack()
@@ -62,6 +61,7 @@ bool HP34970Hack::open(const QString &port)
     write("\n");
     sendCmd("*RST;*CLS", 500000);
     sendCmd("SYST:REM");
+    HP34903ClosedChannels.clear();
 
     return true;
 }
@@ -120,32 +120,25 @@ QString HP34970Hack::sendQuery(const QString &cmd, const Channels_t &channels, l
     return sendQuery(_cmd, timeout);
 }
 
-void HP34970Hack::setRoute(Channels_t closeChannels, int offs)
+void HP34970Hack::setRoute(Channels_t closeChannels)
 {
-    Channels_t openChannels;
-    Channels_t _closeChannels_;
+    Channels_t openChannels(HP34903ClosedChannels);
+    Channels_t closedChannels(closeChannels);
 
-    // channel = x + 1 + offs;
-    ++offs;
-    for (int x(0); x <= 19; ++x) {
-        bool c(HP34903ClosedChannels[x]);
-        Channel_t channel = x + offs;
-        bool cw(closeChannels.count(channel));
+    foreach (Channel_t ch, closeChannels) {
+        openChannels.removeOne(ch);
+    }
 
-        if (c && !cw) {
-            openChannels.append(channel);
-            HP34903ClosedChannels[x] = false;
-        } else
-        if (!c && cw) {
-            _closeChannels_.append(channel);
-            HP34903ClosedChannels[x] = true;
-        }
+    foreach (Channel_t ch, HP34903ClosedChannels) {
+        closeChannels.removeOne(ch);
     }
 
     if(!openChannels.isEmpty())
         sendCmd("ROUT:OPEN", openChannels);
     if (!closeChannels.isEmpty())
-        sendCmd("ROUT:CLOS", _closeChannels_);
+        sendCmd("ROUT:CLOS", closeChannels);
+
+    HP34903ClosedChannels = closedChannels;
 }
 
 void HP34970Hack::setScan(Channel_t channel)

@@ -11,7 +11,7 @@ public:
     typedef const char *Sense_t;
     typedef int Channel_t;
     typedef QList<Channel_t> Channels_t;
-    bool HP34903ClosedChannels[20];
+    Channels_t HP34903ClosedChannels;
 
     static Sense_t SenseVolt;
     static Sense_t SenseRes;
@@ -22,7 +22,7 @@ public:
     void init();
     bool open(const QString &port);
     QStringList read();
-    void setRoute(Channels_t closeChannels, int offs);
+    void setRoute(Channels_t closeChannels);
     void setScan(Channel_t channel);
     void setScan(Channels_t channels);
     void setSense(Sense_t sense, Channels_t channels);

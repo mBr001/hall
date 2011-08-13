@@ -109,7 +109,7 @@ void Experiment::close()
     coilTimer.stop();
     measTimer.stop();
     csvFile.close();
-    hp34970Hack.setRoute(HP34970Hack::Channels_t(), _34903A);
+    hp34970Hack.setRoute(HP34970Hack::Channels_t());
     hp34970Hack.close();
     ps622Hack.setOutput(false);
     // FIXME: hack, je to kvůli tomu aby si pamatoval posladní nastavené U pro vzorek
@@ -632,7 +632,7 @@ void Experiment::stepSamplePower_ba(Experiment *this_)
     HP34970Hack::Channels_t channels;
     channels.append(_34903A_sample_a_pwr_m);
     channels.append(_34903A_sample_b_pwr_p);
-    this_->hp34970Hack.setRoute(channels, _34903A);
+    this_->hp34970Hack.setRoute(channels);
     this_->ps622Hack.setOutput(true);
 }
 
@@ -642,7 +642,7 @@ void Experiment::stepSamplePower_bc(Experiment *this_)
     channels.append(_34903A_sample_b_pwr_p);
     channels.append(_34903A_sample_c_pwr_sw1);
     channels.append(_34903A_pwr_sw1_pwr_m);
-    this_->hp34970Hack.setRoute(channels, _34903A);
+    this_->hp34970Hack.setRoute(channels);
     this_->ps622Hack.setOutput(true);
 }
 
@@ -651,7 +651,7 @@ void Experiment::stepSamplePower_bd(Experiment *this_)
     HP34970Hack::Channels_t channels;
     channels.append(_34903A_sample_b_pwr_p);
     channels.append(_34903A_sample_d_pwr_m);
-    this_->hp34970Hack.setRoute(channels, _34903A);
+    this_->hp34970Hack.setRoute(channels);
     this_->ps622Hack.setOutput(true);
 }
 
@@ -661,7 +661,7 @@ void Experiment::stepSamplePower_ca(Experiment *this_)
     channels.append(_34903A_sample_a_pwr_m);
     channels.append(_34903A_sample_c_pwr_sw1);
     channels.append(_34903A_pwr_sw1_pwr_p);
-    this_->hp34970Hack.setRoute(channels, _34903A);
+    this_->hp34970Hack.setRoute(channels);
     this_->ps622Hack.setOutput(true);
 }
 
@@ -724,7 +724,7 @@ void Experiment::stepMeasHallProbePrepare(Experiment *this_)
     HP34970Hack::Channels_t closeChannels;
     closeChannels.append(_34903A_hall_probe_1_pwr_m);
     closeChannels.append(_34903A_hall_probe_2_pwr_p);
-    this_->hp34970Hack.setRoute(closeChannels, _34903A);
+    this_->hp34970Hack.setRoute(closeChannels);
 
     this_->hp34970Hack.setScan(Experiment::_34901A_hall_probe);
 
