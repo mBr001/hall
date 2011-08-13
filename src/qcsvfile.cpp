@@ -80,7 +80,10 @@ bool QCSVFile::write()
     for (QVector<QString>::iterator icells(begin());
          icells != end(); ++icells) {
 
-        if (icells->contains(_cellSeparator_) || icells->contains("\"")) {
+        if (icells->contains(_cellSeparator_) ||
+                icells->contains("\"") ||
+                icells->contains("\n") ||
+                icells->contains("\r")) {
             *icells = QString("\"%1\"").arg(icells->replace("\"", "\"\""));
         }
         row.append(*icells);
