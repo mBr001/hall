@@ -44,9 +44,16 @@ protected:
 public:
     /** Indexes of columns in CSV file with data from experiment. */
     enum {
-        csvColTime = 0,
-        csvColHallProbeI,
+        csvColHallProbeB = 0,
+        csvColSampleResistivity,
+        csvColSampleResSpec,
+        csvColSampleRHall,
+        csvColSampleDrift,
+        csvColResultsEnd,
+
+        csvColTime,
         csvColHallProbeU,
+        csvColHallProbeI,
         csvColSampleI,
         csvColSampleUacF,
         csvColSampleUacB,
@@ -56,12 +63,9 @@ public:
         csvColSampleUcdB,
         csvColSampleUdaF,
         csvColSampleUdaB,
-        csvColEmpty,
-        csvColHallProbeB,
-        csvColSampleResistivity,
-        csvColSampleResSpec,
-        csvColSampleRHall,
-        csvColSampleDrift,
+        csvColSampleThickness,
+        csvColDataEnd,
+        csvColBFormula,
         /** csvColEnd equeals to a number of columns, it is not a column at all. */
         csvColEnd,
     };

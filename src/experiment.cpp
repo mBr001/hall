@@ -379,46 +379,29 @@ void Experiment::open()
         }
 
         csvFile.resize(csvColEnd);
-        csvFile[csvColTime] = "Time";
-        csvFile[csvColHallProbeI] = "Hall proble";
-        csvFile[csvColHallProbeU] = "Hall proble";
-        csvFile[csvColHallProbeB] = "Hall proble";
-        csvFile[csvColSampleI] = "sample";
-        csvFile[csvColSampleUacF] = "sample";
-        csvFile[csvColSampleUacB] = "sample";
-        csvFile[csvColSampleUbdF] = "sample";
-        csvFile[csvColSampleUbdB] = "sample";
-        csvFile[csvColSampleUcdF] = "sample";
-        csvFile[csvColSampleUcdB] = "sample";
-        csvFile[csvColSampleUdaF] = "sample";
-        csvFile[csvColSampleUdaB] = "sample";
-        csvFile[csvColSampleResistivity] = "sample";
-        csvFile[csvColSampleResSpec] = "sample";
-        csvFile[csvColSampleRHall] = "sample";
-        csvFile[csvColSampleDrift] = "sample";
-        if (!csvFile.write()) {
-            throw new Error("Failed to write header into data file",
-                            csvFile.errorString());
-        }
 
-        csvFile[csvColTime] = "(UTC)";
-        csvFile[csvColHallProbeI] = "I [A]";
-        csvFile[csvColHallProbeU] = "U [V]";
-        csvFile[csvColHallProbeB] = "B [T]";
-        csvFile[csvColSampleI] = "I [A]";
-        csvFile[csvColSampleUacF] = "Uac/+- [V]";
-        csvFile[csvColSampleUacB] = "Uac/-+ [V]";
-        csvFile[csvColSampleUbdF] = "Ubd/+- [V]";
-        csvFile[csvColSampleUbdB] = "Ubd/-+ [V]";
-        csvFile[csvColSampleUcdF] = "Ucd/+- [V]";
-        csvFile[csvColSampleUcdB] = "Ucd/-+ [V]";
-        csvFile[csvColSampleUdaF] = "Uda/+- [V]";
-        csvFile[csvColSampleUdaB] = "Uda/-+ [V]";
-        csvFile[csvColSampleResistivity] = "R [ohm]";
-        csvFile[csvColSampleResSpec] = "Rspec [ohm*m]";
-        csvFile[csvColSampleRHall] = "Rhall [m^3*C^-1]";
-        csvFile[csvColSampleDrift] = "drift [m^2*V^-1*s^-1]";
-        csvFile.write();
+        csvFile[csvColHallProbeB] = "Hall probe\nB [T]";
+        csvFile[csvColSampleResistivity] = "sample\nR [ohm]";
+        csvFile[csvColSampleResSpec] = "sample\nRspec [ohm*m]";
+        csvFile[csvColSampleRHall] = "sample\nRhall [m^3*C^-1]";
+        csvFile[csvColSampleDrift] = "sample\ndrift [m^2*V^-1*s^-1]";
+
+        csvFile[csvColTime] = "Time\n(UTC)";
+        csvFile[csvColHallProbeU] = "Hall probe\nUhp [V]";
+        csvFile[csvColSampleUacF] = "sample\nUac/+- [V]";
+        csvFile[csvColSampleUacB] = "sample\nUac/-+ [V]";
+        csvFile[csvColSampleUbdF] = "sample\nUbd/+- [V]";
+        csvFile[csvColSampleUbdB] = "sample\nUbd/-+ [V]";
+        csvFile[csvColSampleUcdF] = "sample\nUcd/+- [V]";
+        csvFile[csvColSampleUcdB] = "sample\nUcd/-+ [V]";
+        csvFile[csvColSampleUdaF] = "sample\nUda/+- [V]";
+        csvFile[csvColSampleUdaB] = "sample\nUda/-+ [V]";
+
+        csvFile[csvColBFormula] = "B formula\n" /* TODO */;
+        csvFile[csvColHallProbeI] = "Hall proble\nIhp [A]";
+        csvFile[csvColSampleI] = "sample\nI [A]";
+        csvFile[csvColSampleThickness] = "Sample thickness\nh [um]";
+
         if (!csvFile.write()) {
             throw new Error("Failed to write header into data file",
                             csvFile.errorString());
@@ -707,6 +690,10 @@ void Experiment::stepFinish(Experiment *this_)
     this_->csvFile.setAt(Experiment::csvColSampleDrift, "TODO");
     emit this_->measured(this_->csvFile.at(Experiment::csvColTime),
                          this_->_dataB_, this_->_dataResistivity_, hallU);
+
+    QString eq("B=%1 + sqrt(%2 + %3 * Uhp / Ihp)");
+    this_->csvFile.setAt(Experiment::csvColBFormula, eq.arg(this_->B1).arg(this_->B2).arg(this_->B3));
+    this_->csvFile.setAt(Experiment::csvColSampleThickness, this_->_sampleThickness_);
     this_->csvFile.write();
 }
 
