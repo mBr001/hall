@@ -421,7 +421,7 @@ void Experiment::open()
 
         // Open sample power source
         port = config.ps6220Port();
-        if (!ps6220Dev.open(port.toLocal8Bit().constData()))
+        if (!ps6220Dev.open(port.toLocal8Bit().constData(), QSerial::Baude19200))
         {
             err = errno;
             throw new Error("Failed to open sample power supply (Keithaly 6220)",

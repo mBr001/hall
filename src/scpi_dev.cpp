@@ -56,13 +56,13 @@ void ScpiDev::init()
     sendCmd("INIT", 2000000);
 }
 
-bool ScpiDev::open(const QString &port)
+bool ScpiDev::open(const QString &port, BaudeRate_t baudeRate)
 {
     const long timeout = (10l * 1000000l) / 9600l;
 
     close();
 
-    if (!QSerial::open(port, QSerial::Baude9600, 300000, timeout))
+    if (!QSerial::open(port, baudeRate, 300000, timeout))
         return false;
 
     write("\n");

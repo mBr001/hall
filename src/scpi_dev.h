@@ -21,7 +21,7 @@ public:
     void close();
     double current();
     void init();
-    bool open(const QString &port);
+    bool open(const QString &port, BaudeRate_t baudeRate = QSerial::Baude9600);
     bool output();
     QStringList read();
     void setCurrent(double current);
