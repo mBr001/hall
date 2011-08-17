@@ -26,7 +26,7 @@ protected:
     class Steps_t : public QVector<Step_t>
     {
     public:
-        Steps_t() : QVector<Step_t>() {};
+        Steps_t() : QVector<Step_t>() {}
         /** Initiate steps from array of steps in form <begin, end).
             @par begin pointer to first element of array.
             @par end pointer behind last element of array.  */
@@ -65,8 +65,12 @@ public:
         csvColSampleThickness,
         csvColDataEnd,
         csvColBFormula,
+        csvColEmpty,
+
+        csvColSampleId,
+        csvColSampleSize,
         /** csvColEnd equeals to a number of columns, it is not a column at all. */
-        csvColEnd,
+        csvColEnd
     };
 
     /** Channel offset for 34901A card */
@@ -120,6 +124,11 @@ public:
 
     double sampleI();
     void setSampleI(double value);
+    const QString &sampleId();
+    void setSampleId(const QString &id);
+    /** Sample edge lenght, expected square sample [m]. */
+    double sampleSize();
+    void setSampleSize(double size);
     double sampleThickness();
     void setSampleThickness(double value);
 
@@ -252,6 +261,8 @@ private:
     /** I for hall probe to measure B. */
     static const double hallProbeI;
     double _sampleI_;
+    QString _sampleId_;
+    double _sampleSize_;
     double _sampleThickness_;
 };
 

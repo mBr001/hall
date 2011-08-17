@@ -228,6 +228,16 @@ void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
     experiment.setSampleI(value/sampleIUnit);
 }
 
+void MainWindow::on_sampleIdLineEdit_editingFinished()
+{
+    experiment.setSampleId(ui->sampleIdLineEdit->text());
+}
+
+void MainWindow::on_sampleSizeDoubleSpinBox_valueChanged(double size)
+{
+    experiment.setSampleSize(size);
+}
+
 void MainWindow::on_sampleThicknessDoubleSpinBox_valueChanged(double value)
 {
     experiment.setSampleThickness(value/sampleThicknessUnit);

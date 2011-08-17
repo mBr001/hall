@@ -92,7 +92,8 @@ Experiment::Experiment(QObject *parent) :
     B2(NAN),
     B3(NAN),
     _dataHallU0_(NAN),
-    _sampleI_(0)
+    _sampleI_(0),
+    _sampleSize_(0)
 {
     coilTimer.setObjectName("coilTimer");
     coilTimer.setInterval(currentDwell);
@@ -400,6 +401,8 @@ void Experiment::open()
         csvFile[csvColHallProbeI] = "Hall proble\nIhp [A]";
         csvFile[csvColSampleI] = "sample\nI [A]";
         csvFile[csvColSampleThickness] = "Sample thickness\nh [um]";
+        csvFile[csvColSampleId] = "Sample ID";
+        csvFile[csvColSampleSize] = "Sample edge lenght\n[m]";
 
         if (!csvFile.write()) {
             throw new Error("Failed to write header into data file",
@@ -473,6 +476,11 @@ double Experiment::sampleI()
     return ps6220Dev.current();
 }
 
+const QString &Experiment::sampleId()
+{
+    return _sampleId_;
+}
+
 double Experiment::sampleThickness()
 {
     return _sampleThickness_;
@@ -510,6 +518,16 @@ void Experiment::setCoilIStep(double val)
 void Experiment::setSampleI(double value)
 {
     _sampleI_ = value;
+}
+
+void Experiment::setSampleId(const QString &id)
+{
+    _sampleId_ = id;
+}
+
+void Experiment::setSampleSize(double size)
+{
+    _sampleSize_ = size;
 }
 
 void Experiment::setSampleThickness(double value)
@@ -693,6 +711,8 @@ void Experiment::stepFinish(Experiment *this_)
     QString eq("B=%1 + sqrt(%2 + %3 * Uhp / Ihp)");
     this_->csvFile.setAt(Experiment::csvColBFormula, eq.arg(this_->B1).arg(this_->B2).arg(this_->B3));
     this_->csvFile.setAt(Experiment::csvColSampleThickness, this_->_sampleThickness_);
+    this_->csvFile.setAt(Experiment::csvColSampleSize, this_->_sampleSize_);
+    this_->csvFile.setAt(Experiment::csvColSampleId, this_->_sampleId_);
     this_->csvFile.write();
 }
 
