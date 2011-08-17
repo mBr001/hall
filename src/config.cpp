@@ -11,6 +11,7 @@ const char Config::cfg_msdpPort[] = "experiment/coil PS port";
 const char Config::cfg_polSwitchPort[] = "experiment/polarity switch port";
 const char Config::cfg_ps6220Port[] = "experiment/sample PS port";
 const char Config::cfg_sampleI[] = "sample I";
+const char Config::cfg_sampleSize[] = "sample size";
 const char Config::cfg_sampleThickness[] = "sample thickness";
 
 Config::Config()
@@ -83,6 +84,11 @@ double Config::sampleI()
     return settings.value(cfg_sampleI, 0).toDouble();
 }
 
+double Config::sampleSize()
+{
+    return settings.value(cfg_sampleSize, 0).toDouble();
+}
+
 double Config::sampleThickness()
 {
     return settings.value(cfg_sampleThickness, 0).toDouble();
@@ -139,6 +145,11 @@ void Config::setMsdpPort(const QString &port)
 void Config::setSampleI(double I)
 {
     settings.setValue(cfg_sampleI, I);
+}
+
+void Config::setSampleSize(double size)
+{
+    settings.setValue(cfg_sampleSize, size);
 }
 
 void Config::setSampleThickness(double thickness)
