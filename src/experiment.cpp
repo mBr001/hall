@@ -403,6 +403,7 @@ void Experiment::open()
         csvFile[csvColSampleThickness] = "Sample thickness\nh [um]";
         csvFile[csvColSampleId] = "Sample ID";
         csvFile[csvColSampleSize] = "Sample edge lenght\n[m]";
+        csvFile[csvColCoilI] = "Coil\nI [A]";
 
         if (!csvFile.write()) {
             throw new Error("Failed to write header into data file",
@@ -713,6 +714,7 @@ void Experiment::stepFinish(Experiment *this_)
     this_->csvFile.setAt(Experiment::csvColSampleThickness, this_->_sampleThickness_);
     this_->csvFile.setAt(Experiment::csvColSampleSize, this_->_sampleSize_);
     this_->csvFile.setAt(Experiment::csvColSampleId, this_->_sampleId_);
+    this_->csvFile.setAt(Experiment::csvColCoilI, this_->_coilWantI_);
     this_->csvFile.write();
 }
 

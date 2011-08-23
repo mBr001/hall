@@ -63,6 +63,7 @@ public:
         csvColSampleUdaF,
         csvColSampleUdaB,
         csvColSampleThickness,
+        csvColCoilI,
         csvColDataEnd,
         csvColBFormula,
         csvColEmpty,
