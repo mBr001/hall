@@ -696,11 +696,9 @@ void Experiment::stepFinish(Experiment *this_)
     // TODO: kontrola rozptylu hodnot napětí
     this_->_dataResSpec_ = M_PI * this_->_sampleThickness_ / M_LN2 * this_->_dataResistivity_;
 
-    double hallU(((this_->dataUacRev - this_->dataUac) +
+    double hallU(((this_->dataUac - this_->dataUacRev) +
                   (this_->dataUbd - this_->dataUbdRev)) / 4);
-    std::count << "ac" << (this_->dataUacRev - this_->dataUac) <<
-        " bd " << (this_->dataUbd - this_->dataUbdRev) <<
-        " hall " << hallU;
+
     if (this_->_coilWantI_ == 0)
         this_->_dataHallU0_ = hallU;
     hallU -= this_->_dataHallU0_;

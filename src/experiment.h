@@ -251,7 +251,7 @@ private:
     double _coilIRangeBottom_, _coilIRangeTop_;
     double _coilMaxI_;
     Config config;
-    double dataUcd, dataUcdRev, dataUda, dataUad;
+    double dataUcd, dataUcdRev, dataUda, dataUdaRev;
     double dataUac, dataUacRev, dataUbd, dataUbdRev;
     double _dataB_;
     /** Hall U [V] at B = 0T */
