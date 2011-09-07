@@ -554,7 +554,7 @@ void Experiment::stepSampleMeas_cd(Experiment *this_)
 void Experiment::stepSampleMeas_cdRev(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUdc = val;
+    this_->dataUcdRev = val;
     this_->csvFile.setAt(Experiment::csvColSampleUcdB, val);
 
     this_->ps6220Dev.setOutput(false);
@@ -572,7 +572,7 @@ void Experiment::stepSampleMeas_da(Experiment *this_)
 void Experiment::stepSampleMeas_daRev(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUad = val;
+    this_->dataUdaRev = val;
     this_->csvFile.setAt(Experiment::csvColSampleUdaB, val);
 
     this_->ps6220Dev.setOutput(false);
@@ -590,7 +590,7 @@ void Experiment::stepSampleMeas_ac(Experiment *this_)
 void Experiment::stepSampleMeas_acRev(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUca = val;
+    this_->dataUacRev = val;
     this_->csvFile.setAt(Experiment::csvColSampleUacB, val);
 
     this_->ps6220Dev.setOutput(false);
@@ -608,7 +608,7 @@ void Experiment::stepSampleMeas_bd(Experiment *this_)
 void Experiment::stepSampleMeas_bdRev(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUdb = val;
+    this_->dataUbdRev = val;
     this_->csvFile.setAt(Experiment::csvColSampleUbdB, val);
 
     this_->ps6220Dev.setOutput(false);
@@ -691,13 +691,13 @@ void Experiment::stepAbortIfTargetReached(Experiment *this_)
 
 void Experiment::stepFinish(Experiment *this_)
 {
-    this_->_dataResistivity_ = ((this_->dataUcd - this_->dataUdc) +
-                                (this_->dataUda - this_->dataUad)) / 4 / this_->_sampleI_;
+    this_->_dataResistivity_ = ((this_->dataUcd - this_->dataUcdRev) +
+                                (this_->dataUda - this_->dataUdaRev)) / 4 / this_->_sampleI_;
     // TODO: kontrola rozptylu hodnot napětí
     this_->_dataResSpec_ = M_PI * this_->_sampleThickness_ / M_LN2 * this_->_dataResistivity_;
 
-    double hallU(((this_->dataUca - this_->dataUac) +
-                  (this_->dataUbd - this_->dataUdb)) / 4 - this_->_dataHallU0_);
+    double hallU(((this_->dataUacRev - this_->dataUac) +
+                  (this_->dataUbd - this_->dataUbdRev)) / 4 - this_->_dataHallU0_);
 
     this_->_dataRHall_ = this_->_sampleThickness_ * hallU / this_->_dataB_;
 
