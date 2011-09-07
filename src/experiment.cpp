@@ -697,7 +697,13 @@ void Experiment::stepFinish(Experiment *this_)
     this_->_dataResSpec_ = M_PI * this_->_sampleThickness_ / M_LN2 * this_->_dataResistivity_;
 
     double hallU(((this_->dataUacRev - this_->dataUac) +
-                  (this_->dataUbd - this_->dataUbdRev)) / 4 - this_->_dataHallU0_);
+                  (this_->dataUbd - this_->dataUbdRev)) / 4);
+    std::count << "ac" << (this_->dataUacRev - this_->dataUac) <<
+        " bd " << (this_->dataUbd - this_->dataUbdRev) <<
+        " hall " << hallU;
+    if (this_->_coilWantI_ == 0)
+        this_->_dataHallU0_ = hallU;
+    hallU -= this_->_dataHallU0_;
 
     this_->_dataRHall_ = this_->_sampleThickness_ * hallU / this_->_dataB_;
 
@@ -731,8 +737,6 @@ void Experiment::stepMeasHallProbe(Experiment *this_)
     this_->_dataB_ = this_->computeB(val);
     this_->csvFile.setAt(Experiment::csvColHallProbeB, this_->_dataB_);
     this_->csvFile.setAt(Experiment::csvColHallProbeI, hallProbeI);
-    if (this_->_coilWantI_ == 0)
-        this_->_dataHallU0_ = this_->_dataB_;
 
     this_->ps6220Dev.setOutput(false);
 }
