@@ -172,20 +172,15 @@ ssize_t QSerial::readLine(char *buf, ssize_t count, long timeout)
     return -1;
 }
 
-void QSerial::write(const char *str)
+bool QSerial::write(const char *str)
 {
-    if (::write(fd, str, strlen(str)) < 0) {
-        int err = errno;
-        stdExcept("Failed to write to serial port", err);
-    }
+    size_t len(strlen(str));
+    return (::write(fd, str, len) == len);
 }
 
-void QSerial::write(const QString &str)
+bool QSerial::write(const QString &str)
 {
     QByteArray bytes(str.toUtf8());
 
-    if (::write(fd, bytes.constData(), bytes.length()) < 0) {
-        int err = errno;
-        stdExcept("Failed to write to serial port", err);
-    }
+    return (::write(fd, bytes.constData(), bytes.length()) == bytes.length());
 }
