@@ -40,9 +40,9 @@ public:
               long timeoutPerChar);
     
     /** Write null terminated string into serial line. */
-    bool xwrite(const char *str);
+    bool write(const char *str);
     /** Write UTF-8 string into serial line. */
-    bool xwrite(const QString &str);
+    bool write(const QString &str);
     QString readLine(ssize_t count);
     QString readLine(ssize_t count, long timeout);
 private:

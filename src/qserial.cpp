@@ -174,7 +174,7 @@ ssize_t QSerial::readLine(char *buf, ssize_t count, long timeout)
 
 bool QSerial::write(const char *str)
 {
-    size_t len(strlen(str));
+    ssize_t len(strlen(str));
     return (::write(fd, str, len) == len);
 }
 

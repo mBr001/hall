@@ -66,7 +66,10 @@ bool ScpiDev::open(const QString &port, BaudeRate_t baudeRate)
     if (!QSerial::open(port, baudeRate, 300000, timeout))
         return false;
 
-    write("\n");
+    if (!write("\n")) {
+        QSerial::close();
+        return false;
+    }
     sendCmd("*RST;*CLS", 500000);
     sendCmd("SYST:REM");
     routeChannelsClosed.clear();
@@ -122,7 +125,8 @@ void ScpiDev::sendCmd(const QString &cmd, const Channels_t &channels, long timeo
 QString ScpiDev::sendQuery(const QString &cmd, long timeout)
 {
     QString _cmd(cmd + ";*OPC?\n");
-    write(_cmd);
+    if (!write(_cmd))
+        throw new Error("ScpiDev::sendQuery failed send cmd.");;
 
     QString result(readLine(1024, timeout).trimmed());
     if (result == "1")
