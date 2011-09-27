@@ -1,9 +1,3 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2011-07-07T08:10:15
-#
-#-------------------------------------------------
-
 QT       += core gui
 
 TARGET = hall
@@ -12,15 +6,26 @@ TEMPLATE = app
 LIBS += -L/usr/local/lib -lmsdp2xxx
 INCLUDEPATH += /usr/local/include
 
-exists(/usr/include/qwt) {
-    LIBS += -lqwt
-    INCLUDEPATH += /usr/include/qwt
+QWT_SET=0
+exists(/usr/include/qwt5) {
+    LIBS += -lqwt5
+    INCLUDEPATH += /usr/include/qwt5
+    QWT_SET=1
 }
 
 exists(/usr/include/qwt-qt4) {
-    !exists(/usr/include/qwt) {
+    if (QWT_SET != 1) {
         LIBS += -lqwt-qt4
         INCLUDEPATH += /usr/include/qwt-qt4
+        QWT_SET=1
+    }
+}
+
+exists(/usr/include/qwt) {
+    if (QWT_SET != 1) {
+        LIBS += -lqwt
+        INCLUDEPATH += /usr/include/qwt
+        QWT_SET=1
     }
 }
 
