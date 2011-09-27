@@ -109,19 +109,19 @@ bool QSerial::open(const QString &port, BaudeRate_t bauderate, long timeout,
     return open(qPrintable(port), bauderate, timeout, timeoutPerChar);
 }
 
-QString QSerial::readLine(ssize_t count, long timeout = 0)
+bool QSerial::readLine(QString &str, ssize_t maxSize, long timeout = 0)
 {
-    char buf[count + 1];
+    char buf[maxSize + 1];
     ssize_t len;
 
-    len = readLine(buf, count, timeout);
+    len = readLine(buf, maxSize, timeout);
     if (len == -1) {
-        int err = errno;
-        stdExcept("QSerial::readLine read failed.", err);
+        return false;
     }
     buf[len] = 0;
+    str = buf;
 
-    return buf;
+    return true;
 }
 
 /**

@@ -128,7 +128,10 @@ QString ScpiDev::sendQuery(const QString &cmd, long timeout)
     if (!write(_cmd))
         throw new Error("ScpiDev::sendQuery failed send cmd.");;
 
-    QString result(readLine(1024, timeout).trimmed());
+    QString result;
+    if (!readLine(result, 1024, timeout))
+        throw new Error("ScpiDev::sendQuery failed to send query.");
+    result = result.trimmed();
     if (result == "1")
         return QString();
     if (result.endsWith(";1"))
