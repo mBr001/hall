@@ -741,11 +741,15 @@ void Experiment::stepAbortIfTargetReached(Experiment *this_)
 
 void Experiment::stepFinish(Experiment *this_)
 {
+    // TODO: check B vs -B (B direction)
+    /* R = (Ucd - Udc + Uda - Uad) / (4 * I) */
     this_->_dataResistivity_ = ((this_->dataUcd - this_->dataUcdRev) +
                                 (this_->dataUda - this_->dataUdaRev)) / 4 / this_->_sampleI_;
     // TODO: kontrola rozptylu hodnot napětí
-    this_->_dataResSpec_ = M_PI * this_->_sampleThickness_ / M_LN2 * this_->_dataResistivity_;
+    /* Rs = Pi / ln(2) * w * R     w - sample thickness */
+    this_->_dataResSpec_ = M_PI / M_LN2 * this_->_sampleThickness_ * this_->_dataResistivity_;
 
+    /* Uh = (Uac - Uca + Ubd - Udb) / 4    Uh - hall voltage */
     double hallU(((this_->dataUac - this_->dataUacRev) +
                   (this_->dataUbd - this_->dataUbdRev)) / 4);
 
@@ -753,9 +757,12 @@ void Experiment::stepFinish(Experiment *this_)
         this_->_dataHallU0_ = hallU;
     hallU -= this_->_dataHallU0_;
 
-    this_->_dataRHall_ = this_->_sampleThickness_ * hallU / this_->_dataB_;
+    /* Rhall = w * Uh / (B * I) */
+    this_->_dataRHall_ = this_->_sampleThickness_ * hallU / this_->_dataB_ / this_->_sampleI_;
 
-    this_->_dataDrift_ = 0; // TODO
+    // TODO: check this math
+    /* um = Rh / (Rs * w) */
+    this_->_dataDrift_ = fabs(this_->_dataRHall_ / (this_->_dataResistivity_ * this_->_sampleThickness_));
 
     this_->csvFile.setAt(Experiment::csvColSampleResistivity, this_->_dataResistivity_);
     this_->csvFile.setAt(Experiment::csvColSampleResSpec, this_->_dataResSpec_);
