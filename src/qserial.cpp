@@ -14,7 +14,7 @@ const QSerial::BaudeRate_t QSerial::Baude9600 = B9600;
 const QSerial::BaudeRate_t QSerial::Baude19200 = B19200;
 
 QSerial::QSerial() :
-    fd(-1), errorno(0)
+    fd(-1), errorno(0), errorstr("")
 {
 }
 
@@ -25,6 +25,9 @@ QSerial::~QSerial()
 
 void QSerial::close()
 {
+    errorno = 0;
+    errorstr = "";
+
     if (isOpen()) {
         ::close(fd);
         fd = -1;
@@ -38,7 +41,7 @@ int QSerial::error() const
 
 QString QSerial::errorStr() const
 {
-    return strerror(errorno);
+    return QString(errorstr) + strerror(errorno);
 }
 
 bool QSerial::isOpen() const
@@ -82,9 +85,13 @@ bool QSerial::open(const char *port, BaudeRate_t bauderate, long timeout,
 {
     struct termios tio;
 
+    errorno = 0;
+    errorstr = "";
+
     fd = ::open(port, O_RDWR | O_NONBLOCK);
     if (fd == -1) {
         errorno = errno;
+        errorstr = "QSerial::open open ";
         return false;
     }
 
@@ -97,6 +104,7 @@ bool QSerial::open(const char *port, BaudeRate_t bauderate, long timeout,
 
     if (tcsetattr(fd, TCSANOW, &tio) < 0) {
         errorno = errno;
+        errorstr = "QSerial::open tcsetattr ";
         ::close(fd);
 
         return false;
@@ -118,9 +126,14 @@ bool QSerial::readLine(QString &str, ssize_t maxSize, long timeout = 0)
     char buf[maxSize + 1];
     ssize_t len;
 
+    errorno = 0;
+    errorstr = "";
+
     len = readLine(buf, maxSize, timeout);
     if (len == -1) {
         errorno = errno;
+        errorstr = "QSerial::readLine readLine ";
+
         return false;
     }
     buf[len] = 0;
@@ -179,9 +192,14 @@ ssize_t QSerial::readLine(char *buf, ssize_t count, long timeout)
 
 bool QSerial::write(const char *str)
 {
+    errorno = 0;
+    errorstr = "";
+
     ssize_t len(strlen(str));
     if (::write(fd, str, len) != len) {
         errorno = errno;
+        errorstr = "QSerial::write write ";
+
         return false;
     }
     return true;
@@ -189,10 +207,14 @@ bool QSerial::write(const char *str)
 
 bool QSerial::write(const QString &str)
 {
-    QByteArray bytes(str.toUtf8());
+    errorno = 0;
+    errorstr = "";
 
+    QByteArray bytes(str.toUtf8());
     if (::write(fd, bytes.constData(), bytes.length()) == bytes.length()) {
         errorno = errno;
+        errorstr = "QSerial::write write ";
+
         return false;
     }
     return true;

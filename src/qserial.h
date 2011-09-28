@@ -15,9 +15,16 @@ public:
     QSerial();
     ~QSerial();
     void close();
+
+    /** @return errno of last error. */
     int error() const;
+
+    /** String describing last error. */
     QString errorStr() const;
+
+    /** @return true if port is open, false otherwise. */
     bool isOpen() const;
+
     /** List all available serial ports. */
     static QStringList list();
     /**
@@ -28,6 +35,7 @@ public:
      * @param timeoutPerChar Increase reading time timeout per recieved character [us].
      * @return       File descriptor on success, negative number (err no.) on error.
      */
+
     bool open(const char *port, BaudeRate_t bauderate, long timeoutOffs,
               long timeoutPerChar);
     /**
@@ -43,13 +51,16 @@ public:
     
     /** Write null terminated string into serial line. */
     bool write(const char *str);
+
     /** Write UTF-8 string into serial line. */
     bool write(const QString &str);
+
     bool readLine(QString &str, ssize_t count);
     bool readLine(QString &str, ssize_t maxSize, long timeout);
 private:
     int fd;
     int errorno;
+    const char *errorstr;
     long timeoutOffs, timeoutPerChar;
 
     bool isLine(const char *buf, ssize_t size) const;
