@@ -26,7 +26,7 @@ protected:
     {
     public:
         Steps_t() : QVector<Step_t>() {}
-        /** Initiate steps from array of steps in form <begin, end).
+        /** Initiate steps from array of steps => <begin, end).
             @par begin pointer to first element of array.
             @par end pointer behind last element of array.  */
         Steps_t(const Step_t *begin, const Step_t *end);
