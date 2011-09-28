@@ -55,12 +55,13 @@ public:
     /** Write UTF-8 string into serial line. */
     bool write(const QString &str);
 
-    bool readLine(QString &str, ssize_t count);
-    bool readLine(QString &str, ssize_t maxSize, long timeout);
+    bool readLine(QString *str, ssize_t count);
+    bool readLine(QString *str, ssize_t maxSize, long timeout);
+
 private:
-    int fd;
     int errorno;
     const char *errorstr;
+    int fd;
     long timeoutOffs, timeoutPerChar;
 
     bool isLine(const char *buf, ssize_t size) const;

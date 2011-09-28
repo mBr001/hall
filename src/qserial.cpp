@@ -14,7 +14,7 @@ const QSerial::BaudeRate_t QSerial::Baude9600 = B9600;
 const QSerial::BaudeRate_t QSerial::Baude19200 = B19200;
 
 QSerial::QSerial() :
-    fd(-1), errorno(0), errorstr("")
+    errorno(0), errorstr(""), fd(-1)
 {
 }
 
@@ -121,7 +121,7 @@ bool QSerial::open(const QString &port, BaudeRate_t bauderate, long timeout,
     return open(qPrintable(port), bauderate, timeout, timeoutPerChar);
 }
 
-bool QSerial::readLine(QString &str, ssize_t maxSize, long timeout = 0)
+bool QSerial::readLine(QString *str, ssize_t maxSize, long timeout = 0)
 {
     char buf[maxSize + 1];
     ssize_t len;
@@ -137,7 +137,7 @@ bool QSerial::readLine(QString &str, ssize_t maxSize, long timeout = 0)
         return false;
     }
     buf[len] = 0;
-    str = buf;
+    *str = buf;
 
     return true;
 }
