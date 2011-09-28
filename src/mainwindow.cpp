@@ -240,9 +240,9 @@ void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
     experiment.setSampleI(value/sampleIUnit);
 }
 
-void MainWindow::on_sampleIdLineEdit_editingFinished()
+void MainWindow::on_sampleNameLineEdit_editingFinished()
 {
-    experiment.setSampleId(ui->sampleIdLineEdit->text());
+    experiment.setSampleName(ui->sampleNameLineEdit->text());
 }
 
 void MainWindow::on_sampleSizeDoubleSpinBox_valueChanged(double size)

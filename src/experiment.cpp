@@ -416,7 +416,7 @@ bool Experiment::open()
     csvFile[csvColHallProbeI] = "Hall proble\nIhp [A]";
     csvFile[csvColSampleI] = "sample\nI [A]";
     csvFile[csvColSampleThickness] = "Sample thickness\nh [um]";
-    csvFile[csvColSampleId] = "Sample ID";
+    csvFile[csvColSampleName] = "Sample Name";
     csvFile[csvColSampleSize] = "Sample edge lenght\n[m]";
     csvFile[csvColCoilI] = "Coil\nI [A]";
 
@@ -527,9 +527,9 @@ double Experiment::sampleI()
     return i;
 }
 
-const QString &Experiment::sampleId()
+const QString &Experiment::sampleName()
 {
-    return _sampleId_;
+    return _sampleName_;
 }
 
 double Experiment::sampleThickness()
@@ -571,9 +571,9 @@ void Experiment::setSampleI(double value)
     _sampleI_ = value;
 }
 
-void Experiment::setSampleId(const QString &id)
+void Experiment::setSampleName(const QString &id)
 {
-    _sampleId_ = id;
+    _sampleName_ = id;
 }
 
 void Experiment::setSampleSize(double size)
@@ -755,11 +755,12 @@ void Experiment::stepFinish(Experiment *this_)
 
     this_->_dataRHall_ = this_->_sampleThickness_ * hallU / this_->_dataB_;
 
+    this_->_dataDrift_ = 0; // TODO
+
     this_->csvFile.setAt(Experiment::csvColSampleResistivity, this_->_dataResistivity_);
     this_->csvFile.setAt(Experiment::csvColSampleResSpec, this_->_dataResSpec_);
     this_->csvFile.setAt(Experiment::csvColSampleRHall, this_->_dataRHall_);
-    //this_->csvFile.setAt(Experiment::csvColSampleDrift, this_->_dataDrift_);
-    this_->csvFile.setAt(Experiment::csvColSampleDrift, "TODO");
+    this_->csvFile.setAt(Experiment::csvColSampleDrift, this_->_dataDrift_);
     emit this_->measured(this_->csvFile.at(Experiment::csvColTime),
                          this_->_dataB_, this_->_dataResistivity_, hallU);
 
@@ -767,7 +768,7 @@ void Experiment::stepFinish(Experiment *this_)
     this_->csvFile.setAt(Experiment::csvColBFormula, eq.arg(this_->B1).arg(this_->B2).arg(this_->B3));
     this_->csvFile.setAt(Experiment::csvColSampleThickness, this_->_sampleThickness_);
     this_->csvFile.setAt(Experiment::csvColSampleSize, this_->_sampleSize_);
-    this_->csvFile.setAt(Experiment::csvColSampleId, this_->_sampleId_);
+    this_->csvFile.setAt(Experiment::csvColSampleName, this_->_sampleName_);
     this_->csvFile.setAt(Experiment::csvColCoilI, this_->_coilWantI_);
     this_->csvFile.write();
 }

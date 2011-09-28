@@ -42,10 +42,8 @@ private slots:
     void on_sampleCurrDoubleSpinBox_valueChanged(double );
     void on_sampleThicknessDoubleSpinBox_valueChanged(double );
     void on_startPushButton_clicked();
-
     void on_sampleSizeDoubleSpinBox_valueChanged(double arg1);
-
-    void on_sampleIdLineEdit_editingFinished();
+    void on_sampleNameLineEdit_editingFinished();
 
 private:
     /** Application configuration */

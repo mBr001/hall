@@ -67,7 +67,7 @@ public:
         csvColBFormula,
         csvColEmpty,
 
-        csvColSampleId,
+        csvColSampleName,
         csvColSampleSize,
         /** csvColEnd equeals to a number of columns, it is not a column at all. */
         csvColEnd
@@ -124,8 +124,8 @@ public:
 
     double sampleI();
     void setSampleI(double value);
-    const QString &sampleId();
-    void setSampleId(const QString &id);
+    const QString &sampleName();
+    void setSampleName(const QString &id);
     /** Lenght of side for square sample [m]. */
     double sampleSize();
     void setSampleSize(double size);
@@ -260,6 +260,7 @@ private:
     double dataUac, dataUacRev, dataUbd, dataUbdRev;
     double _dataB_;
     /** Hall U [V] at B = 0T */
+    double _dataDrift_;
     double _dataHallU0_;
     double _dataRHall_;
     double _dataResistivity_;
@@ -267,7 +268,7 @@ private:
     /** I for hall probe to measure B. */
     static const double hallProbeI;
     double _sampleI_;
-    QString _sampleId_;
+    QString _sampleName_;
     double _sampleSize_;
     double _sampleThickness_;
 };
