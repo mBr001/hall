@@ -113,8 +113,6 @@ void Experiment::close()
     hp34970Dev.setRoute(ScpiDev::Channels_t());
     hp34970Dev.close();
     ps6220Dev.setOutput(false);
-    // FIXME: hack, je to kvůli tomu aby si pamatoval poslední nastavené U pro vzorek
-    ps6220Dev.setCurrent(_sampleI_);
     ps6220Dev.close();
     pwrPolSwitch.close();
     sdp_close(&sdp);
