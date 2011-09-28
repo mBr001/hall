@@ -15,7 +15,9 @@ public:
     QSerial();
     ~QSerial();
     void close();
-    bool isOpen();
+    int error() const;
+    QString errorStr() const;
+    bool isOpen() const;
     /** List all available serial ports. */
     static QStringList list();
     /**
@@ -47,9 +49,10 @@ public:
     bool readLine(QString &str, ssize_t maxSize, long timeout);
 private:
     int fd;
+    int errorno;
     long timeoutOffs, timeoutPerChar;
 
-    bool isLine(const char *buf, ssize_t size);
+    bool isLine(const char *buf, ssize_t size) const;
     ssize_t readLine(char *buf, ssize_t count, long timeout);
 };
 

@@ -14,7 +14,7 @@ const QSerial::BaudeRate_t QSerial::Baude9600 = B9600;
 const QSerial::BaudeRate_t QSerial::Baude19200 = B19200;
 
 QSerial::QSerial() :
-    fd(-1)
+    fd(-1), errorno(0)
 {
 }
 
@@ -31,12 +31,22 @@ void QSerial::close()
     }
 }
 
-bool QSerial::isOpen()
+int QSerial::error() const
+{
+    return errorno;
+}
+
+QString QSerial::errorStr() const
+{
+    return strerror(errorno);
+}
+
+bool QSerial::isOpen() const
 {
     return (fd != -1);
 }
 
-bool QSerial::isLine(const char *buf, ssize_t size)
+bool QSerial::isLine(const char *buf, ssize_t size) const
 {
     // empty line is not real line
     if (size <= 1)
@@ -73,8 +83,10 @@ bool QSerial::open(const char *port, BaudeRate_t bauderate, long timeout,
     struct termios tio;
 
     fd = ::open(port, O_RDWR | O_NONBLOCK);
-    if (fd == -1)
-         return false;
+    if (fd == -1) {
+        errorno = errno;
+        return false;
+    }
 
     memset(&tio, 0, sizeof(tio));
     tio.c_cflag = CS8 | CREAD | CLOCAL;
@@ -84,9 +96,8 @@ bool QSerial::open(const char *port, BaudeRate_t bauderate, long timeout,
     cfsetospeed(&tio, bauderate);
 
     if (tcsetattr(fd, TCSANOW, &tio) < 0) {
-        int e = errno;
+        errorno = errno;
         ::close(fd);
-        errno = e;
 
         return false;
     }
@@ -109,6 +120,7 @@ bool QSerial::readLine(QString &str, ssize_t maxSize, long timeout = 0)
 
     len = readLine(buf, maxSize, timeout);
     if (len == -1) {
+        errorno = errno;
         return false;
     }
     buf[len] = 0;
@@ -168,12 +180,20 @@ ssize_t QSerial::readLine(char *buf, ssize_t count, long timeout)
 bool QSerial::write(const char *str)
 {
     ssize_t len(strlen(str));
-    return (::write(fd, str, len) == len);
+    if (::write(fd, str, len) != len) {
+        errorno = errno;
+        return false;
+    }
+    return true;
 }
 
 bool QSerial::write(const QString &str)
 {
     QByteArray bytes(str.toUtf8());
 
-    return (::write(fd, bytes.constData(), bytes.length()) == bytes.length());
+    if (::write(fd, bytes.constData(), bytes.length()) == bytes.length()) {
+        errorno = errno;
+        return false;
+    }
+    return true;
 }
