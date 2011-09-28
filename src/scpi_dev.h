@@ -11,6 +11,12 @@ public:
     typedef const char *Sense_t;
     typedef int Channel_t;
     typedef QList<Channel_t> Channels_t;
+    typedef enum {
+        ERR_OK = 0,
+        ERR_QSERIAL = 1,
+        ERR_RESULT = 2
+    } error_t;
+
     Channels_t routeChannelsClosed;
 
     static Sense_t SenseVolt;
@@ -19,27 +25,31 @@ public:
     ScpiDev();
     ~ScpiDev();
     void close();
-    double current();
-    void init();
+    bool current(double *i);
+    int error() const;
+    QString errorStr() const;
+    bool init();
     bool open(const QString &port, BaudeRate_t baudeRate = QSerial::Baude9600);
-    bool output();
-    QStringList read();
-    void setCurrent(double current);
-    void setOutput(bool enabled);
-    void setRoute(Channels_t closeChannels);
-    void setScan(Channel_t channel);
-    void setScan(Channels_t channels);
-    void setSense(Sense_t sense, Channels_t channels);
+    bool output(bool *enabled);
+    bool read(QStringList *values);
+    bool setCurrent(double current);
+    bool setOutput(bool enabled);
+    bool setRoute(Channels_t closeChannels);
+    bool setScan(Channel_t channel);
+    bool setScan(Channels_t channels);
+    bool setSense(Sense_t sense, Channels_t channels);
 
 protected:
     QString formatCmd(const QString &cmd, const Channels_t &channels);
-    void sendCmd(const QString &cmd, long timeout = 0);
-    void sendCmd(const QString &cmd, const Channels_t &channels, long timeout = 0);
-    QString sendQuery(const QString &cmd, long timeout = 0);
-    QString sendQuery(const QString &cmd, const Channels_t &channels, long timeout = 0);
+    bool recvResponse(QString *resp, long timeout = 0);
+    bool sendCmd(const QString &cmd, long timeout = 0);
+    bool sendCmd(const QString &cmd, const Channels_t &channels, long timeout = 0);
+    bool sendQuery(QString *resp, const QString &cmd, long timeout = 0);
+    bool sendQuery(QString *resp, const QString &cmd, const Channels_t &channels, long timeout = 0);
 
 private:
-
+    int errorno;
+    const char *errorstr;
 };
 
 #endif // SCPI_DEV_H

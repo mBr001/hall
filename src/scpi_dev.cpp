@@ -6,7 +6,6 @@
 #include <sys/select.h>
 #include <unistd.h>
 #include <QtCore>
-#include <stdexcept>
 
 #include "error.h"
 #include "scpi_dev.h"
@@ -15,7 +14,7 @@ ScpiDev::Sense_t ScpiDev::SenseVolt = "CONF:VOLT";
 ScpiDev::Sense_t ScpiDev::SenseRes = "CONF:RES";
 
 ScpiDev::ScpiDev() :
-    QSerial()
+    QSerial(), errorno(0), errorstr("")
 {
 }
 
@@ -29,11 +28,28 @@ void ScpiDev::close()
     QSerial::close();
 }
 
-double ScpiDev::current()
+bool ScpiDev::current(double *i)
 {
-    QString current(sendQuery("SOUR:CURR?"));
+    QString resp;
+    if (!sendQuery(&resp, "SOUR:CURR?"))
+        return false;
 
-    return QVariant(current).toDouble();
+    bool ok;
+    *i = QVariant(resp).toDouble(&ok);
+
+    return ok;
+}
+
+int ScpiDev::error() const
+{
+    return errorno;
+}
+
+QString ScpiDev::errorStr() const
+{
+    if (errorno == ERR_QSERIAL)
+        return QSerial::errorStr();
+    return errorstr;
 }
 
 QString ScpiDev::formatCmd(const QString &cmd, const Channels_t &channels)
@@ -52,9 +68,9 @@ QString ScpiDev::formatCmd(const QString &cmd, const Channels_t &channels)
     return format.arg(cmd).arg(ch.join(","));
 }
 
-void ScpiDev::init()
+bool ScpiDev::init()
 {
-    sendCmd("INIT", 2000000);
+    return sendCmd("INIT", 2000000);
 }
 
 bool ScpiDev::open(const QString &port, BaudeRate_t baudeRate)
@@ -77,92 +93,141 @@ bool ScpiDev::open(const QString &port, BaudeRate_t baudeRate)
     return true;
 }
 
-bool ScpiDev::output()
+bool ScpiDev::output(bool *enabled)
 {
-    QString out(sendQuery("OUTP?"));
+    QString resp;
 
-    if (out == "1")
-        return true;
-    if (out == "0")
+    if (!sendQuery(&resp, "OUTP?"))
         return false;
 
-    throw new Error("ScpiDev::output - invalid result");
+    if (resp == "1") {
+        *enabled = true;
+        return true;
+    }
+    if (resp == "0") {
+        *enabled = false;
+        return true;
+    }
+
+    errorno = ERR_RESULT;
+    errorstr = "ScpiDev::output invalid result";
+    return false;
 }
 
-QStringList ScpiDev::read()
+bool ScpiDev::read(QStringList *values)
 {
     QString s;
-    QStringList data;
 
-    s = sendQuery("READ?");
-    data = s.split(",", QString::SkipEmptyParts);
+    if (!sendQuery(&s, "READ?"))
+        return false;
 
-    for (QStringList::iterator idata(data.begin()); idata != data.end(); ++idata) {
+    *values = s.split(",", QString::SkipEmptyParts);
+
+    for (QStringList::iterator idata(values->begin()); idata != values->end(); ++idata) {
         *idata = idata->trimmed();
     }
 
-    return data;
+    return true;
 }
 
-void ScpiDev::sendCmd(const QString &cmd, long timeout)
+bool ScpiDev::recvResponse(QString *resp, long timeout)
 {
-    QString s;
+    errorno = ERR_OK;
+    errorstr = "";
 
-    s = sendQuery(cmd, timeout);
-    if (!s.isEmpty())
-        throw new Error("ScpiDev::cmd response not empty.");
+    if (!readLine(resp, 1024, timeout)) {
+        errorno = ERR_QSERIAL;
+        return false;
+    }
+    *resp = resp->trimmed();
+    if (*resp == "1") {
+        resp->clear();
+        return true;
+    }
+    if (resp->endsWith(";1")) {
+        resp->resize(resp->size() - 2);
+        return true;
+    }
+
+    errorno = ERR_RESULT;
+    errorstr = "ScpiDev::recvResponse invalid result";
+    return false;
 }
 
-void ScpiDev::sendCmd(const QString &cmd, const Channels_t &channels, long timeout)
+bool ScpiDev::sendCmd(const QString &cmd, long timeout)
 {
-    QString s;
+    QString resp;
 
-    s = sendQuery(cmd, channels, timeout);
-    if (!s.isEmpty())
-        throw new Error("ScpiDev::cmd response not empty.");
+    if (!sendQuery(&resp, cmd, timeout))
+        return false;
+
+    if (!resp.isEmpty()) {
+        errorno = ERR_RESULT;
+        errorstr = "ScpiDev::sendCmd nonempty response for nonquery";
+
+        return false;
+    }
+
+    return true;
 }
 
-QString ScpiDev::sendQuery(const QString &cmd, long timeout)
+bool ScpiDev::sendCmd(const QString &cmd, const Channels_t &channels, long timeout)
 {
+    QString resp;
+
+    if (!sendQuery(&resp, cmd, channels, timeout))
+        return false;
+
+    if (!resp.isEmpty()) {
+        errorno = ERR_RESULT;
+        errorstr = "ScpiDev::sendCmd nonempty response";
+
+        return false;
+    }
+
+    return true;
+}
+
+bool ScpiDev::sendQuery(QString *resp, const QString &cmd, long timeout)
+{
+    errorno = 0;
+    errorstr = "";
+
     QString _cmd(cmd + ";*OPC?\n");
-    if (!write(_cmd))
-        throw new Error("ScpiDev::sendQuery failed send cmd.");;
+    if (!write(_cmd)) {
+        errorno = ERR_QSERIAL;
+        return false;
+    }
 
-    QString result;
-    if (!readLine(result, 1024, timeout))
-        throw new Error("ScpiDev::sendQuery failed to send query.");
-    result = result.trimmed();
-    if (result == "1")
-        return QString();
-    if (result.endsWith(";1"))
-        return result.left(result.size() - 2);
+    if (!recvResponse(resp, timeout))
+        return false;
 
-    throw new Error("ScpiDev::sendQuery failed read response.");
+    return true;
 }
 
-QString ScpiDev::sendQuery(const QString &cmd, const Channels_t &channels, long timeout)
+bool ScpiDev::sendQuery(QString *resp, const QString &cmd, const Channels_t &channels, long timeout)
 {
     QString _cmd(formatCmd(cmd, channels));
 
-    return sendQuery(_cmd, timeout);
+    return sendQuery(resp, _cmd, timeout);
 }
 
-void ScpiDev::setCurrent(double current)
+bool ScpiDev::setCurrent(double current)
 {
     QString cmd("SOUR:CURR %1");
 
-    sendCmd(cmd.arg(current));
+    return sendCmd(cmd.arg(current));
 }
 
-void ScpiDev::setOutput(bool enabled)
+bool ScpiDev::setOutput(bool enabled)
 {
     if (enabled)
-        sendCmd("OUTP 1");
+        return sendCmd("OUTP 1");
     else
-        sendCmd("OUTP 0");
+        return sendCmd("OUTP 0");
 }
 
-void ScpiDev::setRoute(Channels_t closeChannels)
+bool ScpiDev::setRoute(Channels_t closeChannels)
 {
     Channels_t openChannels(routeChannelsClosed);
     Channels_t closedChannels(closeChannels);
@@ -175,30 +240,38 @@ void ScpiDev::setRoute(Channels_t closeChannels)
         closeChannels.removeOne(ch);
     }
 
-    if(!openChannels.isEmpty())
-        sendCmd("ROUT:OPEN", openChannels);
-    if (!closeChannels.isEmpty())
-        sendCmd("ROUT:CLOS", closeChannels);
+    if(!openChannels.isEmpty()) {
+        if (!sendCmd("ROUT:OPEN", openChannels))
+            return false;
+    }
+    routeChannelsClosed.clear();
+
+    if (!closeChannels.isEmpty()) {
+        if (!sendCmd("ROUT:CLOS", closeChannels))
+            return false;
+    }
 
     routeChannelsClosed = closedChannels;
+
+    return true;
 }
 
-void ScpiDev::setScan(Channel_t channel)
+bool ScpiDev::setScan(Channel_t channel)
 {
     QString cmd("ROUT:SCAN (@%1);:INIT");
 
-    sendCmd(cmd.arg(channel), 2000000);
+    return sendCmd(cmd.arg(channel), 2000000);
 }
 
-void ScpiDev::setScan(Channels_t channels)
+bool ScpiDev::setScan(Channels_t channels)
 {
     QString cmd("ROUT:SCAN");
 
     cmd = formatCmd(cmd, channels).append(";:INIT");
-    sendCmd(cmd, 2000000);
+    return sendCmd(cmd, 2000000);
 }
 
-void ScpiDev::setSense(Sense_t sense, Channels_t channels)
+bool ScpiDev::setSense(Sense_t sense, Channels_t channels)
 {
-    sendCmd(sense, channels);
+    return sendCmd(sense, channels);
 }
