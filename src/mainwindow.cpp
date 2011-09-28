@@ -5,7 +5,6 @@
 #include <stdexcept>
 #include <vector>
 
-#include "error.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 

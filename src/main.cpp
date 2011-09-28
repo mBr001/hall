@@ -1,6 +1,5 @@
 #include <QtGui/QApplication>
 #include <QMessageBox>
-#include "error.h"
 #include "mainwindow.h"
 
 int main(int argc, char *argv[])

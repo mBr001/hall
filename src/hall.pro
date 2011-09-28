@@ -36,7 +36,6 @@ SOURCES += main.cpp\
     qserial.cpp \
     qcsvfile.cpp \
     config.cpp \
-    error.cpp \
     experiment.cpp \
     scpi_dev.cpp
 
@@ -47,7 +46,6 @@ HEADERS  += mainwindow.h \
     qcsvfile.h \
     experiment.h \
     config.h \
-    error.h \
     experiment.h \
     scpi_dev.h
 

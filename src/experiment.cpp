@@ -1,7 +1,6 @@
 #include <errno.h>
 #include <math.h>
 
-#include "error.h"
 #include "experiment.h"
 
 #ifndef ARRAY_SIZE
@@ -208,8 +207,10 @@ void Experiment::on_coilTimer_timeout()
 {
     sdp_lcd_info_t lcd_info;
 
-    if (sdp_get_lcd_info(&sdp, &lcd_info) < 0) {
-        throw new Error("on_coilTimer_timeout - sdp_get_lcd_info");
+    int err(sdp_get_lcd_info(&sdp, &lcd_info));
+    if (err < 0) {
+        emit fatalError("on_coilTimer_timeout - sdp_get_lcd_info",
+                        sdp_strerror(err));
         return;
     }
 
@@ -273,8 +274,12 @@ void Experiment::on_coilTimer_timeout()
     // Target reach, finish job
     if (fabs(procI - _coilWantI_) < currentSlope) {
         if (!wantCoilPower && fabs(procI) <= currentSlope && procCoilPower) {
-            if (sdp_set_output(&sdp, 0) < 0)
-                throw new Error("timer - sdp_set_output");
+            int err(sdp_set_output(&sdp, 0));
+            if (err < 0) {
+                emit fatalError("on_coilTimer_timeout - sdp_set_output",
+                                sdp_strerror(err));
+            }
+            return;
         }
 
         if (!_measuring_)

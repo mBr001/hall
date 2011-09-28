@@ -7,7 +7,6 @@
 #include <unistd.h>
 #include <QtCore>
 
-#include "error.h"
 #include "qserial.h"
 
 const QSerial::BaudeRate_t QSerial::Baude9600 = B9600;

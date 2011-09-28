@@ -7,7 +7,6 @@
 #include <unistd.h>
 #include <QtCore>
 
-#include "error.h"
 #include "scpi_dev.h"
 
 ScpiDev::Sense_t ScpiDev::SenseVolt = "CONF:VOLT";
