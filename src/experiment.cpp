@@ -113,7 +113,7 @@ void Experiment::close()
     hp34970Dev.setRoute(ScpiDev::Channels_t());
     hp34970Dev.close();
     ps6220Dev.setOutput(false);
-    // FIXME: hack, je to kvůli tomu aby si pamatoval posladní nastavené U pro vzorek
+    // FIXME: hack, je to kvůli tomu aby si pamatoval poslední nastavené U pro vzorek
     ps6220Dev.setCurrent(_sampleI_);
     ps6220Dev.close();
     pwrPolSwitch.close();
@@ -198,8 +198,11 @@ void Experiment::measurementAbort()
 
     // Set up measurement to measure B at coil by default
     // used for periodical B measurement when idle
-    if (ps6220Dev.output())
+    bool open;
+    ps6220Dev.output(&open);
+    if (open) {
         ps6220Dev.setOutput(false);
+    }
     stepMeasHallProbePrepare(this);
 }
 
@@ -229,7 +232,7 @@ void Experiment::on_coilTimer_timeout()
     double procI;
     /** Coil power state, on/off. */
     bool procCoilPower, wantCoilPower;
-    /** Coil power switch state direct/cross */
+    /** Coil power switch state direct/cross. */
     PwrPolSwitch::state_t procCoilSwitchState, wantCoilSwitchState;
 
     /* Get all values necesary for process decisions. */
@@ -430,7 +433,8 @@ void Experiment::open()
             throw new Error("Failed to open sample power supply (Keithaly 6220)",
                             QString::fromLocal8Bit(strerror(err)));
         }
-        _sampleI_ = ps6220Dev.current();
+
+        ps6220Dev.current(&_sampleI_);
 
         // Open and setup HP34970 device
         if (!hp34970Dev.open(config.hp34970Port())) {
@@ -460,21 +464,28 @@ void Experiment::open()
 
 double Experiment::readSingle()
 {
-    QStringList data(hp34970Dev.read());
-    if (data.size() != 1) {
+    QStringList values;
+    if (!hp34970Dev.read(&values))
+    {
+        throw new Error("TODO.");
+    }
+    if (values.size() != 1) {
         throw new Error("Could not get B data.");
     }
 
     bool ok;
-    double val(QVariant(data[0]).toDouble(&ok));
+    double val(QVariant(values[0]).toDouble(&ok));
     if (!ok)
-        return NAN;
+        return NAN; // FIXME
     return val;
 }
 
 double Experiment::sampleI()
 {
-    return ps6220Dev.current();
+    double i;
+    ps6220Dev.current(&i);
+
+    return i;
 }
 
 const QString &Experiment::sampleId()
@@ -741,16 +752,15 @@ void Experiment::stepMeasHallProbe(Experiment *this_)
 
 void Experiment::stepMeasHallProbePrepare(Experiment *this_)
 {
-    /* set current to 1mA, open probe current source */
+    /* Set current to 1mA, open hall probe current source. */
     this_->ps6220Dev.setCurrent(hallProbeI);
 
     ScpiDev::Channels_t closeChannels;
     closeChannels.append(_34903A_hall_probe_1_pwr_m);
     closeChannels.append(_34903A_hall_probe_2_pwr_p);
+
     this_->hp34970Dev.setRoute(closeChannels);
-
     this_->hp34970Dev.setScan(Experiment::_34901A_hall_probe);
-
     this_->ps6220Dev.setOutput(true);
 }
 
