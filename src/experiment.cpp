@@ -219,6 +219,8 @@ void Experiment::on_coilTimer_timeout()
     // if no measurement in progress we measure B themselv (at proper conditions)
     if (!_measuring_) {
         double U(readSingle());
+        if (isnan(U))
+            return;
         emit coilBMeasured(computeB(U));
     }
 
@@ -493,16 +495,22 @@ double Experiment::readSingle()
     QStringList values;
     if (!hp34970Dev.read(&values))
     {
-        throw new Error("TODO.");
+        emit fatalError("HP34970 error", hp34970Dev.errorStr());
+        return NAN;
     }
     if (values.size() != 1) {
-        throw new Error("Could not get B data.");
+        emit fatalError("HP34970 error value error",
+                        "unexpected number of values returned");
+        return NAN;
     }
 
     bool ok;
     double val(QVariant(values[0]).toDouble(&ok));
-    if (!ok)
-        return NAN; // FIXME
+    if (!ok) {
+        emit fatalError("HP34970 error value error",
+                        "failed to parse value as loating point number");
+        return NAN;
+    }
     return val;
 }
 
