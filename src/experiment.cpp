@@ -315,151 +315,179 @@ void Experiment::on_measTimer_timeout()
     measurementAbort();
 }
 
-void Experiment::open()
+bool Experiment::open()
 {
-    QString port;
     int err;
+    QString port;
 
     port = config.msdpPort();
     err = sdp_open(&sdp, port.toLocal8Bit().constData(), SDP_DEV_ADDR_MIN);
     if (err < 0) {
-        throw new Error("Manson SDP power supply operation failed",
+        emit fatalError("Manson SDP power supply open failed",
                         QString::fromLocal8Bit(sdp_strerror(err)));
+        goto err;
     }
 
-    try {
-        /* Set value limit in current input spin box. */
-        sdp_va_t limits;
-        err = sdp_get_va_maximums(&sdp, &limits);
-        if (err < 0) {
-            throw new Error("Manson SDP power supply operation failed",
-                            QString::fromLocal8Bit(sdp_strerror(err)));
-        }
-        _coilMaxI_ = limits.curr;
+    /* Set value limit in current input spin box. */
+    sdp_va_t limits;
+    err = sdp_get_va_maximums(&sdp, &limits);
+    if (err < 0) {
+        emit fatalError("Manson SDP power supply operation failed",
+                        QString::fromLocal8Bit(sdp_strerror(err)));
+        goto err_sdp;
+    }
+    _coilMaxI_ = limits.curr;
 
-        /* Set actual current value as wanted value, avoiding unwanted hickups. */
-        sdp_va_data_t va_data;
-        err = sdp_get_va_data(&sdp, &va_data);
-        if (err < 0) {
-            throw new Error("Manson SDP power supply operation failed",
-                            QString::fromLocal8Bit(sdp_strerror(err)));
-        }
-        _coilWantI_ = va_data.curr;
+    /* Set actual current value as wanted value, avoiding unwanted hickups. */
+    sdp_va_data_t va_data;
+    err = sdp_get_va_data(&sdp, &va_data);
+    if (err < 0) {
+        emit fatalError("Manson SDP power supply operation failed",
+                        QString::fromLocal8Bit(sdp_strerror(err)));
+        goto err_sdp;
+    }
+    _coilWantI_ = va_data.curr;
 
-        err = sdp_set_curr(&sdp, va_data.curr);
-        if (err < 0) {
-            throw new Error("Manson SDP power supply operation failed",
-                            QString::fromLocal8Bit(sdp_strerror(err)));
-        }
+    err = sdp_set_curr(&sdp, va_data.curr);
+    if (err < 0) {
+        emit fatalError("Manson SDP power supply operation failed",
+                        QString::fromLocal8Bit(sdp_strerror(err)));
+        goto err_sdp;
+    }
 
-        /* Set voltage to maximum, we drive only current. */
-        err = sdp_set_volt_limit(&sdp, limits.volt);
-        if (err < 0) {
-            throw new Error("Manson SDP power supply operation failed",
-                            QString::fromLocal8Bit(sdp_strerror(err)));
-        }
+    /* Set voltage to maximum, we operate only with current. */
+    err = sdp_set_volt_limit(&sdp, limits.volt);
+    if (err < 0) {
+        emit fatalError("Manson SDP power supply operation failed",
+                        QString::fromLocal8Bit(sdp_strerror(err)));
+        goto err_sdp;
+    }
 
-        err = sdp_set_volt(&sdp, limits.volt);
-        if (err < 0) {
-            throw new Error("Manson SDP power supply operation failed",
-                            QString::fromLocal8Bit(sdp_strerror(err)));
-        }
+    err = sdp_set_volt(&sdp, limits.volt);
+    if (err < 0) {
+        emit fatalError("Manson SDP power supply operation failed",
+                        QString::fromLocal8Bit(sdp_strerror(err)));
+        goto err_sdp;
+    }
 
-        sdp_lcd_info_t lcd_info;
-        err = sdp_get_lcd_info(&sdp, &lcd_info);
-        if (err < 0) {
-            throw new Error("Manson SDP power supply operation failed",
-                            QString::fromLocal8Bit(sdp_strerror(err)));
-        }
-        if (!lcd_info.output)
-            _coilWantI_ = 0;
+    sdp_lcd_info_t lcd_info;
+    err = sdp_get_lcd_info(&sdp, &lcd_info);
+    if (err < 0) {
+        emit fatalError("Manson SDP power supply operation failed",
+                        QString::fromLocal8Bit(sdp_strerror(err)));
+        goto err_sdp;
+    }
+    if (!lcd_info.output)
+        _coilWantI_ = 0;
 
-        /* Data file preparation. */
-        csvFile.setFileName(config.dataFileName());
-        if (!csvFile.open()) {
-            throw new Error("Failed to open data file",
-                            csvFile.errorString());
-        }
+    /* Data file preparation. */
+    csvFile.setFileName(config.dataFileName());
+    if (!csvFile.open()) {
+        emit fatalError("Failed to open data file",
+                        csvFile.errorString());
+        goto err_sdp;
+    }
 
-        csvFile.resize(csvColEnd);
+    csvFile.resize(csvColEnd);
 
-        csvFile[csvColHallProbeB] = "Hall probe\nB [T]";
-        csvFile[csvColSampleResistivity] = "sample\nR [ohm]";
-        csvFile[csvColSampleResSpec] = "sample\nRspec [ohm*m]";
-        csvFile[csvColSampleRHall] = "sample\nRhall [m^3*C^-1]";
-        csvFile[csvColSampleDrift] = "sample\ndrift [m^2*V^-1*s^-1]";
+    csvFile[csvColHallProbeB] = "Hall probe\nB [T]";
+    csvFile[csvColSampleResistivity] = "sample\nR [ohm]";
+    csvFile[csvColSampleResSpec] = "sample\nRspec [ohm*m]";
+    csvFile[csvColSampleRHall] = "sample\nRhall [m^3*C^-1]";
+    csvFile[csvColSampleDrift] = "sample\ndrift [m^2*V^-1*s^-1]";
 
-        csvFile[csvColTime] = "Time\n(UTC)";
-        csvFile[csvColHallProbeU] = "Hall probe\nUhp [V]";
-        csvFile[csvColSampleUacF] = "sample\nUac/+- [V]";
-        csvFile[csvColSampleUacB] = "sample\nUac/-+ [V]";
-        csvFile[csvColSampleUbdF] = "sample\nUbd/+- [V]";
-        csvFile[csvColSampleUbdB] = "sample\nUbd/-+ [V]";
-        csvFile[csvColSampleUcdF] = "sample\nUcd/+- [V]";
-        csvFile[csvColSampleUcdB] = "sample\nUcd/-+ [V]";
-        csvFile[csvColSampleUdaF] = "sample\nUda/+- [V]";
-        csvFile[csvColSampleUdaB] = "sample\nUda/-+ [V]";
+    csvFile[csvColTime] = "Time\n(UTC)";
+    csvFile[csvColHallProbeU] = "Hall probe\nUhp [V]";
+    csvFile[csvColSampleUacF] = "sample\nUac/+- [V]";
+    csvFile[csvColSampleUacB] = "sample\nUac/-+ [V]";
+    csvFile[csvColSampleUbdF] = "sample\nUbd/+- [V]";
+    csvFile[csvColSampleUbdB] = "sample\nUbd/-+ [V]";
+    csvFile[csvColSampleUcdF] = "sample\nUcd/+- [V]";
+    csvFile[csvColSampleUcdB] = "sample\nUcd/-+ [V]";
+    csvFile[csvColSampleUdaF] = "sample\nUda/+- [V]";
+    csvFile[csvColSampleUdaB] = "sample\nUda/-+ [V]";
 
-        csvFile[csvColBFormula] = "B formula\n" /* TODO */;
-        csvFile[csvColHallProbeI] = "Hall proble\nIhp [A]";
-        csvFile[csvColSampleI] = "sample\nI [A]";
-        csvFile[csvColSampleThickness] = "Sample thickness\nh [um]";
-        csvFile[csvColSampleId] = "Sample ID";
-        csvFile[csvColSampleSize] = "Sample edge lenght\n[m]";
-        csvFile[csvColCoilI] = "Coil\nI [A]";
+    csvFile[csvColBFormula] = "B formula\n" /* TODO */;
+    csvFile[csvColHallProbeI] = "Hall proble\nIhp [A]";
+    csvFile[csvColSampleI] = "sample\nI [A]";
+    csvFile[csvColSampleThickness] = "Sample thickness\nh [um]";
+    csvFile[csvColSampleId] = "Sample ID";
+    csvFile[csvColSampleSize] = "Sample edge lenght\n[m]";
+    csvFile[csvColCoilI] = "Coil\nI [A]";
 
-        if (!csvFile.write()) {
-            throw new Error("Failed to write header into data file",
-                            csvFile.errorString());
-        }
+    if (!csvFile.write()) {
+        emit fatalError("Failed to write header into data file",
+                        csvFile.errorString());
+        goto err_csv_file;
+    }
 
-        // Open polarity switch device
-        port = config.polSwitchPort();
-        if (!pwrPolSwitch.open(port.toLocal8Bit().constData())) {
-            err = errno;
-            throw new Error("Failed to open coil polarity switch port",
-                            QString::fromLocal8Bit(strerror(err)));
-        }
+    // Open polarity switch device
+    port = config.polSwitchPort();
+    if (!pwrPolSwitch.open(port.toLocal8Bit().constData())) {
+        err = errno;
+        emit fatalError("Failed to open coil polarity switch port",
+                        QString::fromLocal8Bit(strerror(err)));
+        goto err_csv_file;
+    }
 
-        if (pwrPolSwitch.polarity() == PwrPolSwitch::cross) {
-            _coilWantI_ = -_coilWantI_;
-        }
+    if (pwrPolSwitch.polarity() == PwrPolSwitch::cross) {
+        _coilWantI_ = -_coilWantI_;
+    }
 
-        // Open sample power source
-        port = config.ps6220Port();
-        if (!ps6220Dev.open(port.toLocal8Bit().constData(), QSerial::Baude19200))
-        {
-            err = errno;
-            throw new Error("Failed to open sample power supply (Keithaly 6220)",
-                            QString::fromLocal8Bit(strerror(err)));
-        }
+    // Open sample power source
+    port = config.ps6220Port();
+    if (!ps6220Dev.open(port.toLocal8Bit().constData(), QSerial::Baude19200))
+    {
+        emit fatalError("Failed to open sample power supply (Keithaly 6220)",
+                        ps6220Dev.errorStr());
+        goto err_pwr_pol_switch;
+    }
 
-        ps6220Dev.current(&_sampleI_);
+    if (!ps6220Dev.current(&_sampleI_)) {
+        emit fatalError("Failed to get current from Keithaly 6220",
+                        ps6220Dev.errorStr());
+        goto err_ps6220dev;
+    }
 
-        // Open and setup HP34970 device
-        if (!hp34970Dev.open(config.hp34970Port())) {
-            err = errno;
-            throw new Error("Failed to open HP34970 device",
-                            QString::fromLocal8Bit(strerror(err)));
-        }
+    // Open and setup HP34970 device
+    if (!hp34970Dev.open(config.hp34970Port())) {
+        emit fatalError("Failed to open HP34970 device", hp34970Dev.errorStr());
+        goto err_ps6220dev;
+    }
+
+    {
         ScpiDev::Channels_t channels;
 
         channels << 101 << 102 << 103 << 104 << 114;
-        hp34970Dev.setSense(ScpiDev::SenseVolt, channels);
-        // set up measurement of B
+        if (!hp34970Dev.setSense(ScpiDev::SenseVolt, channels)) {
+            emit fatalError("Failed set up HP34970 device", hp34970Dev.errorStr());
+            goto err_hp34970;
+        }
+        // set experiment to well defined idle state, measure B[T]
         measurementAbort();
 
         coilTimer.start();
-    }
-    catch (Error e)
-    {
-        csvFile.close();
-        sdp_close(&sdp);
-        pwrPolSwitch.close();
-        ps6220Dev.close();
 
-        throw;
+        return true;
     }
+
+err_hp34970:
+    hp34970Dev.close();
+
+err_ps6220dev:
+    ps6220Dev.close();
+
+err_pwr_pol_switch:
+    pwrPolSwitch.close();
+
+err_csv_file:
+    csvFile.close();
+
+err_sdp:
+    sdp_close(&sdp);
+
+err:
+    return false;
 }
 
 double Experiment::readSingle()

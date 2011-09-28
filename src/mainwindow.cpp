@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     config(),
     configUI(),
     experiment(this),
+    experimentFatalError(false),
     pointsHallU(),
     pointsResistivity(),
     qwtPlotCurveHallU("Hall U"),
@@ -64,7 +65,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (configUI.isHidden() && configUI.result() == QDialog::Accepted) {
         event->ignore();
-        if (experiment.coilI() != 0) {
+        if (!experimentFatalError && experiment.coilI() != 0) {
             if (QMessageBox::warning(
                         this, "Power is still on!",
                         "Power is still on and should be turned (slowly!) "
@@ -137,6 +138,18 @@ void MainWindow::on_coilPowerCheckBox_toggled(bool checked)
     else {
         experiment.setCoilI(0);
     }
+}
+
+void MainWindow::on_experiment_fatalError(const QString &errorShort, const QString &errorLong)
+{
+    QString title("Fatal error in experiment: ");
+    QString text("%1:\n\n%2");
+
+    experimentFatalError = true;
+    text = text.arg(errorShort).arg(errorLong);
+    title.append(errorShort);
+    QMessageBox::critical(this, title, text);
+    close();
 }
 
 void MainWindow::on_experiment_measured(const QString &time, double B,
@@ -257,22 +270,8 @@ void MainWindow::on_startPushButton_clicked()
 
 void MainWindow::show()
 {
-    try {
-        experiment.open();
-    }
-    catch(Error &e)
-    {
-        QString err_title(e.description());
-        QString err_text("%1:\n\n%2");
-
-        err_text = err_text.arg(err_title).arg(e.longDescription());
-        QMessageBox::critical(this, err_title, err_text);
-        statusBar()->showMessage(err_title);
-
-        configUI.show();
-
+    if (!experiment.open())
         return;
-    }
 
     double val;
 

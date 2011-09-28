@@ -109,7 +109,7 @@ public:
 
     /** Close all devices, eg. power supply, Agilent, switch, ... */
     void close();
-    void open();
+    bool open();
 
     void setCoefficients(double B1, double B2, double B3);
     double coefficientB1();
@@ -126,7 +126,7 @@ public:
     void setSampleI(double value);
     const QString &sampleId();
     void setSampleId(const QString &id);
-    /** Sample edge lenght, expected square sample [m]. */
+    /** Lenght of side for square sample [m]. */
     double sampleSize();
     void setSampleSize(double size);
     double sampleThickness();
@@ -233,14 +233,20 @@ protected:
     static void stepSweeping(Experiment *this_);
 
 signals:
-    void measured(QString time, double B, double hallU, double resistivity);
-    void measurementCompleted();
-    void sweepingCompleted();
     void coilBMeasured(double B);
     void coilIMeasured(double I);
     void coilUMeasured(double U);
+    /** Emited when fatal error in experiment occured.
+      *
+      * State of experiment is undefined when this signal is emited.
+      * Only close() might/should/must be called. This signal should be handled even
+      * before open and might be emited asynchronously by timmed operations.
+      */
+    void fatalError(const QString &errorShort, const QString &errorLong);
+    void measured(QString time, double B, double hallU, double resistivity);
+    void measurementCompleted();
+    void sweepingCompleted();
 
-public slots:
 private slots:
     void on_coilTimer_timeout();
     void on_measTimer_timeout();
