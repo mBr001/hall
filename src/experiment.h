@@ -13,12 +13,11 @@ class Experiment : public QObject
 {
     Q_OBJECT
 protected:
-    /** Comprises one timed task in measurement automation. */
+    /** Comprises one timed task of measurement automation. */
     typedef struct {
-        /** Function to call.
-            @return true to continue measurement, false to abort measurement. */
+        /** Function to call. */
         void (*func)(Experiment *this_);
-        /** Delay before next step execution. */
+        /** Delay before go to next step. */
         int delay;
     } Step_t;
 
