@@ -6,19 +6,12 @@
 #include <sys/select.h>
 #include <unistd.h>
 #include <QtCore>
-#include <stdexcept>
 
 #include "error.h"
 #include "qserial.h"
 
 const QSerial::BaudeRate_t QSerial::Baude9600 = B9600;
 const QSerial::BaudeRate_t QSerial::Baude19200 = B19200;
-
-void stdExcept(const QString &str, int err)
-{
-    QString err_str(strerror(err));
-    throw new Error(str + err_str);
-}
 
 QSerial::QSerial() :
     fd(-1)
