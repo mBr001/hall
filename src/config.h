@@ -12,7 +12,7 @@ public:
     double coilIRangeMin();
     double coilIRangeStep();
     QString dataFileName();
-    double hallProbeBn(const QString &name, int idx);
+    QString hallProbeEquationB(const QString &name);
     QStringList hallProbes();
     QString hp34970Port();
     QString msdpPort();
@@ -25,7 +25,7 @@ public:
     void setCoilIRangeMin(double IMin);
     void setCoilIRangeStep(double IStep);
     void setDataFileName(const QString &port);
-    void setHallProbeBn(const QString &name, int idx, double Bn);
+    void setHallProbeEquationB(const QString &name, const QString &eqation);
     void setHp34970Port(const QString &port);
     void setMsdpPort(const QString &port);
     void setPolSwitchPort(const QString &port);

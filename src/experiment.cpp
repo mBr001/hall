@@ -87,9 +87,6 @@ Experiment::Experiment(QObject *parent) :
     measTimer(this),
     _measuring_(false),
     _sweeping_(false),
-    B1(NAN),
-    B2(NAN),
-    B3(NAN),
     _dataHallU0_(NAN),
     _sampleI_(0),
     _sampleSize_(0)
@@ -117,21 +114,6 @@ void Experiment::close()
     sdp_close(&sdp);
 }
 
-double Experiment::coefficientB1()
-{
-    return B1;
-}
-
-double Experiment::coefficientB2()
-{
-    return B2;
-}
-
-double Experiment::coefficientB3()
-{
-    return B3;
-}
-
 double Experiment::coilI()
 {
     return _coilWantI_;
@@ -144,12 +126,16 @@ double Experiment::coilMaxI()
 
 double Experiment::computeB(double U)
 {
-    double B(B1 + sqrt(B2 + B3 * fabs(U / hallProbeI)));
+    QString equation("U=%1; I=%2; %3;");
+    equation = equation.arg(U).arg(this->hallProbeI).arg(_equationB_);
+    QScriptValue result(scriptEngine.evaluate(equation));
+    qsreal B(result.toNumber());
+    //double B(B1 + sqrt(B2 + B3 * fabs(U / hallProbeI)));
     // alternativní vzorec a čísla
     // U /= I; B = U(A+sqrt(U)*(B+C*sqrt(U)))-D;
     // A=5.97622E-4 B=1.591394E-6 C=-9.24701E-11 D=-0.015
 
-    return (U / hallProbeI) > 0. ? B : -B;
+    return B;
 }
 
 bool Experiment::isMeasuring()
@@ -532,16 +518,9 @@ const QString &Experiment::sampleName()
     return _sampleName_;
 }
 
-double Experiment::sampleThickness()
+double Experiment::sampleThickness() const
 {
     return _sampleThickness_;
-}
-
-void Experiment::setCoefficients(double B1, double B2, double B3)
-{
-    this->B1 = B1;
-    this->B2 = B2;
-    this->B3 = B3;
 }
 
 void Experiment::setCoilI(double value)
@@ -564,6 +543,11 @@ void Experiment::setCoilIRange(double val1, double val2)
 void Experiment::setCoilIStep(double val)
 {
     _coilIStep_ = val;
+}
+
+void Experiment::setEquationB(const QString &equation)
+{
+    this->_equationB_ = equation;
 }
 
 void Experiment::setSampleI(double value)
@@ -771,8 +755,7 @@ void Experiment::stepFinish(Experiment *this_)
     emit this_->measured(this_->csvFile.at(Experiment::csvColTime),
                          this_->_dataB_, this_->_dataResistivity_, hallU);
 
-    QString eq("B=%1 + sqrt(%2 + %3 * Uhp / Ihp)");
-    this_->csvFile.setAt(Experiment::csvColBFormula, eq.arg(this_->B1).arg(this_->B2).arg(this_->B3));
+    this_->csvFile.setAt(Experiment::csvColBFormula, this_->_equationB_);
     this_->csvFile.setAt(Experiment::csvColSampleThickness, this_->_sampleThickness_);
     this_->csvFile.setAt(Experiment::csvColSampleSize, this_->_sampleSize_);
     this_->csvFile.setAt(Experiment::csvColSampleName, this_->_sampleName_);

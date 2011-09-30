@@ -1,8 +1,9 @@
 #ifndef EXPERIMENT_H
 #define EXPERIMENT_H
 
-#include <QObject>
 #include <msdp2xxx.h>
+#include <QObject>
+#include <QScriptEngine>
 
 #include "config.h"
 #include "powpolswitch.h"
@@ -38,6 +39,8 @@ protected:
     Steps_t stepsRunning;
     /** Current step of automated Hall measurement. */
     Steps_t::const_iterator stepCurrent;
+    /** Used to evaluate user equations (B from hall probe U) */
+    QScriptEngine scriptEngine;
 
 public:
     /** Indexes of columns in CSV file with data from experiment. */
@@ -111,10 +114,8 @@ public:
     void close();
     bool open();
 
-    void setCoefficients(double B1, double B2, double B3);
-    double coefficientB1();
-    double coefficientB2();
-    double coefficientB3();
+    void setEquationB(const QString &equation);
+    QString equationB() const;
 
     double coilI();
     double coilMaxI();
@@ -127,9 +128,9 @@ public:
     const QString &sampleName();
     void setSampleName(const QString &id);
     /** Lenght of side for square sample [m]. */
-    double sampleSize();
+    double sampleSize() const;
     void setSampleSize(double size);
-    double sampleThickness();
+    double sampleThickness() const;
     void setSampleThickness(double value);
 
     bool isMeasuring();
@@ -252,7 +253,8 @@ private slots:
     void on_measTimer_timeout();
 
 private:
-    double B1, B2, B3;
+    /** Script to compute intensity of B from hall probe U and I. */
+    QString _equationB_;
     double _coilIRangeBottom_, _coilIRangeTop_;
     double _coilMaxI_;
     Config config;

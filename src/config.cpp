@@ -38,14 +38,13 @@ QString Config::dataFileName()
     return settings.value(cfg_dataFileName, QString()).toString();
 }
 
-double Config::hallProbeBn(const QString &name, int idx)
+QString Config::hallProbeEquationB(const QString &name)
 {
-    QString _name_(name + "-" + QVariant(idx).toString());
     settings.beginGroup(cfg_hallProbe);
-    double Bn(settings.value(_name_, NAN).toDouble());
+    QString equation(settings.value(name, "").toString());
     settings.endGroup();
 
-    return Bn;
+    return equation;
 }
 
 QStringList Config::hallProbes()
@@ -114,11 +113,10 @@ void Config::setDataFileName(const QString &port)
     settings.setValue(cfg_dataFileName, port);
 }
 
-void Config::setHallProbeBn(const QString &name, int idx, double Bn)
+void Config::setHallProbeEquationB(const QString &name, const QString &equation)
 {
-    QString _name_(name + "-" + QVariant(idx).toString());
     settings.beginGroup(cfg_hallProbe);
-    settings.setValue(_name_, Bn);
+    settings.setValue(name, equation);
     settings.endGroup();
 }
 

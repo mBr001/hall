@@ -205,35 +205,26 @@ void MainWindow::on_measurePushButton_clicked()
 
 void MainWindow::on_hallProbeAddToolButton_clicked()
 {
-    double B1(ui->hallB1DoubleSpinBox->value());
-    double B2(ui->hallB2DoubleSpinBox->value());
-    double B3(ui->hallB3DoubleSpinBox->value());
+    QString equation(ui->hallProbeEquationBLineEdit->text());
     QString name(ui->hallProbeNameComboBox->currentText());
 
     if (ui->hallProbeNameComboBox->findText(name) == -1) {
         ui->hallProbeNameComboBox->addItem(name);
     }
 
-    config.setHallProbeBn(name, 1, B1);
-    config.setHallProbeBn(name, 2, B2);
-    config.setHallProbeBn(name, 3, B3);
+    config.setHallProbeEquationB(name, equation);
 
-    experiment.setCoefficients(B1, B2, B3);
+    experiment.setEquationB(equation);
 }
 
 void MainWindow::on_hallProbeNameComboBox_currentIndexChanged(const QString &arg1)
 {
-    double B1(config.hallProbeBn(arg1, 1));
-    double B2(config.hallProbeBn(arg1, 2));
-    double B3(config.hallProbeBn(arg1, 3));
+    QString equation(config.hallProbeEquationB(arg1));
 
-    ui->hallB1DoubleSpinBox->setValue(B1);
-    ui->hallB2DoubleSpinBox->setValue(B2);
-    ui->hallB3DoubleSpinBox->setValue(B3);
+    ui->hallProbeEquationBLineEdit->setText(equation);
 
-    experiment.setCoefficients(B1, B2, B3);
+    experiment.setEquationB(equation);
 }
-
 
 void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
 {

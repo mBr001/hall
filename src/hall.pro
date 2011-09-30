@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui script
 
 TARGET = hall
 TEMPLATE = app
