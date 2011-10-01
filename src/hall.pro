@@ -6,26 +6,26 @@ TEMPLATE = app
 LIBS += -L/usr/local/lib -lmsdp2xxx
 INCLUDEPATH += /usr/local/include
 
-QWT_SET=0
+
 exists(/usr/include/qwt5) {
     LIBS += -lqwt5
     INCLUDEPATH += /usr/include/qwt5
-    QWT_SET=1
+    CONFIG += qwt
 }
 
 exists(/usr/include/qwt-qt4) {
-    if (QWT_SET != 1) {
+    !CONFIG(qwt) {
         LIBS += -lqwt-qt4
         INCLUDEPATH += /usr/include/qwt-qt4
-        QWT_SET=1
+        CONFIG += qwt
     }
 }
 
 exists(/usr/include/qwt) {
-    if (QWT_SET != 1) {
+    !CONFIG(qwt) {
         LIBS += -lqwt
         INCLUDEPATH += /usr/include/qwt
-        QWT_SET=1
+        CONFIG += qwt
     }
 }
 
