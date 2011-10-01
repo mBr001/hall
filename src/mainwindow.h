@@ -41,12 +41,12 @@ private slots:
     void on_measurePushButton_clicked();
     void on_sampleCurrDoubleSpinBox_valueChanged(double );
     void on_sampleThicknessDoubleSpinBox_valueChanged(double );
-    void on_startPushButton_clicked();
     void on_sampleSizeDoubleSpinBox_valueChanged(double arg1);
     void on_sampleNameLineEdit_editingFinished();
+    void on_startPushButton_clicked();
 
 private:
-    /** Application configuration */
+    /** Application configuration. */
     Config config;
     /** Configuration dialog. */
     ConfigUI configUI;
@@ -58,7 +58,6 @@ private:
     QVector<QPointF> pointsResistivity;
     QwtPlotCurve qwtPlotCurveHallU;
     QwtPlotCurve qwtPlotCurveResistivity;
-    /** User interface widgets */
     Ui::MainWindow *ui;
 
     /** Start prepared measurement steps. */

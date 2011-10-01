@@ -16,6 +16,7 @@ ConfigUI::ConfigUI(QWidget *parent) :
     ui->powerSupplyPortComboBox->addItems(ports);
     ui->samplePowerPortComboBox->addItems(ports);
 
+#ifdef __linux__
     QString root("/dev/");
     QDir dir(root);
     QStringList filters;
@@ -23,6 +24,9 @@ ConfigUI::ConfigUI(QWidget *parent) :
     dir.setNameFilters(filters);
     ports = dir.entryList(QDir::System, QDir::Name | QDir::LocaleAware);
     ports.replaceInStrings(QRegExp("^"), root);
+#else
+#error "Not implemented!"
+#endif
     ui->switchPortComboBox->addItems(ports);
 
     ui->agilentPortComboBox->setEditText(config.hp34970Port());
@@ -46,11 +50,11 @@ void ConfigUI::on_buttonBox_accepted()
 
     QFile f(ui->fileNameLineEdit->text());
     if (f.exists()) {
-        QString msg("File \n\n%1\n\n already exists, relly owerwrite this file?");
+        QString msg("File \"%1\" already exists,\n owerwrite this file?");
 
         msg = msg.arg(f.fileName());
         if (QMessageBox::question(
-                    this, "File already exists.", msg,
+                    this, "Owerwrite existing file?", msg,
                     QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)
             return;
         f.remove();

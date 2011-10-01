@@ -106,12 +106,12 @@ void Experiment::close()
     coilTimer.stop();
     measTimer.stop();
     csvFile.close();
-    hp34970Dev.setRoute(ScpiDev::Channels_t());
-    hp34970Dev.close();
-    ps6220Dev.setOutput(false);
-    ps6220Dev.close();
     pwrPolSwitch.close();
     sdp_close(&sdp);
+    ps6220Dev.setOutput(false);
+    ps6220Dev.close();
+    hp34970Dev.setRoute(ScpiDev::Channels_t());
+    hp34970Dev.close();
 }
 
 double Experiment::coilI()
@@ -126,7 +126,9 @@ double Experiment::coilMaxI()
 
 double Experiment::computeB(double U)
 {
-    QString equation("U=%1; I=%2; %3;");
+    QString equation("U=%1;\n"
+                     "I=%2;\n"
+                     "%3\n");
     equation = equation.arg(U).arg(this->hallProbeI).arg(_equationB_);
     QScriptValue result(scriptEngine.evaluate(equation));
     qsreal B(result.toNumber());
