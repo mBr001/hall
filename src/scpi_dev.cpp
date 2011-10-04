@@ -85,8 +85,10 @@ bool ScpiDev::open(const QString &port, BaudeRate_t baudeRate)
         QSerial::close();
         return false;
     }
-    sendCmd("*RST;*CLS", 500000);
-    sendCmd("SYST:REM");
+    if (!sendCmd("*RST;*CLS", 500000))
+        return false;
+    if (!sendCmd("SYST:REM"))
+        return false;
     routeChannelsClosed.clear();
 
     return true;
