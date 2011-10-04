@@ -210,7 +210,7 @@ bool QSerial::write(const QString &str)
     errorstr = "";
 
     QByteArray bytes(str.toUtf8());
-    if (::write(fd, bytes.constData(), bytes.length()) == bytes.length()) {
+    if (::write(fd, bytes.constData(), bytes.length()) != bytes.length()) {
         errorno = errno;
         errorstr = "QSerial::write write ";
 
