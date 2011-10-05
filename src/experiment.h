@@ -110,7 +110,11 @@ public:
 
     explicit Experiment(QObject *parent = 0);
 
-    /** Close all devices, eg. power supply, Agilent, switch, ... */
+    /** Check all set values.
+      *
+      * @return true if all requred values are set properly, false otherwise.
+      */
+    bool checkSettings();
     void close();
     bool open();
 
@@ -179,7 +183,7 @@ protected:
     /** True when sweepeng tovards wanted U value on coil. */
     bool _sweeping_;
 
-    /** Use constants B1, B2 and B3 and compute B from U on hall probe. */
+    /** Compute B from U on hall probe. */
     double computeB(double U);
     /** Read single value from 34901A. */
     double readSingle();

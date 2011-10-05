@@ -101,6 +101,12 @@ Experiment::Experiment(QObject *parent) :
     QMetaObject::connectSlotsByName(this);
 }
 
+// TODO
+bool Experiment::checkSettings()
+{
+    return false;
+}
+
 void Experiment::close()
 {
     coilTimer.stop();
