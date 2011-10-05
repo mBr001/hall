@@ -151,19 +151,21 @@ void Experiment::measure(bool single)
 
     _measuringRange_.clear();
     if (!single) {
-        _measuringRange_.append(0);
+        _measuringRange_.append(0.);
 
         double I(_coilIRangeTop_);
-        for (; I >= 0 && I >= _coilIRangeBottom_; I -= _coilIStep_) {
+        if (_coilIRangeTop_ > 0.)
+        for (; I >= 0. && I >= _coilIRangeBottom_; I -= _coilIStep_) {
             _measuringRange_.append(I);
         }
-        if (I < _coilIRangeBottom_ || I < 0.)
-            _measuringRange_.append(std::max(0., _coilIRangeBottom_));
-        for (I = _coilIRangeBottom_; I <= 0 && I <= _coilIRangeTop_; I += _coilIStep_) {
+        //if (I < _coilIRangeBottom_ || I < 0.)
+        //    _measuringRange_.append(std::max(0., _coilIRangeBottom_));
+        if (_coilIRangeBottom_ < 0.)
+        for (I = _coilIRangeBottom_; I <= 0. && I <= _coilIRangeTop_; I += _coilIStep_) {
             _measuringRange_.append(I);
         }
-        if (I > _coilIRangeTop_ || I > 0.)
-            _measuringRange_.append(std::min(0., _coilIRangeTop_));
+        //if (I > _coilIRangeTop_ || I > 0.)
+        //    _measuringRange_.append(std::min(0., _coilIRangeTop_));
     }
     stepsRunning = Steps_t(
                 stepsMeasure,
@@ -205,7 +207,7 @@ void Experiment::on_coilTimer_timeout()
     emit coilIMeasured(lcd_info.read_A);
     emit coilUMeasured(lcd_info.read_V);
 
-    // if no measurement in progress we measure B themselv (at proper conditions)
+    // if no measurement in progress we measure B
     if (!_measuring_) {
         double U(readSingle());
         if (isnan(U))
@@ -300,7 +302,7 @@ void Experiment::on_measTimer_timeout()
         }
         int delay(stepCurrent->delay);
         ++stepCurrent;
-        if (stepCurrent < stepsRunning.end()) {
+        if (stepCurrent != stepsRunning.end()) {
             measTimer.start(delay);
             return;
         }
