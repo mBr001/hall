@@ -53,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
     qwtPlotCurveResistivity.setSymbol(symbol);
 
     ui->hallProbeNameComboBox->addItems(config.hallProbes());
+    ui->sampleSizeDoubleSpinBox->setValue(config.sampleSize());
 }
 
 MainWindow::~MainWindow()
@@ -260,6 +261,7 @@ void MainWindow::on_sampleNameLineEdit_editingFinished()
 
 void MainWindow::on_sampleSizeDoubleSpinBox_valueChanged(double size)
 {
+    config.setSampleSize(size);
     experiment.setSampleSize(size);
 }
 
