@@ -101,9 +101,10 @@ void MainWindow::measure(bool single)
 void MainWindow::on_coilCurrDoubleSpinBox_valueChanged(double value)
 {
     if (ui->coilPowerCheckBox->isChecked()) {
-        ui->sweepingWidget->setEnabled(true);
         ui->measurePushButton->setEnabled(false);
         ui->startPushButton->setEnabled(false);
+        ui->sweepingProgressBar->setMaximum(0);
+        ui->sweepingWidget->setEnabled(true);
 
         experiment.setCoilI(value);
     }
@@ -128,9 +129,11 @@ void MainWindow::on_coilCurrStepDoubleSpinBox_valueChanged(double val)
 
 void MainWindow::on_coilPowerCheckBox_toggled(bool checked)
 {
-    ui->sweepingWidget->setEnabled(true);
     ui->measurePushButton->setEnabled(false);
     ui->startPushButton->setEnabled(false);
+    ui->sweepingProgressBar->setMaximum(0);
+    ui->sweepingWidget->setEnabled(true);
+
     if (checked) {
         experiment.setCoilI(ui->coilCurrDoubleSpinBox->value());
     }
@@ -193,9 +196,10 @@ void MainWindow::on_experiment_measurementCompleted()
 
 void MainWindow::on_experiment_sweepingCompleted()
 {
-    ui->sweepingWidget->setEnabled(false);
     ui->measurePushButton->setEnabled(true);
     ui->startPushButton->setEnabled(true);
+    ui->sweepingProgressBar->setMaximum(100);
+    ui->sweepingWidget->setEnabled(false);
 }
 
 void MainWindow::on_measurePushButton_clicked()
