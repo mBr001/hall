@@ -38,6 +38,13 @@ QString Config::dataFileName()
     return settings.value(cfg_dataFileName, QString()).toString();
 }
 
+void Config::deleteHallProbeEquationB(const QString &name)
+{
+    settings.beginGroup(cfg_hallProbe);
+    settings.remove(name);
+    settings.endGroup();
+}
+
 QString Config::hallProbeEquationB(const QString &name)
 {
     settings.beginGroup(cfg_hallProbe);

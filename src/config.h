@@ -12,6 +12,7 @@ public:
     double coilIRangeMin();
     double coilIRangeStep();
     QString dataFileName();
+    void deleteHallProbeEquationB(const QString &name);
     QString hallProbeEquationB(const QString &name);
     QStringList hallProbes();
     QString hp34970Port();

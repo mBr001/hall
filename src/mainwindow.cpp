@@ -207,7 +207,18 @@ void MainWindow::on_measurePushButton_clicked()
     measure(true);
 }
 
-void MainWindow::on_hallProbeAddToolButton_clicked()
+void MainWindow::on_hallProbeDeleteToolButton_clicked()
+{
+    QString name(ui->hallProbeNameComboBox->currentText());
+    int idx(ui->hallProbeNameComboBox->findText(name));
+
+    if (idx != -1) {
+        ui->hallProbeNameComboBox->removeItem(idx);
+        config.deleteHallProbeEquationB(name);
+    }
+}
+
+void MainWindow::on_hallProbeSaveToolButton_clicked()
 {
     QString equation(ui->hallProbeEquationBLineEdit->text());
     QString name(ui->hallProbeNameComboBox->currentText());
