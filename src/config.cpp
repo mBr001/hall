@@ -5,7 +5,8 @@ const char Config::cfg_coilIRangeMax[] = "coil I range max";
 const char Config::cfg_coilIRangeMin[] = "coil I range min";
 const char Config::cfg_coilIRangeStep[] = "coil I range step";
 const char Config::cfg_dataFileName[] = "experiment/data file name";
-const char Config::cfg_hallProbe[] = "hall probes";
+const char Config::cfg_hallProbe_equationB[] = "hall probes euation B";
+const char Config::cfg_hallProbe_sampleSize[] = "hall probes sample size";
 const char Config::cfg_hp34970Port[] = "experiment/HP34970 port";
 const char Config::cfg_msdpPort[] = "experiment/coil PS port";
 const char Config::cfg_polSwitchPort[] = "experiment/polarity switch port";
@@ -38,25 +39,41 @@ QString Config::dataFileName()
     return settings.value(cfg_dataFileName, QString()).toString();
 }
 
-void Config::deleteHallProbeEquationB(const QString &name)
+void Config::deleteHallProbeEquationB(const QString &sampleName)
 {
-    settings.beginGroup(cfg_hallProbe);
-    settings.remove(name);
+    settings.beginGroup(cfg_hallProbe_equationB);
+    settings.remove(sampleName);
     settings.endGroup();
 }
 
-QString Config::hallProbeEquationB(const QString &name)
+void Config::deleteHallProbeSampleSize(const QString &sampleName)
 {
-    settings.beginGroup(cfg_hallProbe);
-    QString equation(settings.value(name, "").toString());
+    settings.beginGroup(cfg_hallProbe_sampleSize);
+    settings.remove(sampleName);
+    settings.endGroup();
+}
+
+QString Config::hallProbeEquationB(const QString &sampleName)
+{
+    settings.beginGroup(cfg_hallProbe_equationB);
+    QString equation(settings.value(sampleName, "").toString());
     settings.endGroup();
 
     return equation;
 }
 
+double Config::hallProbeSampleSize(const QString &sampleName)
+{
+    settings.beginGroup(cfg_hallProbe_sampleSize);
+    double size(settings.value(sampleName, "").toDouble());
+    settings.endGroup();
+
+    return size;
+}
+
 QStringList Config::hallProbes()
 {
-    settings.beginGroup(cfg_hallProbe);
+    settings.beginGroup(cfg_hallProbe_equationB);
     QStringList hallProbes(settings.childKeys());
     settings.endGroup();
 
@@ -120,10 +137,17 @@ void Config::setDataFileName(const QString &port)
     settings.setValue(cfg_dataFileName, port);
 }
 
-void Config::setHallProbeEquationB(const QString &name, const QString &equation)
+void Config::setHallProbeEquationB(const QString &sampleName, const QString &equation)
 {
-    settings.beginGroup(cfg_hallProbe);
-    settings.setValue(name, equation);
+    settings.beginGroup(cfg_hallProbe_equationB);
+    settings.setValue(sampleName, equation);
+    settings.endGroup();
+}
+
+void Config::setHallProbeSampleSize(const QString &sampleName, double size)
+{
+    settings.beginGroup(cfg_hallProbe_sampleSize);
+    settings.setValue(sampleName, size);
     settings.endGroup();
 }
 

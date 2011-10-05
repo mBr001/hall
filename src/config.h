@@ -12,8 +12,10 @@ public:
     double coilIRangeMin();
     double coilIRangeStep();
     QString dataFileName();
-    void deleteHallProbeEquationB(const QString &name);
-    QString hallProbeEquationB(const QString &name);
+    void deleteHallProbeEquationB(const QString &sampleName);
+    void deleteHallProbeSampleSize(const QString &sampleName);
+    QString hallProbeEquationB(const QString &sampleName);
+    double hallProbeSampleSize(const QString &sampleName);
     QStringList hallProbes();
     QString hp34970Port();
     QString msdpPort();
@@ -26,7 +28,8 @@ public:
     void setCoilIRangeMin(double IMin);
     void setCoilIRangeStep(double IStep);
     void setDataFileName(const QString &port);
-    void setHallProbeEquationB(const QString &name, const QString &eqation);
+    void setHallProbeEquationB(const QString &sampleName, const QString &eqation);
+    void setHallProbeSampleSize(const QString &sampleName, double size);
     void setHp34970Port(const QString &port);
     void setMsdpPort(const QString &port);
     void setPolSwitchPort(const QString &port);
@@ -41,7 +44,8 @@ private:
     static const char cfg_coilIRangeMin[];
     static const char cfg_coilIRangeStep[];
     static const char cfg_dataFileName[];
-    static const char cfg_hallProbe[];
+    static const char cfg_hallProbe_equationB[];
+    static const char cfg_hallProbe_sampleSize[];
     static const char cfg_hp34970Port[];
     static const char cfg_msdpPort[];
     static const char cfg_ps6220Port[];
