@@ -1,6 +1,6 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    qcsvwriter \
+    QCSVWriter \
     hall \
     QSCPIDev

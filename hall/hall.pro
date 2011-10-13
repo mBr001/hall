@@ -3,7 +3,7 @@ QT       += core gui script
 TARGET = hall
 TEMPLATE = app
 
-LIBS += -L../qcsvwriter -lQCSVWriter \
+LIBS += -L../QCSVWriter -lQCSVWriter \
     -L../QSCPIDev -lQSCPIDev \
     -L/usr/local/lib -lmsdp2xxx
 INCLUDEPATH += /usr/local/include
