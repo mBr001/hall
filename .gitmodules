@@ -1,0 +1,3 @@
+[submodule "qcsvwriter"]
+	path = qcsvwriter
+	url = git@github.com:pinkavaj/qcsvwriter.git
