@@ -7,7 +7,7 @@
 
 #include "config.h"
 #include "powpolswitch.h"
-#include "qcsvfile.h"
+#include "../qcsvwriter/qcsvwriter.h"
 #include "scpi_dev.h"
 
 class Experiment : public QObject
@@ -152,7 +152,7 @@ public:
 
 protected:
     /** File to save measured data. */
-    QCSVFile csvFile;
+    QCSVFileWriter csvFile;
     /** Step of I on coil used for automated measurement. */
     double _coilIStep_;
     /** Timer used to adjust current trought magnet in specified time. */

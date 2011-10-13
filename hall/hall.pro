@@ -3,9 +3,8 @@ QT       += core gui script
 TARGET = hall
 TEMPLATE = app
 
-LIBS += -L/usr/local/lib -lmsdp2xxx
+LIBS += -L../qcsvwriter -lQCSVWriter -L/usr/local/lib -lmsdp2xxx
 INCLUDEPATH += /usr/local/include
-
 
 exists(/usr/include/qwt5) {
     LIBS += -lqwt5
@@ -34,7 +33,6 @@ SOURCES += main.cpp\
     configui.cpp \
     powpolwitch.cpp \
     qserial.cpp \
-    qcsvfile.cpp \
     config.cpp \
     experiment.cpp \
     scpi_dev.cpp
@@ -43,11 +41,10 @@ HEADERS  += mainwindow.h \
     configui.h \
     powpolswitch.h \
     qserial.h \
-    qcsvfile.h \
     experiment.h \
     config.h \
     experiment.h \
     scpi_dev.h
 
-FORMS    += mainwindow.ui \
-    configui.ui
+FORMS    += configui.ui \
+    mainwindow.ui
