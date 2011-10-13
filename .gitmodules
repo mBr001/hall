@@ -1,3 +1,6 @@
 [submodule "qcsvwriter"]
 	path = qcsvwriter
 	url = git@github.com:pinkavaj/qcsvwriter.git
+[submodule "QSCPIDev"]
+	path = QSCPIDev
+	url = git@github.com:pinkavaj/QSCPIDev.git

@@ -2,7 +2,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include "configui.h"
-#include "qserial.h"
+#include "../QSCPIDev/qserial.h"
 #include "ui_configui.h"
 
 ConfigUI::ConfigUI(QWidget *parent) :

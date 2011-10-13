@@ -8,7 +8,7 @@
 #include "config.h"
 #include "powpolswitch.h"
 #include "../qcsvwriter/qcsvwriter.h"
-#include "scpi_dev.h"
+#include "../QSCPIDev/qscpidev.h"
 
 class Experiment : public QObject
 {
