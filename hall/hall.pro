@@ -40,7 +40,6 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     configui.h \
     powpolswitch.h \
-    experiment.h \
     config.h \
     experiment.h
 
