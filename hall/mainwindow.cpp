@@ -1,9 +1,6 @@
 #include <QCloseEvent>
-#include <QDateTime>
 #include <QMessageBox>
 #include <qwt_symbol.h>
-#include <stdexcept>
-#include <vector>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"

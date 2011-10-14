@@ -9,8 +9,8 @@ LIBS += -L../QCSVWriter -lQCSVWriter \
 INCLUDEPATH += /usr/local/include
 
 # expected QWT >= 6.0.0
-LIBS += -lqwt
-INCLUDEPATH += /usr/include/qwt
+LIBS += -L/usr/local/lib -lqwt
+INCLUDEPATH += /usr/local/include/qwt /usr/include/qwt
 CONFIG += qwt
 
 SOURCES += main.cpp\

@@ -2,8 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QSettings>
-#include <QTimer>
 #include <qwt_plot_curve.h>
 
 #include "configui.h"
