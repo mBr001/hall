@@ -8,7 +8,7 @@ public:
     typedef enum {
         off = 0,
         direct = 1,
-        cross = 2,
+        cross = 2
     } state_t;
 
     PwrPolSwitch();

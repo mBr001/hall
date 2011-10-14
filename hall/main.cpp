@@ -4,9 +4,15 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+    QTextCodec::setCodecForCStrings(codec);
+    QTextCodec::setCodecForLocale(codec);
+    QTextCodec::setCodecForTr(codec);
+
     a.setApplicationName("Hall");
     a.setOrganizationDomain("www.vscht.cz");
-    a.setOrganizationName("VSCHT");
+    a.setOrganizationName("VŠCHT");
 
     MainWindow w;
     w.startApp();
