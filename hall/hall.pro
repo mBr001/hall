@@ -8,27 +8,10 @@ LIBS += -L../QCSVWriter -lQCSVWriter \
     -L/usr/local/lib -lmsdp2xxx
 INCLUDEPATH += /usr/local/include
 
-exists(/usr/include/qwt5) {
-    LIBS += -lqwt5
-    INCLUDEPATH += /usr/include/qwt5
-    CONFIG += qwt
-}
-
-exists(/usr/include/qwt-qt4) {
-    !CONFIG(qwt) {
-        LIBS += -lqwt-qt4
-        INCLUDEPATH += /usr/include/qwt-qt4
-        CONFIG += qwt
-    }
-}
-
-exists(/usr/include/qwt) {
-    !CONFIG(qwt) {
-        LIBS += -lqwt
-        INCLUDEPATH += /usr/include/qwt
-        CONFIG += qwt
-    }
-}
+# expected QWT >= 6.0.0
+LIBS += -lqwt
+INCLUDEPATH += /usr/include/qwt
+CONFIG += qwt
 
 SOURCES += main.cpp\
         mainwindow.cpp \

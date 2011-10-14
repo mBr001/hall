@@ -55,10 +55,12 @@ private:
     Experiment experiment;
     bool experimentFatalError;
 
-    QVector<QPointF> pointsHallU;
-    QVector<QPointF> pointsResistivity;
+    QVector<double> dataB;
+    QVector<double> dataHallU;
+    QVector<double> dataResistivity;
     QwtPlotCurve qwtPlotCurveHallU;
     QwtPlotCurve qwtPlotCurveResistivity;
+
     Ui::MainWindow *ui;
 
     /** Start prepared measurement steps. */

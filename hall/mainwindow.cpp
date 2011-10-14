@@ -17,8 +17,9 @@ MainWindow::MainWindow(QWidget *parent) :
     configUI(),
     experiment(this),
     experimentFatalError(false),
-    pointsHallU(),
-    pointsResistivity(),
+    dataB(),
+    dataHallU(),
+    dataResistivity(),
     qwtPlotCurveHallU("Hall U"),
     qwtPlotCurveResistivity("Resistivity"),
     ui(new Ui::MainWindow)
@@ -32,25 +33,30 @@ MainWindow::MainWindow(QWidget *parent) :
                      ui->coilCurrMeasDoubleSpinBox, SLOT(setValue(double)));
     QObject::connect(&experiment, SIGNAL(coilUMeasured(double)),
                      ui->coilVoltMeasDoubleSpinBox, SLOT(setValue(double)));
-    pointsHallU.reserve(1024);
-    pointsResistivity.reserve(1024);
+    dataB.reserve(1024);
+    dataHallU.reserve(1024);
+    dataResistivity.reserve(1024);
 
     ui->qwtPlot->enableAxis(QwtPlot::yRight, true);
     ui->qwtPlot->setAxisTitle(QwtPlot::yRight, tr("(*) Resistivity [Ω]"));
     ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, "(×) hall U [V]");
     ui->qwtPlot->setAxisTitle(QwtPlot::xBottom, "B [T]");
     qwtPlotCurveHallU.attach(ui->qwtPlot);
-    QwtSymbol symbol(QwtSymbol::XCross, qwtPlotCurveHallU.brush(),
-            qwtPlotCurveHallU.pen(), QSize(8, 8));
-    //symbol.setColor(QColor(255, 0, 0));
     qwtPlotCurveHallU.setStyle(QwtPlotCurve::NoCurve);
-    qwtPlotCurveHallU.setSymbol(symbol);
+
+    QwtSymbol *qwtPlotHallUSymbol = new QwtSymbol(QwtSymbol::XCross);
+    qwtPlotHallUSymbol->setColor(QColor(255, 0, 0));
+    qwtPlotHallUSymbol->setSize(QSize(8, 8));
+    qwtPlotCurveHallU.setSymbol(qwtPlotHallUSymbol);
 
     qwtPlotCurveResistivity.setYAxis(QwtPlot::yRight);
     qwtPlotCurveResistivity.attach(ui->qwtPlot);
     qwtPlotCurveResistivity.setStyle(QwtPlotCurve::NoCurve);
-    symbol.setStyle(QwtSymbol::Star1);
-    qwtPlotCurveResistivity.setSymbol(symbol);
+
+    QwtSymbol *qwtPlotResistivitySymbol = new QwtSymbol(QwtSymbol::Star1);
+    qwtPlotResistivitySymbol->setColor(QColor(0, 255, 0));
+    qwtPlotResistivitySymbol->setSize(QSize(8, 8));
+    qwtPlotCurveResistivity.setSymbol(qwtPlotResistivitySymbol);
 
     ui->hallProbeNameComboBox->addItems(config.hallProbes());
     ui->sampleSizeDoubleSpinBox->setValue(config.sampleSize());
@@ -168,23 +174,39 @@ void MainWindow::on_experiment_measured(const QString &time, double B,
                 0, 2, new QTableWidgetItem(QVariant(hallU).toString()));
     ui->dataTableWidget->setItem(
                 0, 3, new QTableWidgetItem(time));
-    if (pointsHallU.size() == pointsHallU.capacity()) {
-        int reserve(pointsHallU.capacity() * 2);
-        pointsHallU.reserve(reserve);
-        pointsResistivity.reserve(reserve);
-    }
 
+    bool nanInData(false);
     if (!isnan(B)) {
         ui->coilBDoubleSpinBox->setValue(B);
-        if (!isnan(resistivity)) {
-            pointsResistivity.append(QPointF(B, resistivity));
-            qwtPlotCurveResistivity.setData(pointsResistivity);
+
+        if (dataB.size() == dataB.capacity()) {
+            int reserve(dataB.capacity() * 2);
+
+            dataB.resize(reserve);
+            dataHallU.resize(reserve);
+            dataResistivity.resize(reserve);
         }
-        if (!isnan(hallU))
-            pointsHallU.append(QPointF(B, hallU));
-            qwtPlotCurveHallU.setData(pointsHallU);
+
+        // TODO: skip NAN data from ploting
+        nanInData |= isnan(hallU);
+        nanInData |= isnan(resistivity);
+
+        dataB.append(B);
+        dataHallU.append(hallU);
+        dataResistivity.append(resistivity);
+
+        const double *dataX = dataB.constData();
+        const int dataSize = dataB.size();
+        qwtPlotCurveResistivity.setRawSamples(
+                    dataX, dataResistivity.constData(), dataSize);
+        qwtPlotCurveHallU.setRawSamples(dataX, dataHallU.constData(), dataSize);
         ui->qwtPlot->replot();
     }
+    else
+        nanInData = true;
+
+    if(nanInData)
+        ui->statusBar->showMessage("Warning: NAN in data found! ", 5000);
 }
 
 void MainWindow::on_experiment_measurementCompleted()
