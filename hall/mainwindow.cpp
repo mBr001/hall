@@ -306,6 +306,8 @@ void MainWindow::on_startPushButton_clicked()
 
 void MainWindow::show()
 {
+    experimentFatalError = false;
+
     if (!experiment.open())
         return;
 
