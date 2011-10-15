@@ -116,7 +116,7 @@ void Experiment::close()
     sdp_close(&sdp);
     ps6220Dev.setOutput(false);
     ps6220Dev.close();
-    hp34970Dev.setRoute(ScpiDev::Channels_t());
+    hp34970Dev.setRoute(QSCPIDev::Channels_t());
     hp34970Dev.close();
 }
 
@@ -456,10 +456,10 @@ bool Experiment::open()
     }
 
     {
-        ScpiDev::Channels_t channels;
+        QSCPIDev::Channels_t channels;
 
         channels << 101 << 102 << 103 << 104 << 114;
-        if (!hp34970Dev.setSense(ScpiDev::SenseVolt, channels)) {
+        if (!hp34970Dev.setSense(QSCPIDev::SenseVolt, channels)) {
             emit fatalError("Failed set up HP34970 device", hp34970Dev.errorStr());
             goto err_hp34970;
         }
@@ -690,7 +690,7 @@ void Experiment::stepSamplePower_pm(Experiment *this_)
 
 void Experiment::stepSamplePower_ba(Experiment *this_)
 {
-    ScpiDev::Channels_t channels;
+    QSCPIDev::Channels_t channels;
     channels.append(_34903A_sample_a_pwr_m);
     channels.append(_34903A_sample_b_pwr_p);
     this_->hp34970Dev.setRoute(channels);
@@ -699,7 +699,7 @@ void Experiment::stepSamplePower_ba(Experiment *this_)
 
 void Experiment::stepSamplePower_bc(Experiment *this_)
 {
-    ScpiDev::Channels_t channels;
+    QSCPIDev::Channels_t channels;
     channels.append(_34903A_sample_b_pwr_p);
     channels.append(_34903A_sample_c_pwr_sw1);
     channels.append(_34903A_pwr_sw1_pwr_m);
@@ -709,7 +709,7 @@ void Experiment::stepSamplePower_bc(Experiment *this_)
 
 void Experiment::stepSamplePower_bd(Experiment *this_)
 {
-    ScpiDev::Channels_t channels;
+    QSCPIDev::Channels_t channels;
     channels.append(_34903A_sample_b_pwr_p);
     channels.append(_34903A_sample_d_pwr_m);
     this_->hp34970Dev.setRoute(channels);
@@ -718,7 +718,7 @@ void Experiment::stepSamplePower_bd(Experiment *this_)
 
 void Experiment::stepSamplePower_ca(Experiment *this_)
 {
-    ScpiDev::Channels_t channels;
+    QSCPIDev::Channels_t channels;
     channels.append(_34903A_sample_a_pwr_m);
     channels.append(_34903A_sample_c_pwr_sw1);
     channels.append(_34903A_pwr_sw1_pwr_p);
@@ -794,7 +794,7 @@ void Experiment::stepMeasHallProbePrepare(Experiment *this_)
     /* Set current to 1mA, open hall probe current source. */
     this_->ps6220Dev.setCurrent(hallProbeI);
 
-    ScpiDev::Channels_t closeChannels;
+    QSCPIDev::Channels_t closeChannels;
     closeChannels.append(_34903A_hall_probe_1_pwr_m);
     closeChannels.append(_34903A_hall_probe_2_pwr_p);
 
