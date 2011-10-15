@@ -13,7 +13,6 @@ MainWindow::MainWindow(QWidget *parent) :
     config(),
     configUI(),
     experiment(this),
-    experimentFatalError(false),
     dataB(),
     dataHallU(),
     dataResistivity(),
@@ -64,11 +63,23 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::close()
+{
+    experiment.close();
+    config.setCoilIRangeMax(ui->coilCurrMaxDoubleSpinBox->value());
+    config.setCoilIRangeMin(ui->coilCurrMinDoubleSpinBox->value());
+    config.setCoilIRangeStep(ui->coilCurrStepDoubleSpinBox->value());
+    config.setSampleI(ui->sampleCurrDoubleSpinBox->value());
+    config.setSampleThickness(ui->sampleThicknessDoubleSpinBox->value()/sampleThicknessUnit);
+    hide();
+    configUI.show();
+}
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (configUI.isHidden() && configUI.result() == QDialog::Accepted) {
         event->ignore();
-        if (!experimentFatalError && experiment.coilI() != 0) {
+        if (!experiment.coilI() != 0) {
             if (QMessageBox::warning(
                         this, "Power is still on!",
                         "Power is still on and should be turned (slowly!) "
@@ -79,14 +90,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
                 return;
             }
         }
-        experiment.close();
-        config.setCoilIRangeMax(ui->coilCurrMaxDoubleSpinBox->value());
-        config.setCoilIRangeMin(ui->coilCurrMinDoubleSpinBox->value());
-        config.setCoilIRangeStep(ui->coilCurrStepDoubleSpinBox->value());
-        config.setSampleI(ui->sampleCurrDoubleSpinBox->value());
-        config.setSampleThickness(ui->sampleThicknessDoubleSpinBox->value()/sampleThicknessUnit);
-        hide();
-        configUI.show();
+        close();
         return;
     }
 
@@ -151,7 +155,6 @@ void MainWindow::on_experiment_fatalError(const QString &errorShort, const QStri
     QString title("Fatal error in experiment: ");
     QString text("%1:\n\n%2");
 
-    experimentFatalError = true;
     text = text.arg(errorShort).arg(errorLong);
     title.append(errorShort);
     QMessageBox::critical(this, title, text);
@@ -303,8 +306,6 @@ void MainWindow::on_startPushButton_clicked()
 
 void MainWindow::show()
 {
-    experimentFatalError = false;
-
     if (!experiment.open())
         return;
 

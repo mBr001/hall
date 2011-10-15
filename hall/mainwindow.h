@@ -51,7 +51,6 @@ private:
     ConfigUI configUI;
     /** Experiment driving class. */
     Experiment experiment;
-    bool experimentFatalError;
 
     QVector<double> dataB;
     QVector<double> dataHallU;
@@ -61,6 +60,7 @@ private:
 
     Ui::MainWindow *ui;
 
+    void close();
     /** Start prepared measurement steps. */
     void measure(bool single);
 };
