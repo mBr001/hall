@@ -1,2 +1,9 @@
 * experiment settings checking
+* check sign for B
+* check these B equations:
+  * B = -30.558 + sqrt(934.773 + 392.163 * U / I)
+  * B = U/I * (5.97622E-4 + sqrt(U/I) * (1.51394E-6 - 9.24701E-11 * sqrt(U/I))) - 0.015;
+* read power status from parallel port ???
+  q := PortIn($379) and 127; q == 0 -> powe is on
+* documentation
 
