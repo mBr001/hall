@@ -128,6 +128,10 @@ void MainWindow::on_coilCurrMinDoubleSpinBox_valueChanged(double val1)
 {
     double val2(ui->coilCurrMaxDoubleSpinBox->value());
     experiment.setCoilIRange(val1, val2);
+
+    int t(experiment.ETA());
+    QTime qt;
+    ui->remainsTimeEdit->setTime(qt.addSecs(t));
 }
 
 void MainWindow::on_coilCurrStepDoubleSpinBox_valueChanged(double val)

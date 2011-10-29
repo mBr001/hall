@@ -146,6 +146,28 @@ double Experiment::computeB(double U)
     return B;
 }
 
+int Experiment::ETA()
+{
+    if (isMeasuring()) {
+        return -1;
+    }
+    // Coil current range pass trought
+    double t_coil_swepping = (_coilIRangeTop_ > 0 ? (2 * _coilIRangeTop_) : 0) +
+            (_coilIRangeBottom_ < 0 ? (2 * -_coilIRangeBottom_) : 0);
+    // Coil swepping time from current range
+    t_coil_swepping /= currentSlope;
+
+    // crossing 0.0V takes 3 steps???
+    if (_coilIRangeTop_ > 0)
+        t_coil_swepping += 6 * currentDwell / 1000;
+    if (_coilIRangeBottom_ < 0)
+        t_coil_swepping += 6 * currentDwell / 1000;
+
+    int t_sample;
+    // TODO
+    return t_coil_swepping + t_sample;
+}
+
 bool Experiment::isMeasuring()
 {
     return _measuring_;

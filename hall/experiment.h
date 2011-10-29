@@ -116,6 +116,8 @@ public:
       */
     bool checkSettings();
     void close();
+    /** Estimated time of arrival, time remaining to end of experiment. */
+    int ETA();
     bool open();
 
     void setEquationB(const QString &equation);
