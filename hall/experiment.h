@@ -154,7 +154,7 @@ public:
 
 protected:
     /** File to save measured data. */
-    QCSVFileWriter csvFile;
+    QCSVWriter csvFile;
     /** Step of I on coil used for automated measurement. */
     double _coilIStep_;
     /** Timer used to adjust current trought magnet in specified time. */

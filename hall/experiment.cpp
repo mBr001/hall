@@ -404,8 +404,7 @@ bool Experiment::open()
         _coilWantI_ = 0;
 
     /* Data file preparation. */
-    csvFile.setFileName(config.dataFileName());
-    if (!csvFile.open()) {
+    if (!csvFile.open(config.dataFileName())) {
         emit fatalError("Failed to open data file",
                         csvFile.errorString());
         goto err_sdp;
@@ -420,6 +419,7 @@ bool Experiment::open()
     csvFile[csvColSampleDrift] = "sample\ndrift [m^2*V^-1*s^-1]";
 
     csvFile[csvColTime] = "Time\n(UTC)";
+    csvFile[csvColTime].setDateTimeFormat("yyyy-MM-dd hh:mm:ss");
     csvFile[csvColHallProbeU] = "Hall probe\nUhp [V]";
     csvFile[csvColSampleUacF] = "sample\nUac/+- [V]";
     csvFile[csvColSampleUacB] = "sample\nUac/-+ [V]";
@@ -611,7 +611,7 @@ void Experiment::stepSampleMeas_cd(Experiment *this_)
 {
     double val(this_->readSingle());
     this_->dataUcd = val;
-    this_->csvFile.setAt(Experiment::csvColSampleUcdF, val);
+    this_->csvFile[csvColSampleUcdF] = val;
 
     this_->ps6220Dev.setOutput(false);
 }
@@ -620,7 +620,7 @@ void Experiment::stepSampleMeas_cdRev(Experiment *this_)
 {
     double val(this_->readSingle());
     this_->dataUcdRev = val;
-    this_->csvFile.setAt(Experiment::csvColSampleUcdB, val);
+    this_->csvFile[csvColSampleUcdB] = val;
 
     this_->ps6220Dev.setOutput(false);
 }
@@ -629,7 +629,7 @@ void Experiment::stepSampleMeas_da(Experiment *this_)
 {
     double val(this_->readSingle());
     this_->dataUda = val;
-    this_->csvFile.setAt(Experiment::csvColSampleUdaF, val);
+    this_->csvFile[csvColSampleUdaF] = val;
 
     this_->ps6220Dev.setOutput(false);
 }
@@ -638,7 +638,7 @@ void Experiment::stepSampleMeas_daRev(Experiment *this_)
 {
     double val(this_->readSingle());
     this_->dataUdaRev = val;
-    this_->csvFile.setAt(Experiment::csvColSampleUdaB, val);
+    this_->csvFile[csvColSampleUdaB] = val;
 
     this_->ps6220Dev.setOutput(false);
 }
@@ -647,7 +647,7 @@ void Experiment::stepSampleMeas_ac(Experiment *this_)
 {
     double val(this_->readSingle());
     this_->dataUac = val;
-    this_->csvFile.setAt(Experiment::csvColSampleUacF, val);
+    this_->csvFile[csvColSampleUacF] = val;
 
     this_->ps6220Dev.setOutput(false);
 }
@@ -656,7 +656,7 @@ void Experiment::stepSampleMeas_acRev(Experiment *this_)
 {
     double val(this_->readSingle());
     this_->dataUacRev = val;
-    this_->csvFile.setAt(Experiment::csvColSampleUacB, val);
+    this_->csvFile[csvColSampleUacB] = val;
 
     this_->ps6220Dev.setOutput(false);
 }
@@ -665,7 +665,7 @@ void Experiment::stepSampleMeas_bd(Experiment *this_)
 {
     double val(this_->readSingle());
     this_->dataUbd = val;
-    this_->csvFile.setAt(Experiment::csvColSampleUbdF, val);
+    this_->csvFile[csvColSampleUbdF] = val;
 
     this_->ps6220Dev.setOutput(false);
 }
@@ -674,7 +674,7 @@ void Experiment::stepSampleMeas_bdRev(Experiment *this_)
 {
     double val(this_->readSingle());
     this_->dataUbdRev = val;
-    this_->csvFile.setAt(Experiment::csvColSampleUbdB, val);
+    this_->csvFile[csvColSampleUbdB] = val;
 
     this_->ps6220Dev.setOutput(false);
 }
@@ -707,7 +707,7 @@ void Experiment::stepSamplePower_mp(Experiment *this_)
 void Experiment::stepSamplePower_pm(Experiment *this_)
 {
     this_->ps6220Dev.setCurrent(this_->_sampleI_);
-    this_->csvFile.setAt(Experiment::csvColSampleI, this_->_sampleI_);
+    this_->csvFile[csvColSampleI] = this_->_sampleI_;
 }
 
 void Experiment::stepSamplePower_ba(Experiment *this_)
@@ -779,34 +779,34 @@ void Experiment::stepFinish(Experiment *this_)
     /* um = Rh / (Rs * w) */
     this_->_dataDrift_ = fabs(this_->_dataRHall_ / (this_->_dataResistivity_ * this_->_sampleThickness_));
 
-    this_->csvFile.setAt(Experiment::csvColSampleResistivity, this_->_dataResistivity_);
-    this_->csvFile.setAt(Experiment::csvColSampleResSpec, this_->_dataResSpec_);
-    this_->csvFile.setAt(Experiment::csvColSampleRHall, this_->_dataRHall_);
-    this_->csvFile.setAt(Experiment::csvColSampleDrift, this_->_dataDrift_);
-    emit this_->measured(this_->csvFile.at(Experiment::csvColTime),
+    this_->csvFile[csvColSampleResistivity] = this_->_dataResistivity_;
+    this_->csvFile[csvColSampleResSpec] = this_->_dataResSpec_;
+    this_->csvFile[csvColSampleRHall] = this_->_dataRHall_;
+    this_->csvFile[csvColSampleDrift] = this_->_dataDrift_;
+    emit this_->measured(this_->csvFile[csvColTime],
                          this_->_dataB_, this_->_dataResistivity_, hallU);
 
-    this_->csvFile.setAt(Experiment::csvColBFormula, this_->_equationB_);
-    this_->csvFile.setAt(Experiment::csvColSampleThickness, this_->_sampleThickness_);
-    this_->csvFile.setAt(Experiment::csvColSampleSize, this_->_sampleSize_);
-    this_->csvFile.setAt(Experiment::csvColSampleName, this_->_sampleName_);
-    this_->csvFile.setAt(Experiment::csvColCoilI, this_->_coilWantI_);
+    this_->csvFile[csvColBFormula] = this_->_equationB_;
+    this_->csvFile[csvColSampleThickness] = this_->_sampleThickness_;
+    this_->csvFile[csvColSampleSize] = this_->_sampleSize_;
+    this_->csvFile[csvColSampleName] = this_->_sampleName_;
+    this_->csvFile[csvColCoilI] = this_->_coilWantI_;
     this_->csvFile.write();
 }
 
 void Experiment::stepGetTime(Experiment *this_)
 {
-    this_->csvFile.setAt(csvColTime, QDateTime::currentDateTimeUtc());
+    this_->csvFile[csvColTime] = QDateTime::currentDateTimeUtc();
 }
 
 void Experiment::stepMeasHallProbe(Experiment *this_)
 {
     double val(this_->readSingle());
 
-    this_->csvFile.setAt(Experiment::csvColHallProbeU, val);
+    this_->csvFile[csvColHallProbeU] = val;
     this_->_dataB_ = this_->computeB(val);
-    this_->csvFile.setAt(Experiment::csvColHallProbeB, this_->_dataB_);
-    this_->csvFile.setAt(Experiment::csvColHallProbeI, hallProbeI);
+    this_->csvFile[csvColHallProbeB] = this_->_dataB_;
+    this_->csvFile[csvColHallProbeI] = hallProbeI;
 
     this_->ps6220Dev.setOutput(false);
 }
