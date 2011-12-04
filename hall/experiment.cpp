@@ -27,7 +27,7 @@ const int Experiment::_34903A_hall_probe_2_pwr_p = _34903A + 10;
 const double Experiment::hallProbeI = 0.001;
 
 const Experiment::Step_t Experiment::stepsMeasure[] = {
-    // 2) after stepRestart function is done ++ and first step is therefore skipped
+    // 1) after stepRestart function is done ++ and first step is therefore skipped
     {   NULL, 0 },
     {   stepSetNewTarget, 0 },
     {   stepSweeping, 500 },
@@ -182,15 +182,17 @@ void Experiment::measure(bool single)
         _measuringRange_.append(0.);
 
         double I(_coilIRangeTop_);
-        if (_coilIRangeTop_ > 0.)
-        for (; I >= 0. && I >= _coilIRangeBottom_; I -= _coilIStep_) {
-            _measuringRange_.append(I);
+        if (_coilIRangeTop_ > 0.) {
+            for (; I >= 0. && I >= _coilIRangeBottom_; I -= _coilIStep_) {
+                _measuringRange_.append(I);
+            }
         }
         //if (I < _coilIRangeBottom_ || I < 0.)
         //    _measuringRange_.append(std::max(0., _coilIRangeBottom_));
-        if (_coilIRangeBottom_ < 0.)
-        for (I = _coilIRangeBottom_; I <= 0. && I <= _coilIRangeTop_; I += _coilIStep_) {
-            _measuringRange_.append(I);
+        if (_coilIRangeBottom_ < 0.) {
+            for (I = _coilIRangeBottom_; I <= 0. && I <= _coilIRangeTop_; I += _coilIStep_) {
+                _measuringRange_.append(I);
+            }
         }
         //if (I > _coilIRangeTop_ || I > 0.)
         //    _measuringRange_.append(std::min(0., _coilIRangeTop_));
@@ -199,6 +201,7 @@ void Experiment::measure(bool single)
                 stepsMeasure,
                 stepsMeasure + ARRAY_SIZE(stepsMeasure));
     stepCurrent = stepsRunning.begin();
+    qDebug("Experiment::measure stepCurrent:%p", stepCurrent);
 
     measTimer.start(0);
 }
@@ -324,12 +327,14 @@ void Experiment::on_coilTimer_timeout()
 
 void Experiment::on_measTimer_timeout()
 {
+    qDebug("Experiment::on_measTimer_timeoutA stepCurrent:%p", stepCurrent);
     if (stepCurrent != stepsRunning.end()) {
         if (stepCurrent->func != NULL) {
             stepCurrent->func(this);
         }
         int delay(stepCurrent->delay);
         ++stepCurrent;
+        qDebug("Experiment::on_measTimer_timeoutB stepCurrent:%p", stepCurrent);
         if (stepCurrent != stepsRunning.end()) {
             measTimer.start(delay);
             return;
@@ -750,6 +755,7 @@ void Experiment::stepSamplePower_ca(Experiment *this_)
 
 void Experiment::stepAbortIfTargetReached(Experiment *this_)
 {
+    qDebug("Experiment::stepAbortIfTargetReached stepCurrent:%p", this_->stepCurrent);
     if (!this_->_measuringRange_.size())
         this_->stepCurrent = this_->stepsRunning.end();
 }
@@ -836,7 +842,8 @@ void Experiment::stepSetNewTarget(Experiment *this_)
 
 void Experiment::stepSweeping(Experiment *this_)
 {
+    qDebug("Experiment::stepSweeping stepCurrent:%p", this_->stepCurrent);
     if (this_->_sweeping_) {
-        --(this_->stepCurrent);
+        --this_->stepCurrent;
     }
 }

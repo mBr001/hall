@@ -35,10 +35,13 @@ protected:
 
     /** Array of steps for single "hand made" measurement. */
     static const Step_t stepsMeasure[];
+
     /** Vector of steps to run, created from autoSteps. */
     Steps_t stepsRunning;
+
     /** Current step of automated Hall measurement. */
     Steps_t::const_iterator stepCurrent;
+
     /** Used to evaluate user equations (B from hall probe U) */
     QScriptEngine scriptEngine;
 
