@@ -163,7 +163,7 @@ int Experiment::ETA()
     if (_coilIRangeBottom_ < 0)
         t_coil_swepping += 6 * currentDwell / 1000;
 
-    int t_sample;
+    int t_sample = 0;
     // TODO
     return t_coil_swepping + t_sample;
 }
@@ -201,7 +201,6 @@ void Experiment::measure(bool single)
                 stepsMeasure,
                 stepsMeasure + ARRAY_SIZE(stepsMeasure));
     stepCurrent = stepsRunning.begin();
-    qDebug("Experiment::measure stepCurrent:%p", stepCurrent);
 
     measTimer.start(0);
 }
@@ -327,17 +326,17 @@ void Experiment::on_coilTimer_timeout()
 
 void Experiment::on_measTimer_timeout()
 {
-    qDebug("Experiment::on_measTimer_timeoutA stepCurrent:%p", stepCurrent);
     if (stepCurrent != stepsRunning.end()) {
         if (stepCurrent->func != NULL) {
             stepCurrent->func(this);
         }
-        int delay(stepCurrent->delay);
-        ++stepCurrent;
-        qDebug("Experiment::on_measTimer_timeoutB stepCurrent:%p", stepCurrent);
         if (stepCurrent != stepsRunning.end()) {
-            measTimer.start(delay);
-            return;
+            int delay(stepCurrent->delay);
+            ++stepCurrent;
+            if (stepCurrent != stepsRunning.end()) {
+                measTimer.start(delay);
+                return;
+            }
         }
     }
     measurementAbort();
@@ -755,7 +754,6 @@ void Experiment::stepSamplePower_ca(Experiment *this_)
 
 void Experiment::stepAbortIfTargetReached(Experiment *this_)
 {
-    qDebug("Experiment::stepAbortIfTargetReached stepCurrent:%p", this_->stepCurrent);
     if (!this_->_measuringRange_.size())
         this_->stepCurrent = this_->stepsRunning.end();
 }
@@ -842,7 +840,6 @@ void Experiment::stepSetNewTarget(Experiment *this_)
 
 void Experiment::stepSweeping(Experiment *this_)
 {
-    qDebug("Experiment::stepSweeping stepCurrent:%p", this_->stepCurrent);
     if (this_->_sweeping_) {
         --this_->stepCurrent;
     }
