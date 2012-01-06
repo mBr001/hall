@@ -4,3 +4,6 @@
 [submodule "QCSVWriter"]
 	path = QCSVWriter
 	url = git@github.com:pinkavaj/QCSVWriter.git
+[submodule "msdptool"]
+	path = msdptool
+	url = git@github.com:pinkavaj/msdptool.git

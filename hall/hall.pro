@@ -5,8 +5,9 @@ TEMPLATE = app
 
 LIBS += -L../QCSVWriter -lQCSVWriter \
     -L../QSCPIDev -lQSCPIDev \
-    -L/usr/local/lib -lmsdp2xxx
-INCLUDEPATH += /usr/local/include
+
+LIBS += -L../msdptool/build -L/usr/local/lib -lmsdptool
+INCLUDEPATH += ../msdptool/src/include /usr/local/include
 
 # expected QWT >= 6.0.0
 LIBS += -L/usr/local/lib -lqwt
