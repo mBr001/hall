@@ -140,7 +140,7 @@ double Experiment::computeB(double U)
     qsreal B(result.toNumber());
     //double B(B1 + sqrt(B2 + B3 * fabs(U / hallProbeI)));
     // alternativní vzorec a čísla
-    // U /= I; B = U(A+sqrt(U)*(B+C*sqrt(U)))-D;
+    // U /= I; B = U*(A+sqrt(U)*(B+C*sqrt(U)))-D;
     // A=5.97622E-4 B=1.591394E-6 C=-9.24701E-11 D=-0.015
 
     return B;
