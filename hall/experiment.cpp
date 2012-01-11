@@ -764,8 +764,8 @@ void Experiment::stepFinish(Experiment *this_)
     // TODO: check B vs -B (B direction)
 
     // TODO: kontrola rozptylu hodnot napětí
-    double Rdc((this_->dataUdcRev - this_->dataUdc) / this_->_sampleI_ / 2.);
-    double Rad((this_->dataUad - this_->dataUadRev) / this_->_sampleI_ / 2.);
+    double Rdc((this_->dataUdc - this_->dataUdcRev) / this_->_sampleI_ / 2.);
+    double Rad((this_->dataUadRev - this_->dataUad) / this_->_sampleI_ / 2.);
 
     std::pair<double, double> resisitivity(VanDerPauwSolver::solve(Rdc, Rad));
     this_->_dataResistivity_ = resisitivity.first;
