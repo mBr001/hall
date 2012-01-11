@@ -9,10 +9,10 @@
 #endif
 
 const int Experiment::_34901A = 100;
-const int Experiment::_34901A_sample_cd = _34901A + 1;
-const int Experiment::_34901A_sample_da = _34901A + 2;
-const int Experiment::_34901A_sample_bd = _34901A + 3;
-const int Experiment::_34901A_sample_ac = _34901A + 4;
+const int Experiment::_34901A_sample_dc = _34901A + 1;
+const int Experiment::_34901A_sample_ad = _34901A + 2;
+const int Experiment::_34901A_sample_db = _34901A + 3;
+const int Experiment::_34901A_sample_ca = _34901A + 4;
 const int Experiment::_34901A_hall_probe = _34901A + 5;
 
 const int Experiment::_34903A = 200;
@@ -38,33 +38,33 @@ const Experiment::Step_t Experiment::stepsMeasure[] = {
 
     {   stepSamplePower_pm, 10 },
     {   stepSamplePower_bd, 10 },
-    {   stepSampleMeasPrepare_ac, 100 },
-    {   stepSampleMeas_ac, 10 },
+    {   stepSampleMeasPrepare_ca, 100 },
+    {   stepSampleMeas_ca, 10 },
     {   stepSamplePower_ca, 10 },
-    {   stepSampleMeasPrepare_bd, 100 },
-    {   stepSampleMeas_bd, 10 },
+    {   stepSampleMeasPrepare_db, 100 },
+    {   stepSampleMeas_db, 10 },
 
     {   stepSamplePower_ba, 10 },
-    {   stepSampleMeasPrepare_cd, 100 },
-    {   stepSampleMeas_cd, 10 },
+    {   stepSampleMeasPrepare_dc, 100 },
+    {   stepSampleMeas_dc, 10 },
     {   stepSamplePower_bc, 10 },
-    {   stepSampleMeasPrepare_da, 100 },
-    {   stepSampleMeas_da, 10 },
+    {   stepSampleMeasPrepare_ad, 100 },
+    {   stepSampleMeas_ad, 10 },
 
     {   stepSamplePower_mp, 10 },
     {   stepSamplePower_bd, 10 },
-    {   stepSampleMeasPrepare_ac, 100 },
-    {   stepSampleMeas_acRev, 10 },
+    {   stepSampleMeasPrepare_ca, 100 },
+    {   stepSampleMeas_caRev, 10 },
     {   stepSamplePower_ca, 10 },
-    {   stepSampleMeasPrepare_bd, 100 },
-    {   stepSampleMeas_bdRev, 10 },
+    {   stepSampleMeasPrepare_db, 100 },
+    {   stepSampleMeas_dbRev, 10 },
 
     {   stepSamplePower_ba, 10 },
-    {   stepSampleMeasPrepare_cd, 100 },
-    {   stepSampleMeas_cdRev, 10 },
+    {   stepSampleMeasPrepare_dc, 100 },
+    {   stepSampleMeas_dcRev, 10 },
     {   stepSamplePower_bc, 10 },
-    {   stepSampleMeasPrepare_da, 100 },
-    {   stepSampleMeas_daRev, 10 },
+    {   stepSampleMeasPrepare_ad, 100 },
+    {   stepSampleMeas_adRev, 10 },
 
     {   stepFinish, 0 },
     {   stepAbortIfTargetReached, 0 },
@@ -426,14 +426,14 @@ bool Experiment::open()
     csvFile[csvColTime] = "Time\n(UTC)";
     csvFile[csvColTime].setDateTimeFormat("yyyy-MM-dd hh:mm:ss");
     csvFile[csvColHallProbeU] = "Hall probe\nUhp [V]";
-    csvFile[csvColSampleUacF] = "sample\nUac/+- [V]";
-    csvFile[csvColSampleUacB] = "sample\nUac/-+ [V]";
-    csvFile[csvColSampleUbdF] = "sample\nUbd/+- [V]";
-    csvFile[csvColSampleUbdB] = "sample\nUbd/-+ [V]";
-    csvFile[csvColSampleUcdF] = "sample\nUcd/+- [V]";
-    csvFile[csvColSampleUcdB] = "sample\nUcd/-+ [V]";
-    csvFile[csvColSampleUdaF] = "sample\nUda/+- [V]";
-    csvFile[csvColSampleUdaB] = "sample\nUda/-+ [V]";
+    csvFile[csvColSampleUcaF] = "sample\nUca/+- [V]";
+    csvFile[csvColSampleUcaB] = "sample\nUca/-+ [V]";
+    csvFile[csvColSampleUdbF] = "sample\nUdb/+- [V]";
+    csvFile[csvColSampleUdbB] = "sample\nUdb/-+ [V]";
+    csvFile[csvColSampleUdcF] = "sample\nUdc/+- [V]";
+    csvFile[csvColSampleUdcB] = "sample\nUdc/-+ [V]";
+    csvFile[csvColSampleUadF] = "sample\nUad/+- [V]";
+    csvFile[csvColSampleUadB] = "sample\nUad/-+ [V]";
 
     csvFile[csvColBFormula] = "B formula\n" /* TODO */;
     csvFile[csvColHallProbeI] = "Hall proble\nIhp [A]";
@@ -612,96 +612,96 @@ void Experiment::stepRestart(Experiment *this_)
     this_->stepCurrent = this_->stepsRunning.begin();
 }
 
-void Experiment::stepSampleMeas_cd(Experiment *this_)
+void Experiment::stepSampleMeas_dc(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUcd = val;
-    this_->csvFile[csvColSampleUcdF] = val;
+    this_->dataUdc = val;
+    this_->csvFile[csvColSampleUdcF] = val;
 
     this_->ps6220Dev.setOutput(false);
 }
 
-void Experiment::stepSampleMeas_cdRev(Experiment *this_)
+void Experiment::stepSampleMeas_dcRev(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUcdRev = val;
-    this_->csvFile[csvColSampleUcdB] = val;
+    this_->dataUdcRev = val;
+    this_->csvFile[csvColSampleUdcB] = val;
 
     this_->ps6220Dev.setOutput(false);
 }
 
-void Experiment::stepSampleMeas_da(Experiment *this_)
+void Experiment::stepSampleMeas_ad(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUda = val;
-    this_->csvFile[csvColSampleUdaF] = val;
+    this_->dataUad = val;
+    this_->csvFile[csvColSampleUadF] = val;
 
     this_->ps6220Dev.setOutput(false);
 }
 
-void Experiment::stepSampleMeas_daRev(Experiment *this_)
+void Experiment::stepSampleMeas_adRev(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUdaRev = val;
-    this_->csvFile[csvColSampleUdaB] = val;
+    this_->dataUadRev = val;
+    this_->csvFile[csvColSampleUadB] = val;
 
     this_->ps6220Dev.setOutput(false);
 }
 
-void Experiment::stepSampleMeas_ac(Experiment *this_)
+void Experiment::stepSampleMeas_ca(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUac = val;
-    this_->csvFile[csvColSampleUacF] = val;
+    this_->dataUca = val;
+    this_->csvFile[csvColSampleUcaF] = val;
 
     this_->ps6220Dev.setOutput(false);
 }
 
-void Experiment::stepSampleMeas_acRev(Experiment *this_)
+void Experiment::stepSampleMeas_caRev(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUacRev = val;
-    this_->csvFile[csvColSampleUacB] = val;
+    this_->dataUcaRev = val;
+    this_->csvFile[csvColSampleUcaB] = val;
 
     this_->ps6220Dev.setOutput(false);
 }
 
-void Experiment::stepSampleMeas_bd(Experiment *this_)
+void Experiment::stepSampleMeas_db(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUbd = val;
-    this_->csvFile[csvColSampleUbdF] = val;
+    this_->dataUdb = val;
+    this_->csvFile[csvColSampleUdbF] = val;
 
     this_->ps6220Dev.setOutput(false);
 }
 
-void Experiment::stepSampleMeas_bdRev(Experiment *this_)
+void Experiment::stepSampleMeas_dbRev(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUbdRev = val;
-    this_->csvFile[csvColSampleUbdB] = val;
+    this_->dataUdbRev = val;
+    this_->csvFile[csvColSampleUdbB] = val;
 
     this_->ps6220Dev.setOutput(false);
 }
 
-void Experiment::stepSampleMeasPrepare_cd(Experiment *this_)
+void Experiment::stepSampleMeasPrepare_dc(Experiment *this_)
 {
-    this_->hp34970Dev.setScan(Experiment::_34901A_sample_cd);
+    this_->hp34970Dev.setScan(Experiment::_34901A_sample_dc);
 }
 
-void Experiment::stepSampleMeasPrepare_da(Experiment *this_)
+void Experiment::stepSampleMeasPrepare_ad(Experiment *this_)
 {
-    this_->hp34970Dev.setScan(Experiment::_34901A_sample_da);
+    this_->hp34970Dev.setScan(Experiment::_34901A_sample_ad);
 }
 
-void Experiment::stepSampleMeasPrepare_ac(Experiment *this_)
+void Experiment::stepSampleMeasPrepare_ca(Experiment *this_)
 {
-    this_->hp34970Dev.setScan(Experiment::_34901A_sample_ac);
+    this_->hp34970Dev.setScan(Experiment::_34901A_sample_ca);
 }
 
-void Experiment::stepSampleMeasPrepare_bd(Experiment *this_)
+void Experiment::stepSampleMeasPrepare_db(Experiment *this_)
 {
-    this_->hp34970Dev.setScan(Experiment::_34901A_sample_bd);
+    this_->hp34970Dev.setScan(Experiment::_34901A_sample_db);
 }
 
 void Experiment::stepSamplePower_mp(Experiment *this_)
@@ -764,16 +764,16 @@ void Experiment::stepFinish(Experiment *this_)
     // TODO: check B vs -B (B direction)
 
     // TODO: kontrola rozptylu hodnot napětí
-    double Rcd((this_->dataUcd - this_->dataUcdRev) / this_->_sampleI_ / 2.);
-    double Rda((this_->dataUda - this_->dataUdaRev) / this_->_sampleI_ / 2.);
+    double Rdc((this_->dataUdcRev - this_->dataUdc) / this_->_sampleI_ / 2.);
+    double Rad((this_->dataUad - this_->dataUadRev) / this_->_sampleI_ / 2.);
 
-    std::pair<double, double> resisitivity(VanDerPauwSolver::solve(Rcd, Rda));
+    std::pair<double, double> resisitivity(VanDerPauwSolver::solve(Rdc, Rad));
     this_->_dataResistivity_ = resisitivity.first;
     this_->_dataResSpec_ = resisitivity.first * this_->_sampleThickness_;
 
     /* Uh = (Uac - Uca + Ubd - Udb) / 4    Uh - hall voltage */
-    double hallU(((this_->dataUac - this_->dataUacRev) +
-                  (this_->dataUbd - this_->dataUbdRev)) / 4);
+    double hallU(((this_->dataUca - this_->dataUcaRev) +
+                  (this_->dataUdb - this_->dataUdbRev)) / 4);
 
     if (this_->_coilWantI_ == 0)
         this_->_dataHallU0_ = hallU;
