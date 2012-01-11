@@ -19,13 +19,17 @@ SOURCES += main.cpp\
     configui.cpp \
     powpolwitch.cpp \
     config.cpp \
-    experiment.cpp
+    experiment.cpp \
+    vanderpauwsolver.cpp
 
 HEADERS  += mainwindow.h \
     configui.h \
     powpolswitch.h \
     config.h \
-    experiment.h
+    experiment.h \
+    vanderpauwsolver.h
 
 FORMS    += configui.ui \
     mainwindow.ui
+
+

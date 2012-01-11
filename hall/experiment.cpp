@@ -2,6 +2,7 @@
 #include <math.h>
 
 #include "experiment.h"
+#include "vanderpauwsolver.h"
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
@@ -761,12 +762,14 @@ void Experiment::stepAbortIfTargetReached(Experiment *this_)
 void Experiment::stepFinish(Experiment *this_)
 {
     // TODO: check B vs -B (B direction)
-    /* R = (Ucd - Udc + Uda - Uad) / (4 * I) */
-    this_->_dataResistivity_ = ((this_->dataUcd - this_->dataUcdRev) +
-                                (this_->dataUda - this_->dataUdaRev)) / 4 / this_->_sampleI_;
+
     // TODO: kontrola rozptylu hodnot napětí
-    /* Rs = Pi / ln(2) * w * R     w - sample thickness */
-    this_->_dataResSpec_ = M_PI / M_LN2 * this_->_sampleThickness_ * this_->_dataResistivity_;
+    double Rcd((this_->dataUcd - this_->dataUcdRev) / this_->_sampleI_ / 2.);
+    double Rda((this_->dataUda - this_->dataUdaRev) / this_->_sampleI_ / 2.);
+
+    std::pair<double, double> resisitivity(VanDerPauwSolver::solve(Rcd, Rda));
+    this_->_dataResistivity_ = resisitivity.first;
+    this_->_dataResSpec_ = resisitivity.first * this_->_sampleThickness_;
 
     /* Uh = (Uac - Uca + Ubd - Udb) / 4    Uh - hall voltage */
     double hallU(((this_->dataUac - this_->dataUacRev) +
