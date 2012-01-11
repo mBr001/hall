@@ -13,7 +13,7 @@ const int Experiment::_34901A_sample_cd = _34901A + 1;
 const int Experiment::_34901A_sample_da = _34901A + 2;
 const int Experiment::_34901A_sample_bd = _34901A + 3;
 const int Experiment::_34901A_sample_ac = _34901A + 4;
-const int Experiment::_34901A_hall_probe = _34901A + 14;
+const int Experiment::_34901A_hall_probe = _34901A + 5;
 
 const int Experiment::_34903A = 200;
 const int Experiment::_34903A_sample_a_pwr_m = _34903A + 1;
