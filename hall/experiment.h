@@ -59,14 +59,14 @@ public:
         csvColHallProbeU,
         csvColHallProbeI,
         csvColSampleI,
-        csvColSampleUcaF,
-        csvColSampleUcaB,
-        csvColSampleUdbF,
-        csvColSampleUdbB,
-        csvColSampleUdcF,
-        csvColSampleUdcB,
-        csvColSampleUadF,
-        csvColSampleUadB,
+        csvColSampleUac,
+        csvColSampleUacRev,
+        csvColSampleUbd,
+        csvColSampleUbdRev,
+        csvColSampleUcd,
+        csvColSampleUcdRev,
+        csvColSampleUda,
+        csvColSampleUdaRev,
         csvColSampleThickness,
         csvColCoilI,
         csvColDataEnd,
@@ -82,13 +82,13 @@ public:
     /** Channel offset for 34901A card */
     static const int _34901A;
     /** 34901A: sample pins cd */
-    static const int _34901A_sample_dc;
+    static const int _34901A_sample_cd;
     /** 34901A: sample pins da */
-    static const int _34901A_sample_ad;
+    static const int _34901A_sample_da;
     /** 34901A: sample pins bd */
-    static const int _34901A_sample_db;
+    static const int _34901A_sample_bd;
     /** 34901A: sample pins ac */
-    static const int _34901A_sample_ca;
+    static const int _34901A_sample_ac;
     /** 34901A: hall probe */
     static const int _34901A_hall_probe;
 
@@ -209,22 +209,18 @@ protected:
     /** Restart running measurement from begin. */
     static void stepRestart(Experiment *this_);
 
-    static void stepSampleMeas_dc(Experiment *this_);
-    static void stepSampleMeas_dcRev(Experiment *this_);
-    static void stepSampleMeas_ad(Experiment *this_);
-    static void stepSampleMeas_adRev(Experiment *this_);
-    static void stepSampleMeas_ca(Experiment *this_);
-    static void stepSampleMeas_caRev(Experiment *this_);
-    static void stepSampleMeas_db(Experiment *this_);
-    static void stepSampleMeas_dbRev(Experiment *this_);
-    /** Prepare measurement on sample pins c, d. */
-    static void stepSampleMeasPrepare_dc(Experiment *this_);
-    /** Prepare measurement on sample pins d, a. */
-    static void stepSampleMeasPrepare_ad(Experiment *this_);
-    /** Prepare measurement on sample pins a, c. */
-    static void stepSampleMeasPrepare_ca(Experiment *this_);
-    /** Prepare measurement on sample pins b, d. */
-    static void stepSampleMeasPrepare_db(Experiment *this_);
+    static void stepSampleMeas_ac(Experiment *this_);
+    static void stepSampleMeas_acRev(Experiment *this_);
+    static void stepSampleMeas_bd(Experiment *this_);
+    static void stepSampleMeas_bdRev(Experiment *this_);
+    static void stepSampleMeas_cd(Experiment *this_);
+    static void stepSampleMeas_cdRev(Experiment *this_);
+    static void stepSampleMeas_da(Experiment *this_);
+    static void stepSampleMeas_daRev(Experiment *this_);
+    static void stepSampleMeasPrepare_cd(Experiment *this_);
+    static void stepSampleMeasPrepare_da(Experiment *this_);
+    static void stepSampleMeasPrepare_ac(Experiment *this_);
+    static void stepSampleMeasPrepare_bd(Experiment *this_);
     /** Put power on sample on pins (b, a) = (+, -) */
     static void stepSamplePower_ba(Experiment *this_);
     /** Put power on sample on pins (b, c) = (+, -) */
@@ -267,8 +263,8 @@ private:
     double _coilIRangeBottom_, _coilIRangeTop_;
     double _coilMaxI_;
     Config config;
-    double dataUdc, dataUdcRev, dataUad, dataUadRev;
-    double dataUca, dataUcaRev, dataUdb, dataUdbRev;
+    double dataUcd, dataUcdRev, dataUda, dataUdaRev;
+    double dataUac, dataUacRev, dataUbd, dataUbdRev;
     double _dataB_;
     /** Hall U [V] at B = 0T */
     double _dataDrift_;
