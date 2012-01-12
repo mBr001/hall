@@ -468,19 +468,19 @@ bool Experiment::open()
     if (!ps6220Dev.open(config.ps6220Port(), QSerial::Baude19200))
     {
         emit fatalError("Failed to open sample power supply (Keithaly 6220)",
-                        ps6220Dev.errorStr());
+                        ps6220Dev.errorString());
         goto err_pwr_pol_switch;
     }
 
     if (!ps6220Dev.current(&_sampleI_)) {
         emit fatalError("Failed to get current from Keithaly 6220",
-                        ps6220Dev.errorStr());
+                        ps6220Dev.errorString());
         goto err_ps6220dev;
     }
 
     // Open and setup HP34970 device
     if (!hp34970Dev.open(config.hp34970Port())) {
-        emit fatalError("Failed to open HP34970 device", hp34970Dev.errorStr());
+        emit fatalError("Failed to open HP34970 device", hp34970Dev.errorString());
         goto err_ps6220dev;
     }
 
@@ -489,7 +489,7 @@ bool Experiment::open()
 
         channels << 101 << 102 << 103 << 104 << 114;
         if (!hp34970Dev.setSense(QSCPIDev::SenseVolt, channels)) {
-            emit fatalError("Failed set up HP34970 device", hp34970Dev.errorStr());
+            emit fatalError("Failed set up HP34970 device", hp34970Dev.errorString());
             goto err_hp34970;
         }
         // set experiment to well defined idle state, measure B[T]
@@ -524,7 +524,7 @@ double Experiment::readSingle()
     QStringList values;
     if (!hp34970Dev.read(&values))
     {
-        emit fatalError("HP34970 error", hp34970Dev.errorStr());
+        emit fatalError("HP34970 error", hp34970Dev.errorString());
         return NAN;
     }
     if (values.size() != 1) {
