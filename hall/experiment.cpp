@@ -796,7 +796,7 @@ void Experiment::stepFinish(Experiment *this_)
                          this_->_dataB_, this_->_dataResistivity_, hallU);
 
     this_->csvFile[csvColBFormula] = this_->_equationB_;
-    this_->csvFile[csvColSampleThickness] = this_->_sampleThickness_;
+    this_->csvFile[csvColSampleThickness] = this_->_sampleThickness_ * 1.e6;
     this_->csvFile[csvColSampleSize] = this_->_sampleSize_;
     this_->csvFile[csvColSampleName] = this_->_sampleName_;
     this_->csvFile[csvColCoilI] = this_->_coilWantI_;
