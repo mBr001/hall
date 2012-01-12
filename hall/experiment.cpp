@@ -793,17 +793,21 @@ void Experiment::stepFinish(Experiment *this_)
 {
     // TODO: check B vs -B (B direction)
 
+    double Uac(this_->dataUac - this_->dataUacRev);
+    double Ubd(this_->dataUbd - this_->dataUbdRev);
+    double Ucd(this_->dataUcd - this_->dataUcdRev);
+    double Uda(this_->dataUdaRev - this_->dataUda);
+
     // TODO: kontrola rozptylu hodnot napětí
-    double Rdc((this_->dataUcd - this_->dataUcdRev) / this_->_sampleI_ / 2.);
-    double Rad((this_->dataUdaRev - this_->dataUda) / this_->_sampleI_ / 2.);
+    double Rdc(Ucd / this_->_sampleI_ / 2.);
+    double Rad(Uda / this_->_sampleI_ / 2.);
 
     std::pair<double, double> resisitivity(VanDerPauwSolver::solve(Rdc, Rad));
     this_->_dataResistivity_ = resisitivity.first;
     this_->_dataResSpec_ = resisitivity.first * this_->_sampleThickness_;
 
     /* Uh = (Uac - Uca + Ubd - Udb) / 4    Uh - hall voltage */
-    double hallU(((this_->dataUac - this_->dataUacRev) +
-                  (this_->dataUbd - this_->dataUbdRev)) / 4);
+    double hallU((Uac + Ubd) / 4);
 
     if (this_->_coilWantI_ == 0)
         this_->_dataHallU0_ = hallU;
@@ -820,7 +824,16 @@ void Experiment::stepFinish(Experiment *this_)
     this_->csvFile[csvColSampleResSpec] = this_->_dataResSpec_;
     this_->csvFile[csvColSampleRHall] = this_->_dataRHall_;
     this_->csvFile[csvColSampleDrift] = this_->_dataDrift_;
-    emit this_->measured(this_->_dataB_, hallU, this_->_dataResistivity_, this_->_dataResSpec_);
+
+    double errAsymetry, errShottky;
+
+    errAsymetry = fabs(Ucd - Uda) / (Ucd + Uda);
+    errShottky = std::max(fabs(this_->dataUac + this_->dataUacRev) / Uac,
+                          std::max(fabs(this_->dataUbd + this_->dataUbdRev) / Ubd,
+                                   std::max(fabs(this_->dataUcd + this_->dataUcdRev) / Ucd,
+                                            fabs(this_->dataUda + this_->dataUdaRev) / Uda)));
+    emit this_->measured(this_->_dataB_, hallU, this_->_dataResistivity_,
+                         this_->_dataResSpec_, errAsymetry, errShottky);
 
     this_->csvFile[csvColBFormula] = this_->_equationB_;
     this_->csvFile[csvColSampleThickness] = this_->_sampleThickness_ * 1.e6;

@@ -31,7 +31,8 @@ private slots:
     void on_coilCurrStepDoubleSpinBox_valueChanged(double );
     void on_coilPowerCheckBox_toggled(bool checked);
     void on_experiment_fatalError(const QString &errorShort, const QString &errorLong);
-    void on_experiment_measured(double B, double hallU, double resistivity, double resistivitySpec);
+    void on_experiment_measured(double B, double hallU, double resistivity,
+                                double resistivitySpec, double errAsymetry, double errShottky);
     void on_experiment_measurementCompleted();
     void on_experiment_sweepingCompleted();
     void on_hallProbeDeleteToolButton_clicked();

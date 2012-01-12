@@ -513,20 +513,45 @@
              <property name="text">
               <string>B [T]</string>
              </property>
+             <property name="toolTip">
+              <string>Intensity of magnetic field near sample.</string>
+             </property>
             </column>
             <column>
              <property name="text">
               <string>Hall U [V]</string>
+             </property>
+             <property name="toolTip">
+              <string>Hall U on sample</string>
              </property>
             </column>
             <column>
              <property name="text">
               <string>R. [Ω]</string>
              </property>
+             <property name="toolTip">
+              <string>Sample resistivity</string>
+             </property>
             </column>
             <column>
              <property name="text">
               <string>R Spec. [Ω*m]</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Err. Square [%]</string>
+             </property>
+             <property name="toolTip">
+              <string>Maximal deviation of sample squareness.</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Err. Schottky [%]</string>
+             </property>
+             <property name="toolTip">
+              <string>Maximal difference of U for forvard and backward voltage measurement.</string>
              </property>
             </column>
            </widget>
