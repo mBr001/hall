@@ -820,8 +820,7 @@ void Experiment::stepFinish(Experiment *this_)
     this_->csvFile[csvColSampleResSpec] = this_->_dataResSpec_;
     this_->csvFile[csvColSampleRHall] = this_->_dataRHall_;
     this_->csvFile[csvColSampleDrift] = this_->_dataDrift_;
-    emit this_->measured(this_->csvFile[csvColTime],
-                         this_->_dataB_, this_->_dataResistivity_, hallU);
+    emit this_->measured(this_->_dataB_, hallU, this_->_dataResistivity_, this_->_dataResSpec_);
 
     this_->csvFile[csvColBFormula] = this_->_equationB_;
     this_->csvFile[csvColSampleThickness] = this_->_sampleThickness_ * 1.e6;

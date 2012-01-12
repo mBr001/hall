@@ -165,19 +165,20 @@ void MainWindow::on_experiment_fatalError(const QString &errorShort, const QStri
     close();
 }
 
-void MainWindow::on_experiment_measured(const QString &time, double B,
-                                        double resistivity, double hallU)
+void MainWindow::on_experiment_measured(double B, double hallU, double resistivity,
+                                        double resistivitySpec)
 {
     ui->dataTableWidget->insertRow(0);
 
     ui->dataTableWidget->setItem(
                 0, 0, new QTableWidgetItem(QVariant(B).toString()));
     ui->dataTableWidget->setItem(
-                0, 1, new QTableWidgetItem(QVariant(resistivity).toString()));
+                0, 1, new QTableWidgetItem(QVariant(hallU).toString()));
     ui->dataTableWidget->setItem(
-                0, 2, new QTableWidgetItem(QVariant(hallU).toString()));
+                0, 2, new QTableWidgetItem(QVariant(resistivity).toString()));
     ui->dataTableWidget->setItem(
-                0, 3, new QTableWidgetItem(time));
+                0, 3, new QTableWidgetItem(QVariant(resistivitySpec).toString()));
+
 
     bool nanInData(false);
     if (!isnan(B)) {

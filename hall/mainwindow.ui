@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>768</width>
-    <height>704</height>
+    <height>738</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -511,22 +511,22 @@
             </attribute>
             <column>
              <property name="text">
-              <string>Coil B [T]</string>
+              <string>B [T]</string>
              </property>
             </column>
             <column>
              <property name="text">
-              <string>Resistivity. [Ohm]</string>
+              <string>Hall U [V]</string>
              </property>
             </column>
             <column>
              <property name="text">
-              <string>Hall volt. [V]</string>
+              <string>R. [Ω]</string>
              </property>
             </column>
             <column>
              <property name="text">
-              <string>Time</string>
+              <string>R Spec. [Ω*m]</string>
              </property>
             </column>
            </widget>
