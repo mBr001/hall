@@ -798,7 +798,6 @@ void Experiment::stepFinish(Experiment *this_)
     double Ucd(this_->dataUcd - this_->dataUcdRev);
     double Uda(this_->dataUdaRev - this_->dataUda);
 
-    // TODO: kontrola rozptylu hodnot napětí
     double Rdc(Ucd / this_->_sampleI_ / 2.);
     double Rad(Uda / this_->_sampleI_ / 2.);
 
@@ -806,7 +805,8 @@ void Experiment::stepFinish(Experiment *this_)
     this_->_dataResistivity_ = resisitivity.first;
     this_->_dataResSpec_ = resisitivity.first * this_->_sampleThickness_;
 
-    /* Uh = (Uac - Uca + Ubd - Udb) / 4    Uh - hall voltage */
+    /* Uh = (Uac - Uca + (Ubd - Udb)) / 4    Uh - hall voltage,
+      this equation is a bit twinkle because B x I x U orientation in space. */
     double hallU((Uac + Ubd) / 4);
 
     if (this_->_coilWantI_ == 0)
