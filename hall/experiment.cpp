@@ -16,6 +16,8 @@ const int Experiment::_34901A_sample_ac = _34901A + 4;
 const int Experiment::_34901A_hall_probe = _34901A + 5;
 
 const int Experiment::_34903A = 200;
+const int Experiment::_34903A_min = _34903A + 1;
+const int Experiment::_34903A_max = _34903A + 20;
 const int Experiment::_34903A_sample_a_pwr_m = _34903A + 1;
 const int Experiment::_34903A_sample_b_pwr_p = _34903A + 2;
 const int Experiment::_34903A_sample_c_pwr_sw1 = _34903A + 3;
@@ -117,7 +119,7 @@ void Experiment::close()
     sdp_close(&sdp);
     ps6220Dev.setOutput(false);
     ps6220Dev.close();
-    hp34970Dev.setRoute(QSCPIDev::Channels_t());
+    hp34970Dev.setRoute(QSCPIDev::Channels_t(), _34903A_min, _34903A_max);
     hp34970Dev.close();
 }
 
@@ -720,7 +722,7 @@ void Experiment::stepSamplePower_ba(Experiment *this_)
     QSCPIDev::Channels_t channels;
     channels.append(_34903A_sample_a_pwr_m);
     channels.append(_34903A_sample_b_pwr_p);
-    this_->hp34970Dev.setRoute(channels);
+    this_->hp34970Dev.setRoute(channels, _34903A_min, _34903A_max);
     this_->ps6220Dev.setOutput(true);
 }
 
@@ -730,7 +732,7 @@ void Experiment::stepSamplePower_bc(Experiment *this_)
     channels.append(_34903A_sample_b_pwr_p);
     channels.append(_34903A_sample_c_pwr_sw1);
     channels.append(_34903A_pwr_sw1_pwr_m);
-    this_->hp34970Dev.setRoute(channels);
+    this_->hp34970Dev.setRoute(channels, _34903A_min, _34903A_max);
     this_->ps6220Dev.setOutput(true);
 }
 
@@ -739,7 +741,7 @@ void Experiment::stepSamplePower_bd(Experiment *this_)
     QSCPIDev::Channels_t channels;
     channels.append(_34903A_sample_b_pwr_p);
     channels.append(_34903A_sample_d_pwr_m);
-    this_->hp34970Dev.setRoute(channels);
+    this_->hp34970Dev.setRoute(channels, _34903A_min, _34903A_max);
     this_->ps6220Dev.setOutput(true);
 }
 
@@ -749,7 +751,7 @@ void Experiment::stepSamplePower_ca(Experiment *this_)
     channels.append(_34903A_sample_a_pwr_m);
     channels.append(_34903A_sample_c_pwr_sw1);
     channels.append(_34903A_pwr_sw1_pwr_p);
-    this_->hp34970Dev.setRoute(channels);
+    this_->hp34970Dev.setRoute(channels, _34903A_min, _34903A_max);
     this_->ps6220Dev.setOutput(true);
 }
 
@@ -827,7 +829,7 @@ void Experiment::stepMeasHallProbePrepare(Experiment *this_)
     closeChannels.append(_34903A_hall_probe_1_pwr_m);
     closeChannels.append(_34903A_hall_probe_2_pwr_p);
 
-    this_->hp34970Dev.setRoute(closeChannels);
+    this_->hp34970Dev.setRoute(closeChannels, _34903A_min, _34903A_max);
     this_->hp34970Dev.setScan(Experiment::_34901A_hall_probe);
     this_->ps6220Dev.setOutput(true);
 }

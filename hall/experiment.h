@@ -94,6 +94,10 @@ public:
 
     /** Channel offset for 34903A card */
     static const int _34903A;
+
+    static const int _34903A_min;
+    static const int _34903A_max;
+
     /** 34903A: sample pin a <-> current source (-) */
     static const int _34903A_sample_a_pwr_m;
     /** 34903A: sample pin b <-> current source (+) */
