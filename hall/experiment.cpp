@@ -137,6 +137,34 @@ double Experiment::computeB(double U)
 {
     QString equation("U=%1;\n"
                      "I=%2;\n"
+
+                     "E=Math.E;\n"
+                     "LOG2E=Math.LOG2E;\n"
+                     "LOG10E=Math.LOG10E;\n"
+                     "LN2=Math.LN2;\n"
+                     "LN10=Math.LN10;\n"
+                     "SQRT2=Math.SQRT2;\n"
+                     "SQRT1_2=Math.SQRT1_2;\n"
+
+                     "abs=Math.abs;\n"
+                     "acos=Math.acos;\n"
+                     "asin=Math.asin;\n"
+                     "atan=Math.atan;\n"
+                     "atan2=Math.atan2;\n"
+                     "ceil=Math.ceil;\n"
+                     "cos=Math.cos;\n"
+                     "exp=Math.exp;\n"
+                     "floor=Math.floor;\n"
+                     "log=Math.log;\n"
+                     "max=Math.max;\n"
+                     "min=Math.min;\n"
+                     "pow=Math.pow;\n"
+                     "random=Math.random;\n"
+                     "round=Math.round;\n"
+                     "sin=Math.sin;\n"
+                     "sqrt=Math.sqrt;\n"
+                     "tan=Math.tan;\n"
+
                      "%3\n");
     equation = equation.arg(U).arg(this->hallProbeI).arg(_equationB_);
     QScriptValue result(scriptEngine.evaluate(equation));
