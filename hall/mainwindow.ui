@@ -181,16 +181,6 @@
                 </property>
                </widget>
               </item>
-              <item row="5" column="0" colspan="3">
-               <widget class="QPushButton" name="startPushButton">
-                <property name="toolTip">
-                 <string>Start fully automatized measurement.</string>
-                </property>
-                <property name="text">
-                 <string>Start</string>
-                </property>
-               </widget>
-              </item>
               <item row="4" column="0">
                <widget class="QLabel" name="label_28">
                 <property name="text">
@@ -488,7 +478,17 @@
            <string>Take snapshot of current measured values.</string>
           </property>
           <property name="text">
-           <string>Do single measurement</string>
+           <string>Meas. single point</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="startPushButton">
+          <property name="toolTip">
+           <string>Start fully automatized measurement.</string>
+          </property>
+          <property name="text">
+           <string>Start automatic meas.</string>
           </property>
          </widget>
         </item>
