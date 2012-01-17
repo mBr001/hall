@@ -22,7 +22,6 @@ public:
     QString polSwitchPort();
     QString ps6220Port();
     double sampleI();
-    double sampleSize();
     double sampleThickness();
     void setCoilIRangeMax(double IMax);
     void setCoilIRangeMin(double IMin);
@@ -35,7 +34,6 @@ public:
     void setPolSwitchPort(const QString &port);
     void setPs6220Port(const QString &port);
     void setSampleI(double I);
-    void setSampleSize(double size);
     void setSampleThickness(double thickness);
 
 private:

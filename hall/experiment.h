@@ -142,7 +142,6 @@ public:
     void setSampleName(const QString &id);
     /** Lenght of side for square sample [m]. */
     double sampleSize() const;
-    void setSampleSize(double size);
     double sampleThickness() const;
     void setSampleThickness(double value);
 

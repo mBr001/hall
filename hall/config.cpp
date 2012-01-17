@@ -107,11 +107,6 @@ double Config::sampleI()
     return settings.value(cfg_sampleI, 0).toDouble();
 }
 
-double Config::sampleSize()
-{
-    return settings.value(cfg_sampleSize, 0).toDouble();
-}
-
 double Config::sampleThickness()
 {
     return settings.value(cfg_sampleThickness, 0).toDouble();
@@ -174,11 +169,6 @@ void Config::setMsdpPort(const QString &port)
 void Config::setSampleI(double I)
 {
     settings.setValue(cfg_sampleI, I);
-}
-
-void Config::setSampleSize(double size)
-{
-    settings.setValue(cfg_sampleSize, size);
 }
 
 void Config::setSampleThickness(double thickness)

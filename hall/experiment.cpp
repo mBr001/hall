@@ -626,11 +626,6 @@ void Experiment::setSampleName(const QString &id)
     _sampleName_ = id;
 }
 
-void Experiment::setSampleSize(double size)
-{
-    _sampleSize_ = size;
-}
-
 void Experiment::setSampleThickness(double value)
 {
     _sampleThickness_ = value;

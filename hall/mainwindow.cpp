@@ -55,7 +55,6 @@ MainWindow::MainWindow(QWidget *parent) :
     qwtPlotCurveResistivity.setSymbol(qwtPlotResistivitySymbol);
 
     ui->hallProbeNameComboBox->addItems(config.hallProbes());
-    ui->sampleSizeDoubleSpinBox->setValue(config.sampleSize());
 }
 
 MainWindow::~MainWindow()
@@ -269,14 +268,10 @@ void MainWindow::on_hallProbeSaveToolButton_clicked()
 void MainWindow::on_hallProbeNameComboBox_currentIndexChanged(const QString &currentText)
 {
     QString equation(config.hallProbeEquationB(currentText));
-    double size(config.hallProbeSampleSize(currentText));
 
     ui->hallProbeEquationBLineEdit->setText(equation);
-    ui->hallProbeSampleSizeDoubleSpinBox->setValue(size);
 
     experiment.setEquationB(equation);
-    experiment.setSampleSize(size);
-    ui->sampleSizeDoubleSpinBox->setValue(size);
 }
 
 void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
@@ -287,12 +282,6 @@ void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
 void MainWindow::on_sampleNameLineEdit_editingFinished()
 {
     experiment.setSampleName(ui->sampleNameLineEdit->text());
-}
-
-void MainWindow::on_sampleSizeDoubleSpinBox_valueChanged(double size)
-{
-    config.setSampleSize(size);
-    experiment.setSampleSize(size);
 }
 
 void MainWindow::on_sampleThicknessDoubleSpinBox_valueChanged(double value)
