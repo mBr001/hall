@@ -245,14 +245,12 @@ void MainWindow::on_hallProbeDeleteToolButton_clicked()
     if (idx != -1) {
         ui->hallProbeNameComboBox->removeItem(idx);
     }
-    config.deleteHallProbeEquationB(name);
-    config.deleteHallProbeSampleSize(name);
+    config.deleteHallProbe(name);
 }
 
 void MainWindow::on_hallProbeSaveToolButton_clicked()
 {
     QString equation(ui->hallProbeEquationBLineEdit->text());
-    double size(ui->hallProbeSampleSizeDoubleSpinBox->value());
     QString name(ui->hallProbeNameComboBox->currentText());
 
     if (ui->hallProbeNameComboBox->findText(name) == -1) {
@@ -260,7 +258,6 @@ void MainWindow::on_hallProbeSaveToolButton_clicked()
     }
 
     config.setHallProbeEquationB(name, equation);
-    config.setHallProbeSampleSize(name, size);
 
     experiment.setEquationB(equation);
 }

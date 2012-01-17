@@ -15,6 +15,7 @@ ConfigUI::ConfigUI(QWidget *parent) :
     ui->agilentPortComboBox->addItems(ports);
     ui->powerSupplyPortComboBox->addItems(ports);
     ui->samplePowerPortComboBox->addItems(ports);
+    //FIXME: ui->hallProbeBEquationLineEdit->setText();
 
 #ifdef __linux__
     QString root("/dev/");
