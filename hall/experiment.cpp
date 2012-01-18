@@ -28,6 +28,8 @@ const int Experiment::_34903A_hall_probe_1_pwr_m = _34903A + 9;
 const int Experiment::_34903A_hall_probe_2_pwr_p = _34903A + 10;
 
 const double Experiment::hallProbeI = 0.001;
+const double Experiment::hallProbeIUnits = 1e-3; // mA
+const double Experiment::sampleThicknessUnits = 1e-6; // um
 
 const Experiment::Step_t Experiment::stepsMeasure[] = {
     // 1) after stepRestart function is done ++ and first step is therefore skipped
@@ -208,7 +210,7 @@ QString Experiment::filePath()
                     .replace(":", "."));
     QString nameStr(config->sampleName()
                     .replace(QRegExp("[*-/\\@#$%^&()=\"\'!§?<>`;]"), "_"));
-    QString fileName(dateStr + "_" + nameStr);
+    QString fileName(dateStr + "_" + nameStr + ".csv");
 
     return QDir(config->dataDirPath()).filePath(fileName);
 }
@@ -458,35 +460,68 @@ bool Experiment::open()
         goto err_sdp;
     }
 
-    csvFile.resize(csvColEnd);
+    do {
+        csvFile.resize(1);
+        csvFile[0] = "Hall measurement experimental data";
+        if (!csvFile.write())
+            break;
+        csvFile.error();
 
-    csvFile[csvColHallProbeB] = "Hall probe\nB [T]";
-    csvFile[csvColSampleResistivity] = "sample\nR [ohm]";
-    csvFile[csvColSampleResSpec] = "sample\nRspec [ohm*m]";
-    csvFile[csvColSampleRHall] = "sample\nRhall [m^3*C^-1]";
-    csvFile[csvColSampleDrift] = "sample\ndrift [m^2*V^-1*s^-1]";
+        csvFile.resize(2);
+        csvFile[0] = "Date";
+        csvFile[1] = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+        if (!csvFile.write())
+            break;
 
-    csvFile[csvColTime] = "Time\n(UTC)";
-    csvFile[csvColTime].setDateTimeFormat("yyyy-MM-dd hh:mm:ss");
-    csvFile[csvColHallProbeU] = "Hall probe\nUhp [V]";
-    csvFile[csvColSampleUac] = "sample\nUac [V]";
-    csvFile[csvColSampleUacRev] = "sample\nUac(rev) [V]";
-    csvFile[csvColSampleUbd] = "sample\nUbd [V]";
-    csvFile[csvColSampleUbdRev] = "sample\nUbd(rev) [V]";
-    csvFile[csvColSampleUcd] = "sample\nUcd [V]";
-    csvFile[csvColSampleUcdRev] = "sample\nUcd(rev) [V]";
-    csvFile[csvColSampleUda] = "sample\nUda [V]";
-    csvFile[csvColSampleUdaRev] = "sample\nUda(rev) [V]";
+        csvFile[0] = "Sample name";
+        csvFile[1] = config->sampleName();
+        if (!csvFile.write())
+            break;
 
-    csvFile[csvColBFormula] = "B formula\n" /* TODO */;
-    csvFile[csvColHallProbeI] = "Hall proble\nIhp [A]";
-    csvFile[csvColSampleI] = "sample\nI [A]";
-    csvFile[csvColSampleThickness] = "Sample thickness\nh [um]";
-    csvFile[csvColSampleName] = "Sample Name";
-    csvFile[csvColSampleSize] = "Sample edge lenght\n[m]";
-    csvFile[csvColCoilI] = "Coil\nI [A]";
+        csvFile[0] = "B formula";
+        csvFile[1] = config->hallProbeEquationB(
+                    config->selectedSampleHolderName());
+        if (!csvFile.write())
+            break;
 
-    if (!csvFile.write()) {
+        csvFile[0] = "Sample thickness [μm]";
+        csvFile[1] = config->sampleThickness() / sampleThicknessUnits;
+        if (!csvFile.write())
+            break;
+
+        csvFile[0] = "Hall probe I [mA]";
+        csvFile[1] = hallProbeI / hallProbeIUnits;
+        if (!csvFile.write())
+            break;
+
+        csvFile.resize(csvColEnd);
+
+        csvFile[csvColHallProbeB] = "Hall probe\nB [T]";
+        csvFile[csvColSampleResistivity] = "sample\nR [ohm]";
+        csvFile[csvColSampleResSpec] = "sample\nRspec [ohm*m]";
+        csvFile[csvColSampleRHall] = "sample\nRhall [m^3*C^-1]";
+        csvFile[csvColSampleDrift] = "sample\ndrift [m^2*V^-1*s^-1]";
+        csvFile[csvColSampleCCarrier] = "carrier conc.\nc [?]";
+
+        csvFile[csvColTime] = "Time\n(UTC)";
+        csvFile[csvColTime].setDateTimeFormat("yyyy-MM-dd hh:mm:ss");
+        csvFile[csvColHallProbeU] = "Hall probe\nUhp [V]";
+        csvFile[csvColSampleUac] = "sample\nUac [V]";
+        csvFile[csvColSampleUacRev] = "sample\nUac(rev) [V]";
+        csvFile[csvColSampleUbd] = "sample\nUbd [V]";
+        csvFile[csvColSampleUbdRev] = "sample\nUbd(rev) [V]";
+        csvFile[csvColSampleUcd] = "sample\nUcd [V]";
+        csvFile[csvColSampleUcdRev] = "sample\nUcd(rev) [V]";
+        csvFile[csvColSampleUda] = "sample\nUda [V]";
+        csvFile[csvColSampleUdaRev] = "sample\nUda(rev) [V]";
+
+        csvFile[csvColSampleI] = "sample\nI [A]";
+        csvFile[csvColCoilI] = "Coil\nI [A]";
+        if (!csvFile.write())
+            break;
+    } while(false);
+
+    if (csvFile.error() != QFile::NoError) {
         emit fatalError("Failed to write header into data file",
                         csvFile.errorString());
         goto err_csv_file;
@@ -833,10 +868,6 @@ void Experiment::stepFinish(Experiment *this_)
     emit this_->measured(this_->_dataB_, hallU, this_->_dataResistivity_,
                          this_->_dataResSpec_, errAsymetry, errShottky);
 
-    this_->csvFile[csvColBFormula] = this_->_equationB_;
-    this_->csvFile[csvColSampleThickness] = this_->_sampleThickness_ * 1.e6;
-    this_->csvFile[csvColSampleSize] = this_->_sampleSize_;
-    this_->csvFile[csvColSampleName] = this_->config->sampleName();
     this_->csvFile[csvColCoilI] = this_->_coilWantI_;
     this_->csvFile.write();
 }
@@ -853,7 +884,6 @@ void Experiment::stepMeasHallProbe(Experiment *this_)
     this_->csvFile[csvColHallProbeU] = val;
     this_->_dataB_ = this_->computeB(val);
     this_->csvFile[csvColHallProbeB] = this_->_dataB_;
-    this_->csvFile[csvColHallProbeI] = hallProbeI;
 
     this_->ps6220Dev.setOutput(false);
 }

@@ -53,11 +53,11 @@ public:
         csvColSampleResSpec,
         csvColSampleRHall,
         csvColSampleDrift,
+        csvColSampleCCarrier,
         csvColResultsEnd,
 
         csvColTime,
         csvColHallProbeU,
-        csvColHallProbeI,
         csvColSampleI,
         csvColSampleUac,
         csvColSampleUacRev,
@@ -67,14 +67,8 @@ public:
         csvColSampleUcdRev,
         csvColSampleUda,
         csvColSampleUdaRev,
-        csvColSampleThickness,
         csvColCoilI,
-        csvColDataEnd,
-        csvColBFormula,
-        csvColEmpty,
 
-        csvColSampleName,
-        csvColSampleSize,
         /** csvColEnd equeals to a number of columns, it is not a column at all. */
         csvColEnd
     };
@@ -275,9 +269,11 @@ private:
     double _dataResSpec_;
     /** I for hall probe to measure B. */
     static const double hallProbeI;
+    static const double hallProbeIUnits;
     double _sampleI_;
     double _sampleSize_;
     double _sampleThickness_;
+    static const double sampleThicknessUnits;
 
     /** Create path to new file to store measurement data. */
     QString filePath();
