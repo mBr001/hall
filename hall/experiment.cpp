@@ -233,6 +233,29 @@ bool Experiment::isMeasuring()
     return _measuring_;
 }
 
+std::pair<double, double> Experiment::linRegress(const QVector<double> &x,
+                                                 const QVector<double> &y)
+{
+    if (x.size() != y.size())
+        return std::make_pair<double, double>(NAN, NAN);
+
+    double n(x.size());
+    double sum_x(0.), sum_y(0.), sum_x2(0.), sum_x_y(0.);
+
+    foreach(double i, x) { sum_x += i; sum_x2 += i*i; }
+    foreach(double i, y) { sum_y += i; }
+    for(QVector<double>::const_iterator xi(x.begin()), yi(y.begin());
+            xi != x.end();
+            ++xi, ++yi) {
+        sum_x_y += *xi * *yi;
+    }
+
+    double a = (n*sum_x_y - sum_x*sum_y)/(n*sum_x2 - sum_x*sum_x);
+    double b = (sum_x2*sum_y - sum_x*sum_x_y)/(n*sum_x2 - sum_x*sum_x);
+
+    return std::make_pair<double, double>(a, b);
+}
+
 void Experiment::measure(bool single)
 {
     _measuring_ = true;

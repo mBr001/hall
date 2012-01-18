@@ -270,6 +270,8 @@ private:
 
     /** Create path to new file to store measurement data. */
     QString filePath();
+    std::pair<double, double> linRegress(const QVector<double> &x,
+                                         const QVector<double> &y);
     double hallU0();
 };
 
