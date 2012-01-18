@@ -121,9 +121,6 @@ public:
     int ETA();
     bool open();
 
-    void setEquationB(const QString &equation);
-    QString equationB() const;
-
     double coilI();
     double coilMaxI();
     void setCoilI(double value);
@@ -134,8 +131,6 @@ public:
     void setSampleI(double value);
     /** Lenght of side for square sample [m]. */
     double sampleSize() const;
-    double sampleThickness() const;
-    void setSampleThickness(double value);
 
     bool isMeasuring();
     /** Start single or multiple measurements for defined coilWantI (<min, max>). */
@@ -255,6 +250,7 @@ private slots:
 private:
     /** Script to compute intensity of B from hall probe U and I. */
     QString _equationB_;
+    static const QString eqationBScript;
     double _coilIRangeBottom_, _coilIRangeTop_;
     double _coilMaxI_;
     Config *config;
@@ -271,7 +267,6 @@ private:
     static const double hallProbeI;
     static const double hallProbeIUnits;
     double _sampleI_;
-    double _sampleSize_;
     double _sampleThickness_;
     static const double sampleThicknessUnits;
 

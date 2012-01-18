@@ -31,6 +31,40 @@ const double Experiment::hallProbeI = 0.001;
 const double Experiment::hallProbeIUnits = 1e-3; // mA
 const double Experiment::sampleThicknessUnits = 1e-6; // um
 
+const QString Experiment::eqationBScript(
+                 "I=%2;\n"
+                 "U=%1;\n"
+
+                 "E=Math.E;\n"
+                 "LOG2E=Math.LOG2E;\n"
+                 "LOG10E=Math.LOG10E;\n"
+                 "LN2=Math.LN2;\n"
+                 "LN10=Math.LN10;\n"
+                 "SQRT2=Math.SQRT2;\n"
+                 "SQRT1_2=Math.SQRT1_2;\n"
+
+                 "abs=Math.abs;\n"
+                 "acos=Math.acos;\n"
+                 "asin=Math.asin;\n"
+                 "atan=Math.atan;\n"
+                 "atan2=Math.atan2;\n"
+                 "ceil=Math.ceil;\n"
+                 "cos=Math.cos;\n"
+                 "exp=Math.exp;\n"
+                 "floor=Math.floor;\n"
+                 "log=Math.log;\n"
+                 "max=Math.max;\n"
+                 "min=Math.min;\n"
+                 "pow=Math.pow;\n"
+                 "random=Math.random;\n"
+                 "round=Math.round;\n"
+                 "sin=Math.sin;\n"
+                 "sqrt=Math.sqrt;\n"
+                 "tan=Math.tan;\n"
+
+                 "%3;\n"
+                 "B");
+
 const Experiment::Step_t Experiment::stepsMeasure[] = {
     // 1) after stepRestart function is done ++ and first step is therefore skipped
     {   NULL, 0 },
@@ -93,8 +127,7 @@ Experiment::Experiment(Config *config, QObject *parent) :
     _measuring_(false),
     _sweeping_(false),
     _dataHallU0_(NAN),
-    _sampleI_(0),
-    _sampleSize_(0)
+    _sampleI_(0)
 {
     this->config = config;
 
@@ -139,39 +172,11 @@ double Experiment::coilMaxI()
 
 double Experiment::computeB(double U)
 {
-    QString equation("U=%1;\n"
-                     "I=%2;\n"
-
-                     "E=Math.E;\n"
-                     "LOG2E=Math.LOG2E;\n"
-                     "LOG10E=Math.LOG10E;\n"
-                     "LN2=Math.LN2;\n"
-                     "LN10=Math.LN10;\n"
-                     "SQRT2=Math.SQRT2;\n"
-                     "SQRT1_2=Math.SQRT1_2;\n"
-
-                     "abs=Math.abs;\n"
-                     "acos=Math.acos;\n"
-                     "asin=Math.asin;\n"
-                     "atan=Math.atan;\n"
-                     "atan2=Math.atan2;\n"
-                     "ceil=Math.ceil;\n"
-                     "cos=Math.cos;\n"
-                     "exp=Math.exp;\n"
-                     "floor=Math.floor;\n"
-                     "log=Math.log;\n"
-                     "max=Math.max;\n"
-                     "min=Math.min;\n"
-                     "pow=Math.pow;\n"
-                     "random=Math.random;\n"
-                     "round=Math.round;\n"
-                     "sin=Math.sin;\n"
-                     "sqrt=Math.sqrt;\n"
-                     "tan=Math.tan;\n"
-
-                     "%3\n");
-    equation = equation.arg(U).arg(this->hallProbeI).arg(_equationB_);
-    QScriptValue result(scriptEngine.evaluate(equation));
+    QString eq(eqationBScript.arg(hallProbeI).arg(U).arg(_equationB_));
+    QScriptValue result(scriptEngine.evaluate(eq));
+    if (scriptEngine.hasUncaughtException()) {
+        return NAN;
+    }
     qsreal B(result.toNumber());
     //double B(B1 + sqrt(B2 + B3 * fabs(U / hallProbeI)));
     // alternativní vzorec a čísla
@@ -394,6 +399,15 @@ bool Experiment::open()
     int err;
     QString port;
 
+    _equationB_ = config->hallProbeEquationB(
+                config->selectedSampleHolderName());
+    QString eq(eqationBScript.arg(hallProbeI).arg(0).arg(_equationB_));
+    if (!scriptEngine.canEvaluate(eq)) {
+        return false;
+    }
+
+    _sampleThickness_ = config->sampleThickness();
+
     port = config->msdpPort();
     err = sdp_open(&sdp, port.toLocal8Bit().constData(), SDP_DEV_ADDR_MIN);
     if (err < 0) {
@@ -479,13 +493,12 @@ bool Experiment::open()
             break;
 
         csvFile[0] = "B formula";
-        csvFile[1] = config->hallProbeEquationB(
-                    config->selectedSampleHolderName());
+        csvFile[1] = _equationB_;
         if (!csvFile.write())
             break;
 
         csvFile[0] = "Sample thickness [μm]";
-        csvFile[1] = config->sampleThickness() / sampleThicknessUnits;
+        csvFile[1] = _sampleThickness_ / sampleThicknessUnits;
         if (!csvFile.write())
             break;
 
@@ -627,11 +640,6 @@ double Experiment::sampleI()
     return i;
 }
 
-double Experiment::sampleThickness() const
-{
-    return _sampleThickness_;
-}
-
 void Experiment::setCoilI(double value)
 {
     _coilWantI_ = value;
@@ -654,19 +662,9 @@ void Experiment::setCoilIStep(double val)
     _coilIStep_ = val;
 }
 
-void Experiment::setEquationB(const QString &equation)
-{
-    this->_equationB_ = equation;
-}
-
 void Experiment::setSampleI(double value)
 {
     _sampleI_ = value;
-}
-
-void Experiment::setSampleThickness(double value)
-{
-    _sampleThickness_ = value;
 }
 
 void Experiment::stepRestart(Experiment *this_)

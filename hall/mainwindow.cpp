@@ -280,7 +280,6 @@ void MainWindow::show()
     ui->coilCurrStepDoubleSpinBox->setValue(config.coilIRangeStep());
     ui->sampleCurrDoubleSpinBox->setValue(config.sampleI());
     experiment.setCoilIStep(ui->coilCurrStepDoubleSpinBox->value());
-    experiment.setSampleThickness(config.sampleThickness());
 
     setWindowTitle(QString("Hall - ") + config.sampleName());
 
