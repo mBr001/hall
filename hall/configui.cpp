@@ -114,7 +114,7 @@ void ConfigUI::on_sampleHolderAddToolButton_clicked()
     if (idx == -1 || ui->sampleHolderComboBox->itemText(idx) != sampleHolderName)
         ui->sampleHolderComboBox->addItem(sampleHolderName);
 
-    ui->hallProbeBEquationLineEdit->setEnabled(true);
+    ui->sampleHolderDeleteToolButton->setEnabled(true);
 }
 
 void ConfigUI::on_sampleHolderComboBox_editTextChanged(const QString &arg1)
