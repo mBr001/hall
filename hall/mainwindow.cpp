@@ -69,7 +69,7 @@ void MainWindow::close()
     config.setCoilIRangeMax(ui->coilCurrMaxDoubleSpinBox->value());
     config.setCoilIRangeMin(ui->coilCurrMinDoubleSpinBox->value());
     config.setCoilIRangeStep(ui->coilCurrStepDoubleSpinBox->value());
-    config.setSampleI(ui->sampleCurrDoubleSpinBox->value());
+    config.setSampleI(ui->sampleCurrDoubleSpinBox->value() * sampleIUnit);
     hide();
     configUI.show();
 }
@@ -269,8 +269,7 @@ void MainWindow::show()
     ui->coilCurrDoubleSpinBox->setValue(val);
     ui->coilPowerCheckBox->setChecked(val != 0);
 
-    ui->sampleCurrDoubleSpinBox->setValue(
-                config.sampleI() / sampleIUnit);
+    ui->sampleCurrDoubleSpinBox->setValue(config.sampleI() / sampleIUnit);
 
     val = experiment.coilMaxI();
     ui->coilCurrDoubleSpinBox->setMaximum(val);
@@ -284,8 +283,7 @@ void MainWindow::show()
     ui->coilCurrMaxDoubleSpinBox->setValue(config.coilIRangeMax());
     ui->coilCurrMinDoubleSpinBox->setValue(config.coilIRangeMin());
     ui->coilCurrStepDoubleSpinBox->setValue(config.coilIRangeStep());
-    ui->sampleCurrDoubleSpinBox->setValue(config.sampleI());
-    experiment.setCoilIStep(ui->coilCurrStepDoubleSpinBox->value());
+    experiment.setCoilIStep(config.coilIRangeStep());
 
     setWindowTitle(QString("Hall - ") + config.sampleName());
 
