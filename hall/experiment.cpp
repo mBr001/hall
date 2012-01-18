@@ -399,10 +399,11 @@ bool Experiment::open()
     int err;
     QString port;
 
-    _equationB_ = config->hallProbeEquationB(
-                config->selectedSampleHolderName());
-    QString eq(eqationBScript.arg(hallProbeI).arg(0).arg(_equationB_));
-    if (!scriptEngine.canEvaluate(eq)) {
+    // just hack to check validity of equation, suppose that for at least one of
+    // { -1, 0, 1 } must provide valid result
+    if (!isfinite(computeB(-1)) && !isfinite(computeB(0)) && !isfinite(computeB(1))) {
+        emit fatalError("Failed to evaluate B equation.",
+                        "Equation for magnetic field intensity evaluation is wrong, please fix it.");
         return false;
     }
 
