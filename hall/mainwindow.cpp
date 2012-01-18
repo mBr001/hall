@@ -33,8 +33,12 @@ MainWindow::MainWindow(QWidget *parent) :
     dataResistivity.reserve(1024);
 
     ui->qwtPlot->enableAxis(QwtPlot::yRight, true);
-    ui->qwtPlot->setAxisTitle(QwtPlot::yRight, tr("(*) Resistivity [Ω]"));
-    ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, "(×) hall U [V]");
+    QString titleTpl("<html><body><span style=\"font-family:'Sans Serif'; font-size:14pt; font-weight:600; font-style:bold;\"><span style=\"%1\">%2</span> %3</span></body></html>");
+    QwtText titleR(titleTpl.arg("color: lime;").arg("*").arg("Resistivity [Ω]"));
+    ui->qwtPlot->setAxisTitle(QwtPlot::yRight, titleR);
+
+    QwtText titleHall(titleTpl.arg("color: red;").arg("×").arg("hall U [V]"));
+    ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, titleHall);
     ui->qwtPlot->setAxisTitle(QwtPlot::xBottom, "B [T]");
     qwtPlotCurveHallU.attach(ui->qwtPlot);
     qwtPlotCurveHallU.setStyle(QwtPlotCurve::NoCurve);
