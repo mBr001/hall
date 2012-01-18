@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QwtSymbol *qwtPlotHallUSymbol = new QwtSymbol(QwtSymbol::XCross);
     qwtPlotHallUSymbol->setColor(QColor(255, 0, 0));
-    qwtPlotHallUSymbol->setSize(QSize(8, 8));
+    qwtPlotHallUSymbol->setSize(QSize(12, 12));
     qwtPlotCurveHallU.setSymbol(qwtPlotHallUSymbol);
 
     qwtPlotCurveResistivity.setYAxis(QwtPlot::yRight);
@@ -50,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QwtSymbol *qwtPlotResistivitySymbol = new QwtSymbol(QwtSymbol::Star1);
     qwtPlotResistivitySymbol->setColor(QColor(0, 255, 0));
-    qwtPlotResistivitySymbol->setSize(QSize(8, 8));
+    qwtPlotResistivitySymbol->setSize(QSize(12, 12));
     qwtPlotCurveResistivity.setSymbol(qwtPlotResistivitySymbol);
 }
 

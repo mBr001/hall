@@ -501,7 +501,6 @@
          <zorder>sweepingProgressBar</zorder>
          <zorder>groupBox</zorder>
          <zorder>groupBox_3</zorder>
-         <zorder>verticalSpacer</zorder>
         </widget>
         <widget class="QWidget" name="tab">
          <attribute name="title">
