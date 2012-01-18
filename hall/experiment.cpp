@@ -32,8 +32,8 @@ const double Experiment::hallProbeIUnits = 1e-3; // mA
 const double Experiment::sampleThicknessUnits = 1e-6; // um
 
 const QString Experiment::eqationBScript(
-                 "I=%2;\n"
-                 "U=%1;\n"
+                 "I=%1;\n"
+                 "U=%2;\n"
 
                  "E=Math.E;\n"
                  "LOG2E=Math.LOG2E;\n"
@@ -172,11 +172,13 @@ double Experiment::coilMaxI()
 
 double Experiment::computeB(double U)
 {
+
     QString eq(eqationBScript.arg(hallProbeI).arg(U).arg(_equationB_));
+    scriptEngine.clearExceptions();
     QScriptValue result(scriptEngine.evaluate(eq));
-    if (scriptEngine.hasUncaughtException()) {
+    if (scriptEngine.hasUncaughtException())
         return NAN;
-    }
+
     qsreal B(result.toNumber());
     //double B(B1 + sqrt(B2 + B3 * fabs(U / hallProbeI)));
     // alternativní vzorec a čísla
@@ -399,11 +401,13 @@ bool Experiment::open()
     int err;
     QString port;
 
+    _equationB_ = config->hallProbeEquationB(config->selectedSampleHolderName());
     // just hack to check validity of equation, suppose that for at least one of
     // { -1, 0, 1 } must provide valid result
     if (!isfinite(computeB(-1)) && !isfinite(computeB(0)) && !isfinite(computeB(1))) {
-        emit fatalError("Failed to evaluate B equation.",
-                        "Equation for magnetic field intensity evaluation is wrong, please fix it.");
+        QString msg("Equation for magnetic field intensity is wrong, please fix it.\n\nerror: %1");
+        emit fatalError("Failed to evaluate B equation",
+                        msg.arg(scriptEngine.uncaughtException().toString()));
         return false;
     }
 
