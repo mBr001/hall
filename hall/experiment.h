@@ -53,7 +53,7 @@ public:
         csvColSampleResSpec,
         csvColSampleRHall,
         csvColSampleDrift,
-        csvColSampleCCarrier,
+        csvColSamplecCarrier,
         csvColResultsEnd,
 
         csvColTime,
@@ -259,7 +259,7 @@ private:
     double _dataB_;
     /** Hall U [V] at B = 0T */
     double _dataDrift_;
-    double _dataHallU0_;
+    QVector<double> dataHallU0Vect;
     double _dataRHall_;
     double _dataResistivity_;
     double _dataResSpec_;
@@ -272,6 +272,7 @@ private:
 
     /** Create path to new file to store measurement data. */
     QString filePath();
+    double hallU0();
 };
 
 #endif // EXPERIMENT_H

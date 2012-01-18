@@ -126,7 +126,6 @@ Experiment::Experiment(Config *config, QObject *parent) :
     measTimer(this),
     _measuring_(false),
     _sweeping_(false),
-    _dataHallU0_(NAN),
     _sampleI_(0)
 {
     this->config = config;
@@ -220,6 +219,13 @@ QString Experiment::filePath()
     QString fileName(dateStr + "_" + nameStr + ".csv");
 
     return QDir(config->dataDirPath()).filePath(fileName);
+}
+
+double Experiment::hallU0()
+{
+    double hallU0(0);
+    foreach(double u, dataHallU0Vect) { hallU0 += u; }
+    return hallU0 / double(dataHallU0Vect.size());
 }
 
 bool Experiment::isMeasuring()
@@ -519,7 +525,7 @@ bool Experiment::open()
         csvFile[csvColSampleResSpec] = "sample\nRspec [ohm*m]";
         csvFile[csvColSampleRHall] = "sample\nRhall [m^3*C^-1]";
         csvFile[csvColSampleDrift] = "sample\ndrift [m^2*V^-1*s^-1]";
-        csvFile[csvColSampleCCarrier] = "carrier conc.\nc [?]";
+        csvFile[csvColSamplecCarrier] = "carrier conc.\nc [?]";
 
         csvFile[csvColTime] = "Time\n(UTC)";
         csvFile[csvColTime].setDateTimeFormat("yyyy-MM-dd hh:mm:ss");
@@ -846,8 +852,8 @@ void Experiment::stepFinish(Experiment *this_)
     double hallU((Uac + Ubd) / 4);
 
     if (this_->_coilWantI_ == 0)
-        this_->_dataHallU0_ = hallU;
-    hallU -= this_->_dataHallU0_;
+        this_->dataHallU0Vect.append(hallU);
+    hallU -= this_->hallU0();
 
     /* Rhall = w * Uh / (B * I) */
     this_->_dataRHall_ = this_->_sampleThickness_ * hallU / this_->_dataB_ / this_->_sampleI_;
