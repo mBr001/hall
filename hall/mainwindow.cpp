@@ -237,7 +237,7 @@ void MainWindow::on_measurePushButton_clicked()
 
 void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
 {
-    experiment.setSampleI(value/sampleIUnit);
+    config.setSampleI(value * sampleIUnit);
 }
 
 void MainWindow::on_startPushButton_clicked()
@@ -263,8 +263,8 @@ void MainWindow::show()
     ui->coilCurrDoubleSpinBox->setValue(val);
     ui->coilPowerCheckBox->setChecked(val != 0);
 
-    val = experiment.sampleI();
-    ui->sampleCurrDoubleSpinBox->setValue(val*sampleIUnit);
+    ui->sampleCurrDoubleSpinBox->setValue(
+                config.sampleI() / sampleIUnit);
 
     val = experiment.coilMaxI();
     ui->coilCurrDoubleSpinBox->setMaximum(val);

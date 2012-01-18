@@ -127,8 +127,6 @@ public:
     void setCoilIRange(double val1, double val2);
     void setCoilIStep(double val);
 
-    double sampleI();
-    void setSampleI(double value);
     /** Lenght of side for square sample [m]. */
     double sampleSize() const;
 

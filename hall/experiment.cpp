@@ -236,6 +236,7 @@ bool Experiment::isMeasuring()
 void Experiment::measure(bool single)
 {
     _measuring_ = true;
+    _sampleI_ = config->sampleI();
 
     _measuringRange_.clear();
     if (!single) {
@@ -643,14 +644,6 @@ double Experiment::readSingle()
     return val;
 }
 
-double Experiment::sampleI()
-{
-    double i;
-    ps6220Dev.current(&i);
-
-    return i;
-}
-
 void Experiment::setCoilI(double value)
 {
     _coilWantI_ = value;
@@ -671,11 +664,6 @@ void Experiment::setCoilIRange(double val1, double val2)
 void Experiment::setCoilIStep(double val)
 {
     _coilIStep_ = val;
-}
-
-void Experiment::setSampleI(double value)
-{
-    _sampleI_ = value;
 }
 
 void Experiment::stepRestart(Experiment *this_)
