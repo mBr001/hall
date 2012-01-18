@@ -4,19 +4,29 @@
 const char Config::cfg_coilIRangeMax[] = "coil I range max";
 const char Config::cfg_coilIRangeMin[] = "coil I range min";
 const char Config::cfg_coilIRangeStep[] = "coil I range step";
-const char Config::cfg_dataFileName[] = "experiment/data file name";
-const char Config::cfg_hallProbe[] = "hall probe ";
-const char Config::cfg_hallProbe_equationB[] = "euation B";
+const char Config::cfg_dataDirPath[] = "experiment/data dir path";
+const char Config::cfg_hallProbe_equationB[] = "equation B";
 const char Config::cfg_hp34970Port[] = "experiment/HP34970 port";
 const char Config::cfg_msdpPort[] = "experiment/coil PS port";
 const char Config::cfg_polSwitchPort[] = "experiment/polarity switch port";
 const char Config::cfg_ps6220Port[] = "experiment/sample PS port";
+const char Config::cfg_sampleHolder_prefix[] = "sample holder ";
 const char Config::cfg_sampleI[] = "sample I";
+const char Config::cfg_sampleName[] = "sample name";
 const char Config::cfg_sampleSize[] = "sample size";
 const char Config::cfg_sampleThickness[] = "sample thickness";
+const char Config::cfg_selectedSampleHolderName[] = "selected sample holder name";
 
 Config::Config()
 {
+}
+
+QString Config::buildSampleHolderKeyPrefix(QString sampleHolderName,
+                                           bool slash)
+{
+    QString s(QString(cfg_sampleHolder_prefix) + sampleHolderName.replace("/", "_"));
+
+    return slash ? (s + "/") : s;
 }
 
 double Config::coilIRangeMax()
@@ -34,35 +44,42 @@ double Config::coilIRangeStep()
     return settings.value(cfg_coilIRangeStep, 0).toDouble();
 }
 
-QString Config::dataFileName()
+QString Config::dataDirPath()
 {
-    return settings.value(cfg_dataFileName, QString()).toString();
+    return settings.value(cfg_dataDirPath, QString()).toString();
 }
 
-void Config::deleteHallProbe(const QString &probeName)
+void Config::deleteSampleHolder(const QString &sampleHolderName)
 {
-    settings.remove(QString(cfg_hallProbe) + probeName);
+    QString keyPrefix(buildSampleHolderKeyPrefix(sampleHolderName));
+
+    foreach(QString key, settings.allKeys()) {
+        if (key.startsWith(keyPrefix))
+            settings.remove(key);
+    }
 }
 
-QString Config::hallProbeEquationB(const QString &probeName)
+QString Config::hallProbeEquationB(const QString &sampleHolderName)
 {
-    settings.beginGroup(QString(cfg_hallProbe) + probeName);
+    settings.beginGroup(buildSampleHolderKeyPrefix(sampleHolderName, false));
     QString equation(settings.value(cfg_hallProbe_equationB, "").toString());
     settings.endGroup();
 
     return equation;
 }
 
-QStringList Config::hallProbes()
+QStringList Config::sampleHolders()
 {
     QStringList hallProbes;
 
     foreach(QString key, settings.allKeys()) {
-        if (key.startsWith(cfg_hallProbe)) {
-            hallProbes.append(key.right(key.size() - sizeof(cfg_hallProbe) + 1));
+        if (key.startsWith(cfg_sampleHolder_prefix)) {
+            const int from(sizeof(cfg_sampleHolder_prefix) - 1);
+            hallProbes.append(key.mid(from, key.indexOf(QChar('/'), from) - from));
         }
     }
 
+    hallProbes.removeDuplicates();
     return hallProbes;
 }
 
@@ -91,9 +108,19 @@ double Config::sampleI()
     return settings.value(cfg_sampleI, 0).toDouble();
 }
 
+QString Config::sampleName()
+{
+    return settings.value(cfg_sampleName).toString();
+}
+
 double Config::sampleThickness()
 {
     return settings.value(cfg_sampleThickness, 0).toDouble();
+}
+
+QString Config::selectedSampleHolderName()
+{
+    return settings.value(cfg_selectedSampleHolderName).toString();
 }
 
 void Config::setCoilIRangeMax(double IMax)
@@ -111,14 +138,14 @@ void Config::setCoilIRangeStep(double IStep)
     settings.setValue(cfg_coilIRangeStep, IStep);
 }
 
-void Config::setDataFileName(const QString &port)
+void Config::setDataDirPath(const QString &dirPath)
 {
-    settings.setValue(cfg_dataFileName, port);
+    settings.setValue(cfg_dataDirPath, dirPath);
 }
 
-void Config::setHallProbeEquationB(const QString &probeName, const QString &equation)
+void Config::setHallProbeEquationB(const QString &sampleHolderName, const QString &equation)
 {
-    settings.beginGroup(QString(cfg_hallProbe) + probeName);
+    settings.beginGroup(buildSampleHolderKeyPrefix(sampleHolderName));
     settings.setValue(cfg_hallProbe_equationB, equation);
     settings.endGroup();
 }
@@ -148,7 +175,17 @@ void Config::setSampleI(double I)
     settings.setValue(cfg_sampleI, I);
 }
 
+void Config::setSampleName(const QString & sampleName)
+{
+    settings.setValue(cfg_sampleName, sampleName);
+}
+
 void Config::setSampleThickness(double thickness)
 {
     settings.setValue(cfg_sampleThickness, thickness);
+}
+
+void Config::setSelectedSampleHolderName(const QString &sampleHolderName)
+{
+    settings.setValue(cfg_selectedSampleHolderName, sampleHolderName);
 }

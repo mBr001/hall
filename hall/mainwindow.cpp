@@ -5,14 +5,13 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-const double sampleIUnit = 1000.;
-const double sampleThicknessUnit = 1000000.;
+const double MainWindow::sampleIUnit = .001;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     config(),
-    configUI(),
-    experiment(this),
+    configUI(&config),
+    experiment(&config, this),
     dataB(),
     dataHallU(),
     dataResistivity(),
@@ -53,8 +52,6 @@ MainWindow::MainWindow(QWidget *parent) :
     qwtPlotResistivitySymbol->setColor(QColor(0, 255, 0));
     qwtPlotResistivitySymbol->setSize(QSize(8, 8));
     qwtPlotCurveResistivity.setSymbol(qwtPlotResistivitySymbol);
-
-    ui->hallProbeNameComboBox->addItems(config.hallProbes());
 }
 
 MainWindow::~MainWindow()
@@ -69,7 +66,6 @@ void MainWindow::close()
     config.setCoilIRangeMin(ui->coilCurrMinDoubleSpinBox->value());
     config.setCoilIRangeStep(ui->coilCurrStepDoubleSpinBox->value());
     config.setSampleI(ui->sampleCurrDoubleSpinBox->value());
-    config.setSampleThickness(ui->sampleThicknessDoubleSpinBox->value()/sampleThicknessUnit);
     hide();
     configUI.show();
 }
@@ -101,7 +97,6 @@ void MainWindow::measure(bool single)
     experiment.measure(single);
     ui->coilGroupBox->setEnabled(false);
     ui->measurePushButton->setEnabled(false);
-    ui->sampleGroupBox->setEnabled(false);
     ui->startPushButton->setText("Abort");
 }
 
@@ -219,7 +214,6 @@ void MainWindow::on_experiment_measured(double B, double hallU, double resistivi
 void MainWindow::on_experiment_measurementCompleted()
 {
     ui->coilGroupBox->setEnabled(true);
-    ui->sampleGroupBox->setEnabled(true);
     ui->measurePushButton->setEnabled(true);
     ui->startPushButton->setText("Start");
 }
@@ -237,53 +231,9 @@ void MainWindow::on_measurePushButton_clicked()
     measure(true);
 }
 
-void MainWindow::on_hallProbeDeleteToolButton_clicked()
-{
-    QString name(ui->hallProbeNameComboBox->currentText());
-    int idx(ui->hallProbeNameComboBox->findText(name));
-
-    if (idx != -1) {
-        ui->hallProbeNameComboBox->removeItem(idx);
-    }
-    config.deleteHallProbe(name);
-}
-
-void MainWindow::on_hallProbeSaveToolButton_clicked()
-{
-    QString equation(ui->hallProbeEquationBLineEdit->text());
-    QString name(ui->hallProbeNameComboBox->currentText());
-
-    if (ui->hallProbeNameComboBox->findText(name) == -1) {
-        ui->hallProbeNameComboBox->addItem(name);
-    }
-
-    config.setHallProbeEquationB(name, equation);
-
-    experiment.setEquationB(equation);
-}
-
-void MainWindow::on_hallProbeNameComboBox_currentIndexChanged(const QString &currentText)
-{
-    QString equation(config.hallProbeEquationB(currentText));
-
-    ui->hallProbeEquationBLineEdit->setText(equation);
-
-    experiment.setEquationB(equation);
-}
-
 void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
 {
     experiment.setSampleI(value/sampleIUnit);
-}
-
-void MainWindow::on_sampleNameLineEdit_editingFinished()
-{
-    experiment.setSampleName(ui->sampleNameLineEdit->text());
-}
-
-void MainWindow::on_sampleThicknessDoubleSpinBox_valueChanged(double value)
-{
-    experiment.setSampleThickness(value/sampleThicknessUnit);
 }
 
 void MainWindow::on_startPushButton_clicked()
@@ -325,8 +275,11 @@ void MainWindow::show()
     ui->coilCurrMinDoubleSpinBox->setValue(config.coilIRangeMin());
     ui->coilCurrStepDoubleSpinBox->setValue(config.coilIRangeStep());
     ui->sampleCurrDoubleSpinBox->setValue(config.sampleI());
-    ui->sampleThicknessDoubleSpinBox->setValue(config.sampleThickness()*sampleThicknessUnit);
     experiment.setCoilIStep(ui->coilCurrStepDoubleSpinBox->value());
+    experiment.setSampleThickness(config.sampleThickness());
+
+    setWindowTitle(QString("Hall - ") + config.sampleName());
+
     QWidget::show();
 }
 

@@ -115,7 +115,7 @@ public:
     /** 34903A: hall probe - pin 2 <-> current source (+) */
     static const int _34903A_hall_probe_2_pwr_p;
 
-    explicit Experiment(QObject *parent = 0);
+    explicit Experiment(Config *config, QObject *parent = 0);
 
     /** Check all set values.
       *
@@ -138,8 +138,6 @@ public:
 
     double sampleI();
     void setSampleI(double value);
-    const QString &sampleName();
-    void setSampleName(const QString &id);
     /** Lenght of side for square sample [m]. */
     double sampleSize() const;
     double sampleThickness() const;
@@ -265,7 +263,7 @@ private:
     QString _equationB_;
     double _coilIRangeBottom_, _coilIRangeTop_;
     double _coilMaxI_;
-    Config config;
+    Config *config;
     double dataUcd, dataUcdRev, dataUda, dataUdaRev;
     double dataUac, dataUacRev, dataUbd, dataUbdRev;
     double _dataB_;
@@ -278,9 +276,11 @@ private:
     /** I for hall probe to measure B. */
     static const double hallProbeI;
     double _sampleI_;
-    QString _sampleName_;
     double _sampleSize_;
     double _sampleThickness_;
+
+    /** Create path to new file to store measurement data. */
+    QString filePath();
 };
 
 #endif // EXPERIMENT_H

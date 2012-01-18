@@ -82,7 +82,7 @@ Experiment::Steps_t::Steps_t(const Step_t *begin, const Step_t *end)
     }
 }
 
-Experiment::Experiment(QObject *parent) :
+Experiment::Experiment(Config *config, QObject *parent) :
     QObject(parent),
     _coilIStep_(NAN),
     coilTimer(this),
@@ -94,6 +94,8 @@ Experiment::Experiment(QObject *parent) :
     _sampleI_(0),
     _sampleSize_(0)
 {
+    this->config = config;
+
     coilTimer.setObjectName("coilTimer");
     coilTimer.setInterval(currentDwell);
     coilTimer.setSingleShot(false);
@@ -197,6 +199,18 @@ int Experiment::ETA()
     int t_sample = 0;
     // TODO
     return t_coil_swepping + t_sample;
+}
+
+QString Experiment::filePath()
+{
+    QString dateStr(QDateTime::currentDateTimeUtc()
+                    .toString(Qt::ISODate)
+                    .replace(":", "."));
+    QString nameStr(config->sampleName()
+                    .replace(QRegExp("[*-/\\@#$%^&()=\"\'!§?<>`;]"), "_"));
+    QString fileName(dateStr + "_" + nameStr);
+
+    return QDir(config->dataDirPath()).filePath(fileName);
 }
 
 bool Experiment::isMeasuring()
@@ -378,7 +392,7 @@ bool Experiment::open()
     int err;
     QString port;
 
-    port = config.msdpPort();
+    port = config->msdpPort();
     err = sdp_open(&sdp, port.toLocal8Bit().constData(), SDP_DEV_ADDR_MIN);
     if (err < 0) {
         emit fatalError("Manson SDP power supply open failed",
@@ -438,8 +452,7 @@ bool Experiment::open()
     if (!lcd_info.output)
         _coilWantI_ = 0;
 
-    /* Data file preparation. */
-    if (!csvFile.open(config.dataFileName())) {
+    if (!csvFile.open(filePath())) {
         emit fatalError("Failed to open data file",
                         csvFile.errorString());
         goto err_sdp;
@@ -480,7 +493,7 @@ bool Experiment::open()
     }
 
     // Open polarity switch device
-    port = config.polSwitchPort();
+    port = config->polSwitchPort();
     if (!pwrPolSwitch.open(port.toLocal8Bit().constData())) {
         err = errno;
         emit fatalError("Failed to open coil polarity switch port",
@@ -493,7 +506,7 @@ bool Experiment::open()
     }
 
     // Open sample power source
-    if (!ps6220Dev.open(config.ps6220Port(), QSerial::Baude19200))
+    if (!ps6220Dev.open(config->ps6220Port(), QSerial::Baude19200))
     {
         emit fatalError("Failed to open sample power supply (Keithaly 6220)",
                         ps6220Dev.errorString());
@@ -507,7 +520,7 @@ bool Experiment::open()
     }
 
     // Open and setup HP34970 device
-    if (!hp34970Dev.open(config.hp34970Port())) {
+    if (!hp34970Dev.open(config->hp34970Port())) {
         emit fatalError("Failed to open HP34970 device", hp34970Dev.errorString());
         goto err_ps6220dev;
     }
@@ -579,11 +592,6 @@ double Experiment::sampleI()
     return i;
 }
 
-const QString &Experiment::sampleName()
-{
-    return _sampleName_;
-}
-
 double Experiment::sampleThickness() const
 {
     return _sampleThickness_;
@@ -619,11 +627,6 @@ void Experiment::setEquationB(const QString &equation)
 void Experiment::setSampleI(double value)
 {
     _sampleI_ = value;
-}
-
-void Experiment::setSampleName(const QString &id)
-{
-    _sampleName_ = id;
 }
 
 void Experiment::setSampleThickness(double value)
@@ -833,7 +836,7 @@ void Experiment::stepFinish(Experiment *this_)
     this_->csvFile[csvColBFormula] = this_->_equationB_;
     this_->csvFile[csvColSampleThickness] = this_->_sampleThickness_ * 1.e6;
     this_->csvFile[csvColSampleSize] = this_->_sampleSize_;
-    this_->csvFile[csvColSampleName] = this_->_sampleName_;
+    this_->csvFile[csvColSampleName] = this_->config->sampleName();
     this_->csvFile[csvColCoilI] = this_->_coilWantI_;
     this_->csvFile.write();
 }

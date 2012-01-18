@@ -13,18 +13,27 @@ class ConfigUI : public QDialog
     Q_OBJECT
 
 public:
-    explicit ConfigUI(QWidget *parent = 0);
+    explicit ConfigUI(Config *config, QWidget *parent = 0);
     ~ConfigUI();
+
+protected:
+    static QStringList listParalelPorts();
 
 private slots:
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
-    void on_fileNameToolButton_clicked();
+    void on_dirPathToolButton_clicked();
+    void on_sampleHolderAddToolButton_clicked();
+    void on_sampleHolderDeleteToolButton_clicked();
+    void on_sampleHolderComboBox_editTextChanged(const QString &arg1);
+    void on_sampleHolderComboBox_currentIndexChanged(const QString &arg1);
 
 private:
-
     Ui::ConfigUI *ui;
-    Config config;
+    Config *config;
+
+    static const double sampleThicknessUnit;
+    static const double sampleIUnit;
 };
 
 #endif // CONFIGUI_H

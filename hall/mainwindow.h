@@ -35,13 +35,8 @@ private slots:
                                 double resistivitySpec, double errAsymetry, double errShottky);
     void on_experiment_measurementCompleted();
     void on_experiment_sweepingCompleted();
-    void on_hallProbeDeleteToolButton_clicked();
-    void on_hallProbeNameComboBox_currentIndexChanged(const QString &arg1);
-    void on_hallProbeSaveToolButton_clicked();
     void on_measurePushButton_clicked();
     void on_sampleCurrDoubleSpinBox_valueChanged(double );
-    void on_sampleNameLineEdit_editingFinished();
-    void on_sampleThicknessDoubleSpinBox_valueChanged(double );
     void on_startPushButton_clicked();
 
 private:
@@ -63,6 +58,8 @@ private:
     void close();
     /** Start prepared measurement steps. */
     void measure(bool single);
+
+    static const double sampleIUnit;
 };
 
 #endif // MAINWINDOW_H
