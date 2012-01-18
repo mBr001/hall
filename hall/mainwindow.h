@@ -32,7 +32,8 @@ private slots:
     void on_coilPowerCheckBox_toggled(bool checked);
     void on_experiment_fatalError(const QString &errorShort, const QString &errorLong);
     void on_experiment_measured(double B, double hallU, double resistivity,
-                                double resistivitySpec, double errAsymetry, double errShottky);
+                                double resistivitySpec, double n,
+                                double errAsymetry, double errShottky);
     void on_experiment_measurementCompleted();
     void on_experiment_sweepingCompleted();
     void on_measurePushButton_clicked();

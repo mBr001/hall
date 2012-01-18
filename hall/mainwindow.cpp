@@ -164,7 +164,8 @@ void MainWindow::on_experiment_fatalError(const QString &errorShort, const QStri
 }
 
 void MainWindow::on_experiment_measured(double B, double hallU, double resistivity,
-                                        double resistivitySpec, double errAsymentry, double errShottky)
+                                        double resistivitySpec, double n,
+                                        double errAsymentry, double errShottky)
 {
     ui->dataTableWidget->insertRow(0);
 
@@ -181,8 +182,15 @@ void MainWindow::on_experiment_measured(double B, double hallU, double resistivi
     ui->dataTableWidget->setItem(
                 0, 5, new QTableWidgetItem(QVariant(round(errShottky * 1000.) / 10.).toString()));
 
-    bool nanInData(false);
-    if (!isnan(B)) {
+    if (isfinite(n)) {
+        QString nStr("%1");
+
+        ui->carriercLineEdit->setText(nStr.arg(n, 0, 'E', 3));
+    } else {
+        ui->carriercLineEdit->setText("N/A");
+    }
+
+    if (isfinite(B)) {
         ui->coilBDoubleSpinBox->setValue(B);
 
         if (dataB.size() == dataB.capacity()) {
@@ -194,8 +202,6 @@ void MainWindow::on_experiment_measured(double B, double hallU, double resistivi
         }
 
         // TODO: skip NAN data from ploting
-        nanInData |= isnan(hallU);
-        nanInData |= isnan(resistivity);
 
         dataB.append(B);
         dataHallU.append(hallU);
@@ -208,11 +214,11 @@ void MainWindow::on_experiment_measured(double B, double hallU, double resistivi
         qwtPlotCurveHallU.setRawSamples(dataX, dataHallU.constData(), dataSize);
         ui->qwtPlot->replot();
     }
-    else
-        nanInData = true;
-
-    if(nanInData)
+    else {
+        ui->coilBDoubleSpinBox->setValue(
+                    ui->coilBDoubleSpinBox->minimum());
         ui->statusBar->showMessage("Warning: NAN in data found! ", 5000);
+    }
 }
 
 void MainWindow::on_experiment_measurementCompleted()

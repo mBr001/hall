@@ -237,7 +237,9 @@ signals:
       * before open and might be emited asynchronously by timmed operations.
       */
     void fatalError(const QString &errorShort, const QString &errorLong);
-    void measured(double B, double hallU, double resistivity, double resistivitySpec, double errAsymetry, double errShottky);
+    void measured(double B, double hallU, double resistivity,
+                  double resistivitySpec, double n,
+                  double errAsymetry, double errShottky);
     void measurementCompleted();
     void sweepingCompleted();
 
@@ -257,22 +259,25 @@ private:
     double _dataB_;
     /** Hall U [V] at B = 0T */
     double _dataDrift_;
-    QVector<double> dataHallU0Vect;
+    QVector<double> dataB;
+    QVector<double> dataHallUVec;
+    QVector<double> dataResistivity;
     double _dataRHall_;
     double _dataResistivity_;
     double _dataResSpec_;
     /** I for hall probe to measure B. */
     static const double hallProbeI;
     static const double hallProbeIUnits;
+    /** Elementar charge, charge of single electron. */
+    static const double q;
     double _sampleI_;
     double _sampleThickness_;
     static const double sampleThicknessUnits;
 
     /** Create path to new file to store measurement data. */
     QString filePath();
-    std::pair<double, double> linRegress(const QVector<double> &x,
+    static std::pair<double, double> linRegress(const QVector<double> &x,
                                          const QVector<double> &y);
-    double hallU0();
 };
 
 #endif // EXPERIMENT_H

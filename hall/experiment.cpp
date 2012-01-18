@@ -29,6 +29,7 @@ const int Experiment::_34903A_hall_probe_2_pwr_p = _34903A + 10;
 
 const double Experiment::hallProbeI = 0.001;
 const double Experiment::hallProbeIUnits = 1e-3; // mA
+const double Experiment::q = 1.602176565e-19; // e- [C]
 const double Experiment::sampleThicknessUnits = 1e-6; // um
 
 const QString Experiment::eqationBScript(
@@ -221,13 +222,6 @@ QString Experiment::filePath()
     return QDir(config->dataDirPath()).filePath(fileName);
 }
 
-double Experiment::hallU0()
-{
-    double hallU0(0);
-    foreach(double u, dataHallU0Vect) { hallU0 += u; }
-    return hallU0 / double(dataHallU0Vect.size());
-}
-
 bool Experiment::isMeasuring()
 {
     return _measuring_;
@@ -236,7 +230,7 @@ bool Experiment::isMeasuring()
 std::pair<double, double> Experiment::linRegress(const QVector<double> &x,
                                                  const QVector<double> &y)
 {
-    if (x.size() != y.size())
+    if (x.size() != y.size() || x.size() < 2)
         return std::make_pair<double, double>(NAN, NAN);
 
     double n(x.size());
@@ -549,7 +543,7 @@ bool Experiment::open()
         csvFile[csvColSampleResSpec] = "sample\nRspec [ohm*m]";
         csvFile[csvColSampleRHall] = "sample\nRhall [m^3*C^-1]";
         csvFile[csvColSampleDrift] = "sample\ndrift [m^2*V^-1*s^-1]";
-        csvFile[csvColSamplecCarrier] = "carrier conc.\nc [?]";
+        csvFile[csvColSamplecCarrier] = "carrier conc.\nc [m^-3]";
 
         csvFile[csvColTime] = "Time\n(UTC)";
         csvFile[csvColTime].setDateTimeFormat("yyyy-MM-dd hh:mm:ss");
@@ -862,9 +856,9 @@ void Experiment::stepFinish(Experiment *this_)
       this equation is a bit twinkle because B x I x U orientation in space. */
     double hallU((Uac + Ubd) / 4);
 
-    if (this_->_coilWantI_ == 0)
-        this_->dataHallU0Vect.append(hallU);
-    hallU -= this_->hallU0();
+    this_->dataB.append(this_->_dataB_);
+    this_->dataHallUVec.append(hallU);
+    this_->dataResistivity.append(this_->_dataResistivity_);
 
     /* Rhall = w * Uh / (B * I) */
     this_->_dataRHall_ = this_->_sampleThickness_ * hallU / this_->_dataB_ / this_->_sampleI_;
@@ -873,10 +867,15 @@ void Experiment::stepFinish(Experiment *this_)
     /* um = Rh / (Rs * w) */
     this_->_dataDrift_ = fabs(this_->_dataRHall_ / (this_->_dataResistivity_ * this_->_sampleThickness_));
 
+    std::pair<double, double> a_b(linRegress(this_->dataHallUVec, this_->dataB));
+
+    double n = fabs(this_->_sampleI_ * a_b.first / (q * this_->_sampleThickness_));
+
     this_->csvFile[csvColSampleResistivity] = this_->_dataResistivity_;
     this_->csvFile[csvColSampleResSpec] = this_->_dataResSpec_;
     this_->csvFile[csvColSampleRHall] = this_->_dataRHall_;
     this_->csvFile[csvColSampleDrift] = this_->_dataDrift_;
+    this_->csvFile[csvColSamplecCarrier] = n;
 
     double errAsymetry, errShottky;
 
@@ -886,7 +885,7 @@ void Experiment::stepFinish(Experiment *this_)
                                    std::max(fabs(this_->dataUcd + this_->dataUcdRev) / Ucd,
                                             fabs(this_->dataUda + this_->dataUdaRev) / Uda)));
     emit this_->measured(this_->_dataB_, hallU, this_->_dataResistivity_,
-                         this_->_dataResSpec_, errAsymetry, errShottky);
+                         this_->_dataResSpec_, n, errAsymetry, errShottky);
 
     this_->csvFile[csvColCoilI] = this_->_coilWantI_;
     this_->csvFile.write();
