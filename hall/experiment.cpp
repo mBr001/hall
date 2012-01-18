@@ -257,23 +257,22 @@ void Experiment::measure(bool single)
 
     _measuringRange_.clear();
     if (!single) {
-        _measuringRange_.append(0.);
+        const double eps = 0.0001;
+        _measuringRange_.append(_coilIRangeBottom_);
 
-        double I(_coilIRangeTop_);
-        if (_coilIRangeTop_ > 0.) {
-            for (; I >= 0. && I >= _coilIRangeBottom_; I -= _coilIStep_) {
+        for (int n(1); n; --n) {
+            double I;
+
+            for (I = _coilIRangeBottom_ + _coilIStep_;
+                    I - _coilIRangeTop_<= eps;
+                    I += _coilIStep_)
                 _measuringRange_.append(I);
-            }
-        }
-        //if (I < _coilIRangeBottom_ || I < 0.)
-        //    _measuringRange_.append(std::max(0., _coilIRangeBottom_));
-        if (_coilIRangeBottom_ < 0.) {
-            for (I = _coilIRangeBottom_; I <= 0. && I <= _coilIRangeTop_; I += _coilIStep_) {
+
+            for (I = _coilIRangeTop_ - _coilIStep_;
+                    I - _coilIRangeBottom_ >= -eps;
+                    I -= _coilIStep_)
                 _measuringRange_.append(I);
-            }
         }
-        //if (I > _coilIRangeTop_ || I > 0.)
-        //    _measuringRange_.append(std::min(0., _coilIRangeTop_));
     }
     stepsRunning = Steps_t(
                 stepsMeasure,
@@ -544,6 +543,8 @@ bool Experiment::open()
         csvFile[csvColSampleRHall] = "sample\nRhall [m^3*C^-1]";
         csvFile[csvColSampleDrift] = "sample\ndrift [m^2*V^-1*s^-1]";
         csvFile[csvColSamplecCarrier] = "carrier conc.\nc [m^-3]";
+
+        csvFile[csvColResultsEnd] = "-";
 
         csvFile[csvColTime] = "Time\n(UTC)";
         csvFile[csvColTime].setDateTimeFormat("yyyy-MM-dd hh:mm:ss");

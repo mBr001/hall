@@ -287,7 +287,7 @@ p, li { white-space: pre-wrap; }
            </spacer>
           </item>
           <item row="1" column="0">
-           <widget class="QGroupBox" name="groupBox">
+           <widget class="QGroupBox" name="automaticGroupBox">
             <property name="title">
              <string>Automatic measurement</string>
             </property>
@@ -473,7 +473,7 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item row="0" column="0">
-           <widget class="QGroupBox" name="groupBox_3">
+           <widget class="QGroupBox" name="manualGroupBox">
             <property name="title">
              <string>Manual</string>
             </property>

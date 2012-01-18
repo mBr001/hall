@@ -99,9 +99,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::measure(bool single)
 {
     experiment.measure(single);
-    ui->coilGroupBox->setEnabled(false);
-    ui->measurePushButton->setEnabled(false);
+
+    ui->measurePushButton->setText("Abort");
     ui->startPushButton->setText("Abort");
+
+    ui->automaticGroupBox->setEnabled(false);
+    ui->coilGroupBox->setEnabled(false);
+    ui->manualGroupBox->setEnabled(false);
 }
 
 void MainWindow::on_coilCurrDoubleSpinBox_valueChanged(double value)
@@ -144,12 +148,7 @@ void MainWindow::on_coilPowerCheckBox_toggled(bool checked)
     ui->sweepingProgressBar->setMaximum(0);
     ui->sweepingWidget->setEnabled(true);
 
-    if (checked) {
-        experiment.setCoilI(ui->coilCurrDoubleSpinBox->value());
-    }
-    else {
-        experiment.setCoilI(0);
-    }
+    experiment.setCoilI(checked ? ui->coilCurrDoubleSpinBox->value() : 0.);
 }
 
 void MainWindow::on_experiment_fatalError(const QString &errorShort, const QString &errorLong)
@@ -223,9 +222,15 @@ void MainWindow::on_experiment_measured(double B, double hallU, double resistivi
 
 void MainWindow::on_experiment_measurementCompleted()
 {
+    ui->automaticGroupBox->setEnabled(true);
     ui->coilGroupBox->setEnabled(true);
-    ui->measurePushButton->setEnabled(true);
+    ui->manualGroupBox->setEnabled(true);
+
     ui->startPushButton->setText("Start");
+    ui->measurePushButton->setText("Single measurement");
+
+    ui->coilCurrDoubleSpinBox->setValue(experiment.coilI());
+    ui->coilPowerCheckBox->setChecked(experiment.coilI() != 0.);
 }
 
 void MainWindow::on_experiment_sweepingCompleted()
@@ -238,7 +243,12 @@ void MainWindow::on_experiment_sweepingCompleted()
 
 void MainWindow::on_measurePushButton_clicked()
 {
-    measure(true);
+    if (experiment.isMeasuring()) {
+        experiment.measurementAbort();
+    }
+    else {
+        measure(true);
+    }
 }
 
 void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
@@ -284,6 +294,14 @@ void MainWindow::show()
     ui->coilCurrMinDoubleSpinBox->setValue(config.coilIRangeMin());
     ui->coilCurrStepDoubleSpinBox->setValue(config.coilIRangeStep());
     experiment.setCoilIStep(config.coilIRangeStep());
+
+    ui->automaticGroupBox->setEnabled(true);
+    ui->coilGroupBox->setEnabled(true);
+    ui->manualGroupBox->setEnabled(true);
+    ui->carriercLineEdit->setText("N/A");
+    ui->measurePushButton->setText("Single measurement");
+    ui->startPushButton->setText("Start");
+
 
     setWindowTitle(QString("Hall - ") + config.sampleName());
 
