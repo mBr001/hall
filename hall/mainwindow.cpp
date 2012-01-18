@@ -78,7 +78,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (configUI.isHidden() && configUI.result() == QDialog::Accepted) {
         event->ignore();
-        if (!experiment.coilI() != 0) {
+        if (experiment.coilI() != 0.) {
             if (QMessageBox::warning(
                         this, "Power is still on!",
                         "Power is still on and should be turned (slowly!) "
