@@ -5,6 +5,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+const double MainWindow::carriercUnit = 1e6;
 const double MainWindow::sampleIUnit = .001;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -184,7 +185,7 @@ void MainWindow::on_experiment_measured(double B, double hallU, double resistivi
     if (isfinite(n)) {
         QString nStr("%1");
 
-        ui->carriercLineEdit->setText(nStr.arg(n, 0, 'E', 3));
+        ui->carriercLineEdit->setText(nStr.arg(n * carriercUnit, 0, 'E', 4));
     } else {
         ui->carriercLineEdit->setText("N/A");
     }

@@ -60,6 +60,7 @@ private:
     /** Start prepared measurement steps. */
     void measure(bool single);
 
+    static const double carriercUnit;
     static const double sampleIUnit;
 };
 
