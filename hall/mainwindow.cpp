@@ -168,15 +168,16 @@ void MainWindow::on_experiment_measured(double B, double hallU, double resistivi
                                         double errAsymentry, double errShottky)
 {
     ui->dataTableWidget->insertRow(0);
+    QString e("%1");
 
     ui->dataTableWidget->setItem(
-                0, 0, new QTableWidgetItem(QVariant(B).toString()));
+                0, 0, new QTableWidgetItem(e.arg(B, 0, 'e', 4)));
     ui->dataTableWidget->setItem(
-                0, 1, new QTableWidgetItem(QVariant(hallU).toString()));
+                0, 1, new QTableWidgetItem(e.arg(hallU, 0, 'e', 4)));
     ui->dataTableWidget->setItem(
-                0, 2, new QTableWidgetItem(QVariant(resistivity).toString()));
+                0, 2, new QTableWidgetItem(e.arg(resistivity, 0, 'e', 4)));
     ui->dataTableWidget->setItem(
-                0, 3, new QTableWidgetItem(QVariant(resistivitySpec).toString()));
+                0, 3, new QTableWidgetItem(e.arg(resistivitySpec, 0, 'e', 4)));
     ui->dataTableWidget->setItem(
                 0, 4, new QTableWidgetItem(QVariant(round(errAsymentry * 1000.) / 10.).toString()));
     ui->dataTableWidget->setItem(
