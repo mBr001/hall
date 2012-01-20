@@ -272,6 +272,7 @@ private:
     static const double q;
     double _sampleI_;
     double _sampleThickness_;
+    static const double carriercUnits;
     static const double sampleThicknessUnits;
 
     /** Create path to new file to store measurement data. */

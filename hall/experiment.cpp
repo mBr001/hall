@@ -27,7 +27,8 @@ const int Experiment::_34903A_pwr_sw1_pwr_p = _34903A + 6;
 const int Experiment::_34903A_hall_probe_1_pwr_m = _34903A + 9;
 const int Experiment::_34903A_hall_probe_2_pwr_p = _34903A + 10;
 
-const double Experiment::hallProbeI = 0.001;
+const double Experiment::carriercUnits = 1e6; // cm^-3
+const double Experiment::hallProbeI = 0.001; // 1 mA
 const double Experiment::hallProbeIUnits = 1e-3; // mA
 const double Experiment::q = 1.602176565e-19; // e- [C]
 const double Experiment::sampleThicknessUnits = 1e-6; // um
@@ -542,7 +543,7 @@ bool Experiment::open()
         csvFile[csvColSampleResSpec] = "sample\nRspec [ohm*m]";
         csvFile[csvColSampleRHall] = "sample\nRhall [m^3*C^-1]";
         csvFile[csvColSampleDrift] = "sample\ndrift [m^2*V^-1*s^-1]";
-        csvFile[csvColSamplecCarrier] = "carrier conc.\nc [m^-3]";
+        csvFile[csvColSamplecCarrier] = "carrier conc.\nN [cm^-3]";
 
         csvFile[csvColResultsEnd] = "-";
 
@@ -876,7 +877,7 @@ void Experiment::stepFinish(Experiment *this_)
     this_->csvFile[csvColSampleResSpec] = this_->_dataResSpec_;
     this_->csvFile[csvColSampleRHall] = this_->_dataRHall_;
     this_->csvFile[csvColSampleDrift] = this_->_dataDrift_;
-    this_->csvFile[csvColSamplecCarrier] = n;
+    this_->csvFile[csvColSamplecCarrier] = n * carriercUnits;
 
     double errAsymetry, errShottky;
 
