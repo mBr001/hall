@@ -62,6 +62,7 @@ private:
 
     /** Start prepared measurement steps. */
     void measure(bool single);
+    void reset();
 
     static const double carriercUnit;
     static const double resistivitySpecUnit;

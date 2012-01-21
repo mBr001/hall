@@ -191,7 +191,7 @@ void MainWindow::on_experiment_measured(double B, double hallU, double resistivi
                 0, 8, new QTableWidgetItem(QVariant(round(errShottky * 1000.) / 10.).toString()));
     ui->dataTableWidget->resizeColumnsToContents();
 
-    ui->carriercLineEdit->setText(doubleToString(carrierConc / carriercUnit));
+    //ui->carriercLineEdit->setText(doubleToString(carrierConc / carriercUnit));
 
     if (isfinite(B)) {
         ui->coilBDoubleSpinBox->setValue(B);
@@ -261,6 +261,20 @@ void MainWindow::on_startPushButton_clicked()
     }
 }
 
+void MainWindow::reset()
+{
+    ui->automaticGroupBox->setEnabled(true);
+    ui->coilGroupBox->setEnabled(true);
+    ui->manualGroupBox->setEnabled(true);
+    ui->carriercLineEdit->setText("N/A");
+    ui->resistivityLineEdit->setText("N/A");
+    ui->resistivitySpecLineEdit->setText("N/A");
+    ui->driftLineEdit->setText("N/A");
+    ui->measurePushButton->setText("Single measurement");
+    ui->startPushButton->setText("Start");
+    ui->dataTableWidget->clear();
+}
+
 void MainWindow::show()
 {
     if (!experiment.open())
@@ -288,15 +302,9 @@ void MainWindow::show()
     ui->coilCurrStepDoubleSpinBox->setValue(config.coilIRangeStep());
     experiment.setCoilIStep(config.coilIRangeStep());
 
-    ui->automaticGroupBox->setEnabled(true);
-    ui->coilGroupBox->setEnabled(true);
-    ui->manualGroupBox->setEnabled(true);
-    ui->carriercLineEdit->setText("N/A");
-    ui->measurePushButton->setText("Single measurement");
-    ui->startPushButton->setText("Start");
-
-
     setWindowTitle(QString("Hall - ") + config.sampleName());
+
+    reset();
 
     QWidget::show();
 }
