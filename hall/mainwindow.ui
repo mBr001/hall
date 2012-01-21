@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>832</width>
-    <height>490</height>
+    <width>826</width>
+    <height>499</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -324,7 +324,7 @@ p, li { white-space: pre-wrap; }
            <string>Take snapshot of current measured values.</string>
           </property>
           <property name="text">
-           <string>Single measurement</string>
+           <string>Start manual</string>
           </property>
          </widget>
         </item>
@@ -500,19 +500,6 @@ p, li { white-space: pre-wrap; }
                </item>
               </layout>
              </item>
-             <item row="2" column="3">
-              <spacer name="horizontalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
              <item row="3" column="0">
               <widget class="QLabel" name="label_10">
                <property name="text">
@@ -578,18 +565,88 @@ p, li { white-space: pre-wrap; }
                </property>
               </widget>
              </item>
-             <item row="0" column="3">
-              <spacer name="horizontalSpacer_3">
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="1" rowspan="2">
+           <widget class="QGroupBox" name="groupBox">
+            <property name="title">
+             <string>Experiment setup</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_10">
+             <item row="3" column="0" colspan="3">
+              <spacer name="horizontalSpacer_2">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>400</width>
-                 <height>20</height>
+                 <width>262</width>
+                 <height>155</height>
                 </size>
                </property>
               </spacer>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_25">
+               <property name="text">
+                <string>Sample ID (name)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_26">
+               <property name="text">
+                <string>Sample thickness</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_27">
+               <property name="text">
+                <string>Sample holder</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="sampleNameLineEdit">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLineEdit" name="sampleHolderLineEdit">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QLabel" name="label_32">
+               <property name="text">
+                <string>μm</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QDoubleSpinBox" name="sampleThicknessDoubleSpinBox">
+               <property name="toolTip">
+                <string>Measured value of current passing trought coil.</string>
+               </property>
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+               <property name="buttonSymbols">
+                <enum>QAbstractSpinBox::NoButtons</enum>
+               </property>
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="maximum">
+                <double>9999.989999999999782</double>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>

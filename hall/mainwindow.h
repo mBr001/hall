@@ -67,6 +67,7 @@ private:
     static const double carriercUnit;
     static const double resistivitySpecUnit;
     static const double sampleIUnit;
+    static const double sampleThicknessUnit;
 };
 
 #endif // MAINWINDOW_H

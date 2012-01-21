@@ -8,6 +8,7 @@
 const double MainWindow::carriercUnit = 1e6;
 const double MainWindow::resistivitySpecUnit = 1e-2;
 const double MainWindow::sampleIUnit = .001;
+const double MainWindow::sampleThicknessUnit = 1e-6;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -303,6 +304,9 @@ void MainWindow::show()
     experiment.setCoilIStep(config.coilIRangeStep());
 
     setWindowTitle(QString("Hall - ") + config.sampleName());
+    ui->sampleNameLineEdit->setText(config.sampleName());
+    ui->sampleThicknessDoubleSpinBox->setValue(config.sampleThickness() / sampleThicknessUnit);
+    ui->sampleHolderLineEdit->setText(config.selectedSampleHolderName());
 
     reset();
 

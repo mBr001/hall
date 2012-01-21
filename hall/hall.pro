@@ -32,4 +32,5 @@ HEADERS  += mainwindow.h \
 FORMS    += configui.ui \
     mainwindow.ui
 
-
+OTHER_FILES += \
+    ../TODO
