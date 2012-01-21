@@ -135,6 +135,8 @@ public:
     void measure(bool single = true);
     /** Stop measurement imediately. */
     void measurementAbort();
+    /** Reset experiment status, clear all cached data. */
+    bool reset();
 
     QString HP34970Port();
     void setHP34970Port(QString port);

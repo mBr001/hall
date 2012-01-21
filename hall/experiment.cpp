@@ -606,14 +606,18 @@ bool Experiment::open()
 
     {
         QSCPIDev::Channels_t channels;
-
-        channels << 101 << 102 << 103 << 104 << 114;
+        channels << _34901A_sample_cd
+                 << _34901A_sample_da
+                 << _34901A_sample_bd
+                 << _34901A_sample_ac
+                 << _34901A_hall_probe;
         if (!hp34970Dev.setSense(QSCPIDev::SenseVolt, channels)) {
             emit fatalError("Failed set up HP34970 device", hp34970Dev.errorString());
             goto err_hp34970;
         }
-        // set experiment to well defined idle state, measure B[T]
-        measurementAbort();
+        // set experiment to well defined idle state
+        if (!reset())
+            goto err_hp34970;
 
         coilTimer.start();
 
@@ -661,6 +665,55 @@ double Experiment::readSingle()
         return NAN;
     }
     return val;
+}
+
+bool Experiment::reset()
+{
+    measurementAbort();
+
+    dataB.resize(0);
+    if (!csvFile.write()) {
+        emit fatalError("Failed to write header into data file",
+                    csvFile.errorString());
+        return false;
+    }
+
+    dataHallUVec.resize(0);
+    dataResistivity.resize(0);
+
+    csvFile.resize(0);
+    csvFile.resize(csvColEnd);
+
+    csvFile[csvColHallProbeB] = "Hall probe\nB [T]";
+    csvFile[csvColSampleResistivity] = "sample\nR [ohm]";
+    csvFile[csvColSampleResSpec] = "sample\nRspec [ohm*m]";
+    csvFile[csvColSampleRHall] = "sample\nRhall [m^3*C^-1]";
+    csvFile[csvColSampleDrift] = "sample\ndrift [m^2*V^-1*s^-1]";
+    csvFile[csvColSamplecCarrier] = "carrier conc.\nN [cm^-3]";
+
+    csvFile[csvColResultsEnd] = "-";
+
+    csvFile[csvColTime] = "Time\n(UTC)";
+    csvFile[csvColTime].setDateTimeFormat("yyyy-MM-dd hh:mm:ss");
+    csvFile[csvColHallProbeU] = "Hall probe\nUhp [V]";
+    csvFile[csvColSampleUac] = "sample\nUac [V]";
+    csvFile[csvColSampleUacRev] = "sample\nUac(rev) [V]";
+    csvFile[csvColSampleUbd] = "sample\nUbd [V]";
+    csvFile[csvColSampleUbdRev] = "sample\nUbd(rev) [V]";
+    csvFile[csvColSampleUcd] = "sample\nUcd [V]";
+    csvFile[csvColSampleUcdRev] = "sample\nUcd(rev) [V]";
+    csvFile[csvColSampleUda] = "sample\nUda [V]";
+    csvFile[csvColSampleUdaRev] = "sample\nUda(rev) [V]";
+
+    csvFile[csvColSampleI] = "sample\nI [A]";
+    csvFile[csvColCoilI] = "Coil\nI [A]";
+    if (!csvFile.write()) {
+        emit fatalError("Failed to write header into data file",
+                    csvFile.errorString());
+        return false;
+    }
+
+    return true;
 }
 
 void Experiment::setCoilI(double value)
