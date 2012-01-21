@@ -123,6 +123,9 @@ public:
 
     double coilI();
     double coilMaxI();
+    const QVector<double> &getDataB();
+    const QVector<double> &getDataHallU();
+    const QVector<double> &getDataResistivity();
     void setCoilI(double value);
     void setCoilIRange(double val1, double val2);
     void setCoilIStep(double val);
@@ -262,7 +265,7 @@ private:
     /** Hall U [V] at B = 0T */
     double _dataDrift_;
     QVector<double> dataB;
-    QVector<double> dataHallUVec;
+    QVector<double> dataHallU;
     QVector<double> dataResistivity;
     double _dataRHall_;
     double _dataResistivity_;

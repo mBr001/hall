@@ -14,9 +14,6 @@ MainWindow::MainWindow(QWidget *parent) :
     config(),
     configUI(&config),
     experiment(&config, this),
-    dataB(),
-    dataHallU(),
-    dataResistivity(),
     qwtPlotCurveHallU("Hall U"),
     qwtPlotCurveResistivity("Resistivity"),
     ui(new Ui::MainWindow)
@@ -30,9 +27,6 @@ MainWindow::MainWindow(QWidget *parent) :
                      ui->coilCurrMeasDoubleSpinBox, SLOT(setValue(double)));
     QObject::connect(&experiment, SIGNAL(coilUMeasured(double)),
                      ui->coilVoltMeasDoubleSpinBox, SLOT(setValue(double)));
-    dataB.reserve(1024);
-    dataHallU.reserve(1024);
-    dataResistivity.reserve(1024);
 
     ui->qwtPlot->enableAxis(QwtPlot::yRight, true);
     QString titleTpl("<html><body><span style=\"font-family:'Sans Serif'; font-size:14pt; font-weight:600; font-style:bold;\"><span style=\"%1\">%2</span> %3</span></body></html>");
@@ -202,25 +196,14 @@ void MainWindow::on_experiment_measured(double B, double hallU, double resistivi
     if (isfinite(B)) {
         ui->coilBDoubleSpinBox->setValue(B);
 
-        if (dataB.size() == dataB.capacity()) {
-            int reserve(dataB.capacity() * 2);
-
-            dataB.resize(reserve);
-            dataHallU.resize(reserve);
-            dataResistivity.resize(reserve);
-        }
-
         // TODO: skip NAN data from ploting
 
-        dataB.append(B);
-        dataHallU.append(hallU);
-        dataResistivity.append(resistivity);
-
+        const QVector<double> &dataB(experiment.getDataB());
         const double *dataX = dataB.constData();
         const int dataSize = dataB.size();
         qwtPlotCurveResistivity.setRawSamples(
-                    dataX, dataResistivity.constData(), dataSize);
-        qwtPlotCurveHallU.setRawSamples(dataX, dataHallU.constData(), dataSize);
+                    dataX, experiment.getDataResistivity().constData(), dataSize);
+        qwtPlotCurveHallU.setRawSamples(dataX, experiment.getDataHallU().constData(), dataSize);
         ui->qwtPlot->replot();
     }
     else {

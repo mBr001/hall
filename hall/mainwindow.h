@@ -50,9 +50,6 @@ private:
     /** Experiment driving class. */
     Experiment experiment;
 
-    QVector<double> dataB;
-    QVector<double> dataHallU;
-    QVector<double> dataResistivity;
     QwtPlotCurve qwtPlotCurveHallU;
     QwtPlotCurve qwtPlotCurveResistivity;
 

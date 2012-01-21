@@ -140,6 +140,10 @@ Experiment::Experiment(Config *config, QObject *parent) :
     measTimer.setSingleShot(true);
 
     QMetaObject::connectSlotsByName(this);
+
+    dataB.reserve(1024);
+    dataHallU.reserve(1024);
+    dataResistivity.reserve(1024);
 }
 
 // TODO
@@ -221,6 +225,21 @@ QString Experiment::filePath()
     QString fileName(dateStr + "_" + nameStr + ".csv");
 
     return QDir(config->dataDirPath()).filePath(fileName);
+}
+
+const QVector<double> &Experiment::getDataB()
+{
+    return dataB;
+}
+
+const QVector<double> &Experiment::getDataHallU()
+{
+    return dataHallU;
+}
+
+const QVector<double> &Experiment::getDataResistivity()
+{
+    return dataResistivity;
 }
 
 bool Experiment::isMeasuring()
@@ -678,7 +697,7 @@ bool Experiment::reset()
         return false;
     }
 
-    dataHallUVec.resize(0);
+    dataHallU.resize(0);
     dataResistivity.resize(0);
 
     csvFile.resize(0);
@@ -912,7 +931,7 @@ void Experiment::stepFinish(Experiment *this_)
     double hallU((Uac + Ubd) / 4);
 
     this_->dataB.append(this_->_dataB_);
-    this_->dataHallUVec.append(hallU);
+    this_->dataHallU.append(hallU);
     this_->dataResistivity.append(this_->_dataResistivity_);
 
     /* Rhall = w * Uh / (B * I) */
@@ -922,7 +941,7 @@ void Experiment::stepFinish(Experiment *this_)
     /* um = Rh / (Rs * w) */
     this_->_dataDrift_ = fabs(this_->_dataRHall_ / (this_->_dataResistivity_ * this_->_sampleThickness_));
 
-    std::pair<double, double> a_b(linRegress(this_->dataHallUVec, this_->dataB));
+    std::pair<double, double> a_b(linRegress(this_->dataHallU, this_->dataB));
 
     double carrierConc = fabs(this_->_sampleI_ * a_b.first / (q * this_->_sampleThickness_));
 
