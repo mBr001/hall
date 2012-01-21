@@ -32,7 +32,7 @@ private slots:
     void on_coilPowerCheckBox_toggled(bool checked);
     void on_experiment_fatalError(const QString &errorShort, const QString &errorLong);
     void on_experiment_measured(double B, double hallU, double resistivity,
-                                double resistivitySpec, double n,
+                                double resistivitySpec, double carrierConc,
                                 double errAsymetry, double errShottky);
     void on_experiment_measurementCompleted();
     void on_experiment_sweepingCompleted();
@@ -67,6 +67,7 @@ private:
     void measure(bool single);
 
     static const double carriercUnit;
+    static const double resistivitySpecUnit;
     static const double sampleIUnit;
 };
 

@@ -6,6 +6,7 @@
 #include "ui_mainwindow.h"
 
 const double MainWindow::carriercUnit = 1e6;
+const double MainWindow::resistivitySpecUnit = 1e-2;
 const double MainWindow::sampleIUnit = .001;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -57,6 +58,8 @@ MainWindow::MainWindow(QWidget *parent) :
     qwtPlotResistivitySymbol->setColor(QColor(0, 255, 0));
     qwtPlotResistivitySymbol->setSize(QSize(12, 12));
     qwtPlotCurveResistivity.setSymbol(qwtPlotResistivitySymbol);
+
+    ui->dataTableWidget->resizeColumnsToContents();
 }
 
 MainWindow::~MainWindow()
@@ -169,7 +172,7 @@ void MainWindow::on_experiment_fatalError(const QString &errorShort, const QStri
 }
 
 void MainWindow::on_experiment_measured(double B, double hallU, double resistivity,
-                                        double resistivitySpec, double n,
+                                        double resistivitySpec, double carrierConc,
                                         double errAsymentry, double errShottky)
 {
     ui->dataTableWidget->insertRow(0);
@@ -178,22 +181,23 @@ void MainWindow::on_experiment_measured(double B, double hallU, double resistivi
                 0, 0, new QTableWidgetItem(doubleToString(B)));
     ui->dataTableWidget->setItem(
                 0, 1, new QTableWidgetItem(doubleToString(hallU)));
-
+    ui->dataTableWidget->setItem(
+                0, 2, new QTableWidgetItem(doubleToString(config.sampleI() / sampleIUnit)));
     ui->dataTableWidget->setItem(
                 0, 3, new QTableWidgetItem(doubleToString(resistivity)));
     ui->dataTableWidget->setItem(
-                0, 4, new QTableWidgetItem(doubleToString(resistivitySpec)));
-
+                0, 4, new QTableWidgetItem(doubleToString(resistivitySpec / resistivitySpecUnit)));
+    ui->dataTableWidget->setItem(
+                0, 5, new QTableWidgetItem(doubleToString(carrierConc / carriercUnit)));
+    ui->dataTableWidget->setItem(
+                0, 6, new QTableWidgetItem("N/A"));
     ui->dataTableWidget->setItem(
                 0, 7, new QTableWidgetItem(QVariant(round(errAsymentry * 1000.) / 10.).toString()));
     ui->dataTableWidget->setItem(
                 0, 8, new QTableWidgetItem(QVariant(round(errShottky * 1000.) / 10.).toString()));
+    ui->dataTableWidget->resizeColumnsToContents();
 
-    if (isfinite(n)) {
-        ui->carriercLineEdit->setText(doubleToString(n * carriercUnit));
-    } else {
-        ui->carriercLineEdit->setText("N/A");
-    }
+    ui->carriercLineEdit->setText(doubleToString(carrierConc / carriercUnit));
 
     if (isfinite(B)) {
         ui->coilBDoubleSpinBox->setValue(B);

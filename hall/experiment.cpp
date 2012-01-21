@@ -871,13 +871,13 @@ void Experiment::stepFinish(Experiment *this_)
 
     std::pair<double, double> a_b(linRegress(this_->dataHallUVec, this_->dataB));
 
-    double n = fabs(this_->_sampleI_ * a_b.first / (q * this_->_sampleThickness_));
+    double carrierConc = fabs(this_->_sampleI_ * a_b.first / (q * this_->_sampleThickness_));
 
     this_->csvFile[csvColSampleResistivity] = this_->_dataResistivity_;
     this_->csvFile[csvColSampleResSpec] = this_->_dataResSpec_;
     this_->csvFile[csvColSampleRHall] = this_->_dataRHall_;
     this_->csvFile[csvColSampleDrift] = this_->_dataDrift_;
-    this_->csvFile[csvColSamplecCarrier] = n * carriercUnits;
+    this_->csvFile[csvColSamplecCarrier] = carrierConc * carriercUnits;
 
     double errAsymetry, errShottky;
 
@@ -887,7 +887,7 @@ void Experiment::stepFinish(Experiment *this_)
                                    std::max(fabs(this_->dataUcd + this_->dataUcdRev) / Ucd,
                                             fabs(this_->dataUda + this_->dataUdaRev) / Uda)));
     emit this_->measured(this_->_dataB_, hallU, this_->_dataResistivity_,
-                         this_->_dataResSpec_, n, errAsymetry, errShottky);
+                         this_->_dataResSpec_, carrierConc, errAsymetry, errShottky);
 
     this_->csvFile[csvColCoilI] = this_->_coilWantI_;
     this_->csvFile.write();
