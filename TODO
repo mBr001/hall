@@ -1,28 +1,19 @@
-- reset experiment (tabulky a dat) při open
-- přidat konstanty
-- formátování čásell na 5 platných míst
 - přidat do tabulky:
-  - carrier conc.
   - pohyblivostb
  - přidat průměry do výstupních dat (výsledn é hodnoty)
    resitivita plošná
-   zduplikovat carrier conc
+   carrier conc
    driftová rychlost (vynechat hodnoty při nulovém poli)
 - přidat vlevo ostatní hodnoty
 - upravit jednotky (koncentrace cm^-3)
-    (ohm cm-3)
      všechno na cm
-- reset čudlík experimentu???
-- přidat měčící proud do tabulky
 - odstranit remaining time
-- nějak lépe rozlišit tlačítka automatického/ručního měření
+- reset experiment (tabulky a dat) při open
+- reset čudlík experimentu???
 - umožnit udělat si nástřel a ten pak nezapočítávat do dat
 
 * experiment settings checking
 * check sign for B
-* check these B equations:
-  * B = -30.558 + sqrt(934.773 + 392.163 * U / I)
-  * B = U/I * (5.97622E-4 + sqrt(U/I) * (1.51394E-6 - 9.24701E-11 * sqrt(U/I))) - 0.015;
 * read power status from parallel port ???
   q := PortIn($379) and 127; q == 0 -> powe is on
 * documentation

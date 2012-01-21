@@ -34,6 +34,7 @@ private slots:
     void on_experiment_fatalError(const QString &errorShort, const QString &errorLong);
     void on_experiment_measured(double B, double hallU, double resistivity,
                                 double resistivitySpec, double carrierConc,
+                                double drift,
                                 double errAsymetry, double errShottky);
     void on_experiment_measurementCompleted();
     void on_experiment_sweepingCompleted();

@@ -959,7 +959,7 @@ void Experiment::stepFinish(Experiment *this_)
                                    std::max(fabs(this_->dataUcd + this_->dataUcdRev) / Ucd,
                                             fabs(this_->dataUda + this_->dataUdaRev) / Uda)));
     emit this_->measured(this_->_dataB_, hallU, this_->_dataResistivity_,
-                         this_->_dataResSpec_, carrierConc, errAsymetry, errShottky);
+                         this_->_dataResSpec_, carrierConc, this_->_dataDrift_, errAsymetry, errShottky);
 
     this_->csvFile[csvColCoilI] = this_->_coilWantI_;
     this_->csvFile.write();

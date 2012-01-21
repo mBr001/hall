@@ -170,6 +170,7 @@ void MainWindow::on_experiment_fatalError(const QString &errorShort, const QStri
 
 void MainWindow::on_experiment_measured(double B, double hallU, double resistivity,
                                         double resistivitySpec, double carrierConc,
+                                        double drift,
                                         double errAsymentry, double errShottky)
 {
     ui->dataTableWidget->insertRow(0);
@@ -187,7 +188,7 @@ void MainWindow::on_experiment_measured(double B, double hallU, double resistivi
     ui->dataTableWidget->setItem(
                 0, 5, new QTableWidgetItem(doubleToString(carrierConc / carriercUnit)));
     ui->dataTableWidget->setItem(
-                0, 6, new QTableWidgetItem("N/A"));
+                0, 6, new QTableWidgetItem(doubleToString(drift)));
     ui->dataTableWidget->setItem(
                 0, 7, new QTableWidgetItem(QVariant(round(errAsymentry * 1000.) / 10.).toString()));
     ui->dataTableWidget->setItem(

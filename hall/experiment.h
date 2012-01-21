@@ -243,7 +243,8 @@ signals:
       */
     void fatalError(const QString &errorShort, const QString &errorLong);
     void measured(double B, double hallU, double resistivity,
-                  double resistivitySpec, double n,
+                  double resistivitySpec, double carrierConc,
+                  double drift,
                   double errAsymetry, double errShottky);
     void measurementCompleted();
     void sweepingCompleted();
