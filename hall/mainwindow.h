@@ -43,8 +43,10 @@ private slots:
 private:
     /** Application configuration. */
     Config config;
+
     /** Configuration dialog. */
     ConfigUI configUI;
+
     /** Experiment driving class. */
     Experiment experiment;
 
@@ -57,6 +59,10 @@ private:
     Ui::MainWindow *ui;
 
     void close();
+
+    /** Print double to string usign app. specific number formating. */
+    QString doubleToString(double x);
+
     /** Start prepared measurement steps. */
     void measure(bool single);
 

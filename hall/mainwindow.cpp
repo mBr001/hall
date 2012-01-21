@@ -97,6 +97,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QMainWindow::closeEvent(event);
 }
 
+QString MainWindow::doubleToString(double x)
+{
+    return QString("%1").arg(x, 0, 'E', 4);
+}
+
 void MainWindow::measure(bool single)
 {
     experiment.measure(single);
@@ -168,25 +173,24 @@ void MainWindow::on_experiment_measured(double B, double hallU, double resistivi
                                         double errAsymentry, double errShottky)
 {
     ui->dataTableWidget->insertRow(0);
-    QString e("%1");
 
     ui->dataTableWidget->setItem(
-                0, 0, new QTableWidgetItem(e.arg(B, 0, 'e', 4)));
+                0, 0, new QTableWidgetItem(doubleToString(B)));
     ui->dataTableWidget->setItem(
-                0, 1, new QTableWidgetItem(e.arg(hallU, 0, 'e', 4)));
+                0, 1, new QTableWidgetItem(doubleToString(hallU)));
+
     ui->dataTableWidget->setItem(
-                0, 2, new QTableWidgetItem(e.arg(resistivity, 0, 'e', 4)));
+                0, 3, new QTableWidgetItem(doubleToString(resistivity)));
     ui->dataTableWidget->setItem(
-                0, 3, new QTableWidgetItem(e.arg(resistivitySpec, 0, 'e', 4)));
+                0, 4, new QTableWidgetItem(doubleToString(resistivitySpec)));
+
     ui->dataTableWidget->setItem(
-                0, 4, new QTableWidgetItem(QVariant(round(errAsymentry * 1000.) / 10.).toString()));
+                0, 7, new QTableWidgetItem(QVariant(round(errAsymentry * 1000.) / 10.).toString()));
     ui->dataTableWidget->setItem(
-                0, 5, new QTableWidgetItem(QVariant(round(errShottky * 1000.) / 10.).toString()));
+                0, 8, new QTableWidgetItem(QVariant(round(errShottky * 1000.) / 10.).toString()));
 
     if (isfinite(n)) {
-        QString nStr("%1");
-
-        ui->carriercLineEdit->setText(nStr.arg(n * carriercUnit, 0, 'E', 4));
+        ui->carriercLineEdit->setText(doubleToString(n * carriercUnit));
     } else {
         ui->carriercLineEdit->setText("N/A");
     }
