@@ -104,21 +104,14 @@ void MainWindow::doStartMeasure(bool single)
 {
     experiment.measure(single);
 
-    ui->startStopAutomaticStackedWidget->setCurrentIndex(STOP_STACK);
-    ui->startStopManualStackedWidget->setCurrentIndex(STOP_STACK);
+    ui->startStopStackedWidget->setCurrentIndex(STOP_STACK);
 
     ui->automaticGroupBox->setEnabled(false);
     ui->coilGroupBox->setEnabled(false);
     ui->manualGroupBox->setEnabled(false);
 }
 
-void MainWindow::on_abortMeasurement1PushButton_clicked()
-{
-    experiment.measurementAbort();
-}
-
-
-void MainWindow::on_abortMeasurement2PushButton_clicked()
+void MainWindow::on_abortMeasurementPushButton_clicked()
 {
     experiment.measurementAbort();
 }
@@ -126,8 +119,7 @@ void MainWindow::on_abortMeasurement2PushButton_clicked()
 void MainWindow::on_coilCurrDoubleSpinBox_valueChanged(double value)
 {
     if (ui->coilPowerCheckBox->isChecked()) {
-        ui->startStopAutomaticStackedWidget->setEnabled(false);
-        ui->startStopManualStackedWidget->setEnabled(false);
+        ui->startStopStackedWidget->setEnabled(false);
         ui->sweepingProgressBar->setMaximum(0);
         ui->sweepingWidget->setEnabled(true);
 
@@ -158,8 +150,7 @@ void MainWindow::on_coilCurrStepDoubleSpinBox_valueChanged(double val)
 
 void MainWindow::on_coilPowerCheckBox_toggled(bool checked)
 {
-    ui->startStopAutomaticStackedWidget->setEnabled(true);
-    ui->startStopManualStackedWidget->setEnabled(true);
+    ui->startStopStackedWidget->setEnabled(true);
     ui->sweepingProgressBar->setMaximum(0);
     ui->sweepingWidget->setEnabled(true);
 
@@ -230,18 +221,14 @@ void MainWindow::on_experiment_measurementCompleted()
     ui->automaticGroupBox->setEnabled(true);
     ui->coilGroupBox->setEnabled(true);
     ui->manualGroupBox->setEnabled(true);
-
-    ui->startStopAutomaticStackedWidget->setCurrentIndex(START_STACK);
-    ui->startStopManualStackedWidget->setCurrentIndex(START_STACK);
-
+    ui->startStopStackedWidget->setCurrentIndex(START_STACK);
     ui->coilCurrDoubleSpinBox->setValue(experiment.coilI());
     ui->coilPowerCheckBox->setChecked(experiment.coilI() != 0.);
 }
 
 void MainWindow::on_experiment_sweepingCompleted()
 {
-    ui->startStopAutomaticStackedWidget->setEnabled(true);
-    ui->startStopManualStackedWidget->setEnabled(true);
+    ui->startStopStackedWidget->setEnabled(true);
     ui->sweepingProgressBar->setMaximum(100);
     ui->sweepingWidget->setEnabled(false);
 }
@@ -268,13 +255,12 @@ void MainWindow::reset()
     ui->automaticGroupBox->setEnabled(true);
     ui->coilGroupBox->setEnabled(true);
     ui->manualGroupBox->setEnabled(true);
-    ui->startStopAutomaticStackedWidget->setCurrentIndex(START_STACK);
-    ui->startStopManualStackedWidget->setCurrentIndex(START_STACK);
+    ui->startStopStackedWidget->setCurrentIndex(START_STACK);
     ui->carriercLineEdit->setText("N/A");
     ui->resistivityLineEdit->setText("N/A");
     ui->resistivitySpecLineEdit->setText("N/A");
     ui->driftLineEdit->setText("N/A");
-    ui->dataTableWidget->clear();
+    ui->dataTableWidget->clearContents();
 }
 
 void MainWindow::show()

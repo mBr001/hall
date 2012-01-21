@@ -25,8 +25,7 @@ public slots:
     void show();
 
 private slots:
-    void on_abortMeasurement1PushButton_clicked();
-    void on_abortMeasurement2PushButton_clicked();
+    void on_abortMeasurementPushButton_clicked();
     void on_coilCurrDoubleSpinBox_valueChanged(double );
     void on_coilCurrMaxDoubleSpinBox_valueChanged(double );
     void on_coilCurrMinDoubleSpinBox_valueChanged(double );

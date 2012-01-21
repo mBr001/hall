@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>782</width>
-    <height>518</height>
+    <width>792</width>
+    <height>542</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -123,6 +123,9 @@
              <property name="text">
               <string>I</string>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
             </widget>
            </item>
            <item row="2" column="0">
@@ -130,12 +133,18 @@
              <property name="text">
               <string>U</string>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
             </widget>
            </item>
            <item row="3" column="0">
             <widget class="QLabel" name="label_7">
              <property name="text">
               <string>B</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
@@ -191,6 +200,9 @@
              <property name="text">
               <string>Carrier c.</string>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
             </widget>
            </item>
            <item row="0" column="2">
@@ -216,6 +228,9 @@ p, li { white-space: pre-wrap; }
              <property name="text">
               <string>R</string>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
             </widget>
            </item>
            <item row="2" column="0">
@@ -223,12 +238,18 @@ p, li { white-space: pre-wrap; }
              <property name="text">
               <string>R Spec.</string>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
             </widget>
            </item>
            <item row="3" column="0">
             <widget class="QLabel" name="label_18">
              <property name="text">
               <string>Drift</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
@@ -319,19 +340,29 @@ p, li { white-space: pre-wrap; }
          </spacer>
         </item>
         <item>
-         <widget class="QStackedWidget" name="startStopManualStackedWidget">
+         <widget class="QStackedWidget" name="startStopStackedWidget">
           <property name="currentIndex">
            <number>0</number>
           </property>
           <widget class="QWidget" name="">
            <layout class="QGridLayout" name="gridLayout_11">
-            <item row="0" column="1">
+            <item row="1" column="1">
              <widget class="QPushButton" name="startManualPushButton">
               <property name="toolTip">
                <string>Take snapshot of current measured values.</string>
               </property>
               <property name="text">
                <string>Start manual</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="startAutomaticPushButton">
+              <property name="toolTip">
+               <string>Start fully automatized measurement.</string>
+              </property>
+              <property name="text">
+               <string>Start automatic</string>
               </property>
              </widget>
             </item>
@@ -353,7 +384,7 @@ p, li { white-space: pre-wrap; }
           <widget class="QWidget" name="">
            <layout class="QGridLayout" name="gridLayout_12">
             <item row="0" column="1">
-             <widget class="QPushButton" name="abortMeasurement1PushButton">
+             <widget class="QPushButton" name="abortMeasurementPushButton">
               <property name="text">
                <string>Abort</string>
               </property>
@@ -404,7 +435,7 @@ p, li { white-space: pre-wrap; }
           <item row="1" column="0">
            <widget class="QGroupBox" name="automaticGroupBox">
             <property name="title">
-             <string>Automatic measurement</string>
+             <string>Automatic</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_8">
              <item row="0" column="2">
@@ -432,12 +463,18 @@ p, li { white-space: pre-wrap; }
                <property name="text">
                 <string>Coil I - from</string>
                </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
               </widget>
              </item>
              <item row="1" column="0">
               <widget class="QLabel" name="label_16">
                <property name="text">
                 <string>Coil I - to</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
@@ -465,6 +502,9 @@ p, li { white-space: pre-wrap; }
               <widget class="QLabel" name="label_11">
                <property name="text">
                 <string>Step</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
@@ -499,6 +539,9 @@ p, li { white-space: pre-wrap; }
                <property name="text">
                 <string>Sample Testing I</string>
                </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
               </widget>
              </item>
              <item row="4" column="1">
@@ -518,67 +561,18 @@ p, li { white-space: pre-wrap; }
                </property>
               </widget>
              </item>
-             <item row="5" column="0" colspan="3">
-              <layout class="QHBoxLayout" name="horizontalLayout_3">
-               <item>
-                <spacer name="horizontalSpacer">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QStackedWidget" name="startStopAutomaticStackedWidget">
-                 <property name="currentIndex">
-                  <number>0</number>
-                 </property>
-                 <widget class="QWidget" name="">
-                  <layout class="QGridLayout" name="gridLayout_13">
-                   <item row="0" column="0">
-                    <widget class="QPushButton" name="startAutomaticPushButton">
-                     <property name="toolTip">
-                      <string>Start fully automatized measurement.</string>
-                     </property>
-                     <property name="text">
-                      <string>Start automatic</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </widget>
-                 <widget class="QWidget" name="">
-                  <layout class="QGridLayout" name="gridLayout_14">
-                   <item row="0" column="0">
-                    <widget class="QPushButton" name="abortMeasurement2PushButton">
-                     <property name="text">
-                      <string>Abort</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </widget>
-                </widget>
-               </item>
-              </layout>
-             </item>
              <item row="3" column="0">
               <widget class="QLabel" name="label_10">
                <property name="text">
                 <string>Repeat</string>
                </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
               </widget>
              </item>
              <item row="3" column="1">
               <widget class="QSpinBox" name="measRepeatSpinBox">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
                <property name="toolTip">
                 <string>Number of measurement cycles/repeats.</string>
                </property>
@@ -648,8 +642,8 @@ p, li { white-space: pre-wrap; }
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>240</width>
-                 <height>173</height>
+                 <width>245</width>
+                 <height>155</height>
                 </size>
                </property>
               </spacer>
@@ -659,6 +653,9 @@ p, li { white-space: pre-wrap; }
                <property name="text">
                 <string>Sample ID (name)</string>
                </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
               </widget>
              </item>
              <item row="1" column="0">
@@ -666,12 +663,18 @@ p, li { white-space: pre-wrap; }
                <property name="text">
                 <string>Sample thickness</string>
                </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
               </widget>
              </item>
              <item row="2" column="0">
               <widget class="QLabel" name="label_27">
                <property name="text">
                 <string>Sample holder</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
