@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>826</width>
-    <height>499</height>
+    <width>782</width>
+    <height>518</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -319,13 +319,61 @@ p, li { white-space: pre-wrap; }
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="measurePushButton">
-          <property name="toolTip">
-           <string>Take snapshot of current measured values.</string>
+         <widget class="QStackedWidget" name="startStopManualStackedWidget">
+          <property name="currentIndex">
+           <number>0</number>
           </property>
-          <property name="text">
-           <string>Start manual</string>
-          </property>
+          <widget class="QWidget" name="">
+           <layout class="QGridLayout" name="gridLayout_11">
+            <item row="0" column="1">
+             <widget class="QPushButton" name="startManualPushButton">
+              <property name="toolTip">
+               <string>Take snapshot of current measured values.</string>
+              </property>
+              <property name="text">
+               <string>Start manual</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="">
+           <layout class="QGridLayout" name="gridLayout_12">
+            <item row="0" column="1">
+             <widget class="QPushButton" name="abortMeasurement1PushButton">
+              <property name="text">
+               <string>Abort</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
        </layout>
@@ -461,9 +509,6 @@ p, li { white-space: pre-wrap; }
                <property name="maximum">
                 <double>100.000000000000000</double>
                </property>
-               <property name="singleStep">
-                <double>0.100000000000000</double>
-               </property>
               </widget>
              </item>
              <item row="4" column="2">
@@ -489,13 +534,35 @@ p, li { white-space: pre-wrap; }
                 </spacer>
                </item>
                <item>
-                <widget class="QPushButton" name="startPushButton">
-                 <property name="toolTip">
-                  <string>Start fully automatized measurement.</string>
+                <widget class="QStackedWidget" name="startStopAutomaticStackedWidget">
+                 <property name="currentIndex">
+                  <number>0</number>
                  </property>
-                 <property name="text">
-                  <string>Start</string>
-                 </property>
+                 <widget class="QWidget" name="">
+                  <layout class="QGridLayout" name="gridLayout_13">
+                   <item row="0" column="0">
+                    <widget class="QPushButton" name="startAutomaticPushButton">
+                     <property name="toolTip">
+                      <string>Start fully automatized measurement.</string>
+                     </property>
+                     <property name="text">
+                      <string>Start automatic</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="">
+                  <layout class="QGridLayout" name="gridLayout_14">
+                   <item row="0" column="0">
+                    <widget class="QPushButton" name="abortMeasurement2PushButton">
+                     <property name="text">
+                      <string>Abort</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
                 </widget>
                </item>
               </layout>
@@ -581,8 +648,8 @@ p, li { white-space: pre-wrap; }
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>262</width>
-                 <height>155</height>
+                 <width>240</width>
+                 <height>173</height>
                 </size>
                </property>
               </spacer>

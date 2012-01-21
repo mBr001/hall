@@ -25,6 +25,8 @@ public slots:
     void show();
 
 private slots:
+    void on_abortMeasurement1PushButton_clicked();
+    void on_abortMeasurement2PushButton_clicked();
     void on_coilCurrDoubleSpinBox_valueChanged(double );
     void on_coilCurrMaxDoubleSpinBox_valueChanged(double );
     void on_coilCurrMinDoubleSpinBox_valueChanged(double );
@@ -36,11 +38,16 @@ private slots:
                                 double errAsymetry, double errShottky);
     void on_experiment_measurementCompleted();
     void on_experiment_sweepingCompleted();
-    void on_measurePushButton_clicked();
     void on_sampleCurrDoubleSpinBox_valueChanged(double );
-    void on_startPushButton_clicked();
+    void on_startAutomaticPushButton_clicked();
+    void on_startManualPushButton_clicked();
 
 private:
+    typedef enum {
+        START_STACK = 0,
+        STOP_STACK = 1
+    } StartStopStack_t;
+
     /** Application configuration. */
     Config config;
 
@@ -61,7 +68,7 @@ private:
     QString doubleToString(double x);
 
     /** Start prepared measurement steps. */
-    void measure(bool single);
+    void doStartMeasure(bool single);
     void reset();
 
     static const double carriercUnit;

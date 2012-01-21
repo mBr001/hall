@@ -100,23 +100,34 @@ QString MainWindow::doubleToString(double x)
     return QString("%1").arg(x, 0, 'E', 4);
 }
 
-void MainWindow::measure(bool single)
+void MainWindow::doStartMeasure(bool single)
 {
     experiment.measure(single);
 
-    ui->measurePushButton->setText("Abort");
-    ui->startPushButton->setText("Abort");
+    ui->startStopAutomaticStackedWidget->setCurrentIndex(STOP_STACK);
+    ui->startStopManualStackedWidget->setCurrentIndex(STOP_STACK);
 
     ui->automaticGroupBox->setEnabled(false);
     ui->coilGroupBox->setEnabled(false);
     ui->manualGroupBox->setEnabled(false);
 }
 
+void MainWindow::on_abortMeasurement1PushButton_clicked()
+{
+    experiment.measurementAbort();
+}
+
+
+void MainWindow::on_abortMeasurement2PushButton_clicked()
+{
+    experiment.measurementAbort();
+}
+
 void MainWindow::on_coilCurrDoubleSpinBox_valueChanged(double value)
 {
     if (ui->coilPowerCheckBox->isChecked()) {
-        ui->measurePushButton->setEnabled(false);
-        ui->startPushButton->setEnabled(false);
+        ui->startStopAutomaticStackedWidget->setEnabled(false);
+        ui->startStopManualStackedWidget->setEnabled(false);
         ui->sweepingProgressBar->setMaximum(0);
         ui->sweepingWidget->setEnabled(true);
 
@@ -147,8 +158,8 @@ void MainWindow::on_coilCurrStepDoubleSpinBox_valueChanged(double val)
 
 void MainWindow::on_coilPowerCheckBox_toggled(bool checked)
 {
-    ui->measurePushButton->setEnabled(false);
-    ui->startPushButton->setEnabled(false);
+    ui->startStopAutomaticStackedWidget->setEnabled(true);
+    ui->startStopManualStackedWidget->setEnabled(true);
     ui->sweepingProgressBar->setMaximum(0);
     ui->sweepingWidget->setEnabled(true);
 
@@ -220,8 +231,8 @@ void MainWindow::on_experiment_measurementCompleted()
     ui->coilGroupBox->setEnabled(true);
     ui->manualGroupBox->setEnabled(true);
 
-    ui->startPushButton->setText("Start");
-    ui->measurePushButton->setText("Single measurement");
+    ui->startStopAutomaticStackedWidget->setCurrentIndex(START_STACK);
+    ui->startStopManualStackedWidget->setCurrentIndex(START_STACK);
 
     ui->coilCurrDoubleSpinBox->setValue(experiment.coilI());
     ui->coilPowerCheckBox->setChecked(experiment.coilI() != 0.);
@@ -229,20 +240,16 @@ void MainWindow::on_experiment_measurementCompleted()
 
 void MainWindow::on_experiment_sweepingCompleted()
 {
-    ui->measurePushButton->setEnabled(true);
-    ui->startPushButton->setEnabled(true);
+    ui->startStopAutomaticStackedWidget->setEnabled(true);
+    ui->startStopManualStackedWidget->setEnabled(true);
     ui->sweepingProgressBar->setMaximum(100);
     ui->sweepingWidget->setEnabled(false);
 }
 
-void MainWindow::on_measurePushButton_clicked()
+void MainWindow::on_startManualPushButton_clicked()
 {
-    if (experiment.isMeasuring()) {
-        experiment.measurementAbort();
-    }
-    else {
-        measure(true);
-    }
+    if (!experiment.isMeasuring())
+        doStartMeasure(true);
 }
 
 void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
@@ -250,16 +257,10 @@ void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
     config.setSampleI(value * sampleIUnit);
 }
 
-void MainWindow::on_startPushButton_clicked()
+void MainWindow::on_startAutomaticPushButton_clicked()
 {
-    if (experiment.isMeasuring()) {
-        experiment.measurementAbort();
-    }
-    else {
-        // TODO
-        //experiment.measurementStartIntervall();
-        measure(false);
-    }
+    if (!experiment.isMeasuring())
+        doStartMeasure(false);
 }
 
 void MainWindow::reset()
@@ -267,12 +268,12 @@ void MainWindow::reset()
     ui->automaticGroupBox->setEnabled(true);
     ui->coilGroupBox->setEnabled(true);
     ui->manualGroupBox->setEnabled(true);
+    ui->startStopAutomaticStackedWidget->setCurrentIndex(START_STACK);
+    ui->startStopManualStackedWidget->setCurrentIndex(START_STACK);
     ui->carriercLineEdit->setText("N/A");
     ui->resistivityLineEdit->setText("N/A");
     ui->resistivitySpecLineEdit->setText("N/A");
     ui->driftLineEdit->setText("N/A");
-    ui->measurePushButton->setText("Single measurement");
-    ui->startPushButton->setText("Start");
     ui->dataTableWidget->clear();
 }
 
