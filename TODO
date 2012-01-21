@@ -1,3 +1,23 @@
+- reset experiment (tabulky a dat) při open
+- přidat konstanty
+- formátování čásell na 5 platných míst
+- přidat do tabulky:
+  - carrier conc.
+  - pohyblivostb
+ - přidat průměry do výstupních dat (výsledn é hodnoty)
+   resitivita plošná
+   zduplikovat carrier conc
+   driftová rychlost (vynechat hodnoty při nulovém poli)
+- přidat vlevo ostatní hodnoty
+- upravit jednotky (koncentrace cm^-3)
+    (ohm cm-3)
+     všechno na cm
+- reset čudlík experimentu???
+- přidat měčící proud do tabulky
+- odstranit remaining time
+- nějak lépe rozlišit tlačítka automatického/ručního měření
+- umožnit udělat si nástřel a ten pak nezapočítávat do dat
+
 * experiment settings checking
 * check sign for B
 * check these B equations:
