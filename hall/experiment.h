@@ -6,6 +6,7 @@
 #include <QScriptEngine>
 
 #include "config.h"
+#include "halldata.h"
 #include "powpolswitch.h"
 #include "../QCSVWriter/qcsvwriter.h"
 #include "../QSCPIDev/qscpidev.h"
@@ -44,6 +45,9 @@ protected:
 
     /** Used to evaluate user equations (B from hall probe U) */
     QScriptEngine scriptEngine;
+
+    HallData hallData;
+    HallData::MeasuredData measuredData;
 
 public:
     /** Indexes of columns in CSV file with data from experiment. */
@@ -117,6 +121,7 @@ public:
       */
     bool checkSettings();
     void close();
+    const HallData &data() const;
     /** Estimated time of arrival, time remaining to end of experiment. */
     int ETA();
     bool open();
@@ -182,7 +187,7 @@ protected:
     bool _sweeping_;
 
     /** Compute B from U on hall probe. */
-    double computeB(double U);
+    double computeB(double I, double U);
     /** Read single value from 34901A. */
     double readSingle();
 
@@ -252,6 +257,12 @@ signals:
 private slots:
     void on_coilTimer_timeout();
     void on_measTimer_timeout();
+    void on_hallData_measurementAcquired(
+        const HallData::MeasuredData &measuredData,
+        HallData::EvaluatedData& evaluatedData);
+    void on_hallData_measurementAdded(
+        const HallData::MeasuredData &measuredData,
+        const HallData::EvaluatedData &evaluatedData);
 
 private:
     /** Script to compute intensity of B from hall probe U and I. */
@@ -260,23 +271,11 @@ private:
     double _coilIRangeBottom_, _coilIRangeTop_;
     double _coilMaxI_;
     Config *config;
-    double dataUcd, dataUcdRev, dataUda, dataUdaRev;
-    double dataUac, dataUacRev, dataUbd, dataUbdRev;
-    double _dataB_;
-    /** Hall U [V] at B = 0T */
-    double _dataDrift_;
-    QVector<double> dataB;
-    QVector<double> dataHallU;
-    QVector<double> dataResistivity;
-    double _dataRHall_;
-    double _dataResistivity_;
-    double _dataResSpec_;
     /** I for hall probe to measure B. */
     static const double hallProbeI;
     static const double hallProbeIUnits;
     /** Elementar charge, charge of single electron. */
     static const double q;
-    double _sampleI_;
     double _sampleThickness_;
     static const double carriercUnits;
     static const double sampleThicknessUnits;

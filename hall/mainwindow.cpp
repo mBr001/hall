@@ -202,12 +202,12 @@ void MainWindow::on_experiment_measured(double B, double hallU, double resistivi
 
         // TODO: skip NAN data from ploting
 
-        const QVector<double> &dataB(experiment.getDataB());
+        const QVector<double> &dataB(experiment.data().B());
         const double *dataX = dataB.constData();
         const int dataSize = dataB.size();
         qwtPlotCurveResistivity.setRawSamples(
-                    dataX, experiment.getDataResistivity().constData(), dataSize);
-        qwtPlotCurveHallU.setRawSamples(dataX, experiment.getDataHallU().constData(), dataSize);
+                    dataX, experiment.data().R().constData(), dataSize);
+        qwtPlotCurveHallU.setRawSamples(dataX, experiment.data().Uhall().constData(), dataSize);
         ui->qwtPlot->replot();
     }
     else {

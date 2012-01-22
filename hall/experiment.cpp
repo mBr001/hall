@@ -122,15 +122,17 @@ Experiment::Steps_t::Steps_t(const Step_t *begin, const Step_t *end)
 
 Experiment::Experiment(Config *config, QObject *parent) :
     QObject(parent),
+    hallData(this),
     _coilIStep_(NAN),
     coilTimer(this),
     _coilWantI_(NAN),
     measTimer(this),
     _measuring_(false),
-    _sweeping_(false),
-    _sampleI_(0)
+    _sweeping_(false)
 {
     this->config = config;
+
+    hallData.setObjectName("hallData");
 
     coilTimer.setObjectName("coilTimer");
     coilTimer.setInterval(currentDwell);
@@ -140,10 +142,6 @@ Experiment::Experiment(Config *config, QObject *parent) :
     measTimer.setSingleShot(true);
 
     QMetaObject::connectSlotsByName(this);
-
-    dataB.reserve(1024);
-    dataHallU.reserve(1024);
-    dataResistivity.reserve(1024);
 }
 
 // TODO
@@ -175,10 +173,9 @@ double Experiment::coilMaxI()
     return _coilMaxI_;
 }
 
-double Experiment::computeB(double U)
+double Experiment::computeB(double I, double U)
 {
-
-    QString eq(eqationBScript.arg(hallProbeI).arg(U).arg(_equationB_));
+    QString eq(eqationBScript.arg(I).arg(U).arg(_equationB_));
     scriptEngine.clearExceptions();
     QScriptValue result(scriptEngine.evaluate(eq));
     if (scriptEngine.hasUncaughtException())
@@ -191,6 +188,11 @@ double Experiment::computeB(double U)
     // A=5.97622E-4 B=1.591394E-6 C=-9.24701E-11 D=-0.015
 
     return B;
+}
+
+const HallData &Experiment::data() const
+{
+    return hallData;
 }
 
 int Experiment::ETA()
@@ -227,21 +229,6 @@ QString Experiment::filePath()
     return QDir(config->dataDirPath()).filePath(fileName);
 }
 
-const QVector<double> &Experiment::getDataB()
-{
-    return dataB;
-}
-
-const QVector<double> &Experiment::getDataHallU()
-{
-    return dataHallU;
-}
-
-const QVector<double> &Experiment::getDataResistivity()
-{
-    return dataResistivity;
-}
-
 bool Experiment::isMeasuring()
 {
     return _measuring_;
@@ -273,7 +260,7 @@ std::pair<double, double> Experiment::linRegress(const QVector<double> &x,
 void Experiment::measure(bool single)
 {
     _measuring_ = true;
-    _sampleI_ = config->sampleI();
+    measuredData.sampleI = config->sampleI();
 
     _measuringRange_.clear();
     if (!single) {
@@ -339,7 +326,7 @@ void Experiment::on_coilTimer_timeout()
         double U(readSingle());
         if (isnan(U))
             return;
-        emit coilBMeasured(computeB(U));
+        emit coilBMeasured(computeB(hallProbeI, U));
     }
 
     // update coil current value
@@ -421,6 +408,88 @@ void Experiment::on_coilTimer_timeout()
     sdp_set_curr(&sdp, fabs(procI));
 }
 
+void Experiment::on_hallData_measurementAcquired(
+    const HallData::MeasuredData &measuredData,
+    HallData::EvaluatedData &evaluatedData)
+{
+    evaluatedData.B = computeB(hallProbeI, measuredData.hallProbeU);
+
+    double Uac(measuredData.sampleUac - measuredData.sampleUacRev);
+    double Ubd(measuredData.sampleUbd - measuredData.sampleUbdRev);
+    double Ucd(measuredData.sampleUcd - measuredData.sampleUcdRev);
+    double Uda(measuredData.sampleUda - measuredData.sampleUdaRev);
+
+    /* Uh = (Uac - Uca + (Ubd - Udb)) / 4    Uh - hall voltage,
+      this equation is a bit twinkle because B x I x U orientation in space. */
+    evaluatedData.Uhall = (Uac + Ubd) / 4;
+
+    double Rdc(Ucd / measuredData.sampleI / 2.);
+    double Rad(Uda / measuredData.sampleI / 2.);
+
+    std::pair<double, double> resisitivity(VanDerPauwSolver::solve(Rdc, Rad));
+    evaluatedData.R = resisitivity.first;
+    evaluatedData.Rspec = resisitivity.first * _sampleThickness_;
+
+    //evaluatedData.B = _dataB_;
+
+    /* Rhall = w * Uh / (B * I) */
+    evaluatedData.Rhall = _sampleThickness_ * evaluatedData.Uhall /
+            (evaluatedData.B * measuredData.sampleI);
+
+    // TODO: check this math
+    /* um = Rh / (Rs * w) */
+    evaluatedData.driftSpeed = fabs(evaluatedData.Rhall / (evaluatedData.R * _sampleThickness_));
+
+    evaluatedData.errAsymetry = fabs(Ucd - Uda) / (Ucd + Uda);
+    double dUac(measuredData.sampleUac + measuredData.sampleUacRev);
+    double dUbd(measuredData.sampleUbd + measuredData.sampleUbdRev);
+    double dUcd(measuredData.sampleUcd + measuredData.sampleUcdRev);
+    double dUda(measuredData.sampleUda + measuredData.sampleUdaRev);
+    evaluatedData.errShottky = std::max(fabs(dUac / Uac),
+                                        std::max(fabs(dUbd) / Ubd,
+                                                 std::max(fabs(dUcd) / Ucd, fabs(dUda) / Uda)));
+}
+
+void Experiment::on_hallData_measurementAdded(
+    const HallData::MeasuredData &measuredData,
+    const HallData::EvaluatedData &evaluatedData)
+{
+    std::pair<double, double> a_b(linRegress(hallData.Uhall(), hallData.B()));
+
+    double carrierConc = fabs(measuredData.sampleI * a_b.first / (q * _sampleThickness_));
+
+    emit measured(evaluatedData.B, evaluatedData.Uhall, evaluatedData.R,
+                  evaluatedData.Rspec, carrierConc, evaluatedData.driftSpeed,
+                  evaluatedData.errAsymetry, evaluatedData.errShottky);
+
+    csvFile[csvColTime] = measuredData.time;
+
+    csvFile[csvColSampleI] = measuredData.sampleI;
+    csvFile[csvColSampleUcd] = measuredData.sampleUcd;
+    csvFile[csvColSampleUcdRev] = measuredData.sampleUcdRev;
+    csvFile[csvColSampleUda] = measuredData.sampleUda;
+    csvFile[csvColSampleUdaRev] = measuredData.sampleUdaRev;
+    csvFile[csvColSampleUac] = measuredData.sampleUac;
+    csvFile[csvColSampleUacRev] = measuredData.sampleUacRev;
+    csvFile[csvColSampleUbd] = measuredData.sampleUbd;
+    csvFile[csvColSampleUbdRev] = measuredData.sampleUbdRev;
+
+    csvFile[csvColHallProbeB] = evaluatedData.B;
+    csvFile[csvColHallProbeU] = measuredData.hallProbeU;
+
+    csvFile[csvColSamplecCarrier] = carrierConc * carriercUnits;
+    csvFile[csvColSampleDrift] = evaluatedData.driftSpeed;
+    csvFile[csvColSampleResistivity] = evaluatedData.R;
+    csvFile[csvColSampleResSpec] = evaluatedData.Rspec;
+    csvFile[csvColSampleRHall] = evaluatedData.Rhall;
+
+    csvFile[csvColCoilI] = _coilWantI_;
+
+    if (!csvFile.write()) {
+        emit fatalError("Failed to write data into file.", csvFile.errorString());
+    }
+}
+
 void Experiment::on_measTimer_timeout()
 {
     if (stepCurrent != stepsRunning.end()) {
@@ -447,7 +516,9 @@ bool Experiment::open()
     _equationB_ = config->hallProbeEquationB(config->selectedSampleHolderName());
     // just hack to check validity of equation, suppose that for at least one of
     // { -1, 0, 1 } must provide valid result
-    if (!isfinite(computeB(-1)) && !isfinite(computeB(0)) && !isfinite(computeB(1))) {
+    if (!isfinite(computeB(0.001, -1)) &&
+            !isfinite(computeB(0.001, 0)) &&
+            !isfinite(computeB(0.001, 1))) {
         QString msg("Equation for magnetic field intensity is wrong, please fix it.\n\nerror: %1");
         emit fatalError("Failed to evaluate B equation",
                         msg.arg(scriptEngine.uncaughtException().toString()));
@@ -527,7 +598,6 @@ bool Experiment::open()
         csvFile[0] = "Hall measurement experimental data";
         if (!csvFile.write())
             break;
-        csvFile.error();
 
         csvFile.resize(2);
         csvFile[0] = "Date";
@@ -552,34 +622,6 @@ bool Experiment::open()
 
         csvFile[0] = "Hall probe I [mA]";
         csvFile[1] = hallProbeI / hallProbeIUnits;
-        if (!csvFile.write())
-            break;
-
-        csvFile.resize(csvColEnd);
-
-        csvFile[csvColHallProbeB] = "Hall probe\nB [T]";
-        csvFile[csvColSampleResistivity] = "sample\nR [ohm]";
-        csvFile[csvColSampleResSpec] = "sample\nRspec [ohm*m]";
-        csvFile[csvColSampleRHall] = "sample\nRhall [m^3*C^-1]";
-        csvFile[csvColSampleDrift] = "sample\ndrift [m^2*V^-1*s^-1]";
-        csvFile[csvColSamplecCarrier] = "carrier conc.\nN [cm^-3]";
-
-        csvFile[csvColResultsEnd] = "-";
-
-        csvFile[csvColTime] = "Time\n(UTC)";
-        csvFile[csvColTime].setDateTimeFormat("yyyy-MM-dd hh:mm:ss");
-        csvFile[csvColHallProbeU] = "Hall probe\nUhp [V]";
-        csvFile[csvColSampleUac] = "sample\nUac [V]";
-        csvFile[csvColSampleUacRev] = "sample\nUac(rev) [V]";
-        csvFile[csvColSampleUbd] = "sample\nUbd [V]";
-        csvFile[csvColSampleUbdRev] = "sample\nUbd(rev) [V]";
-        csvFile[csvColSampleUcd] = "sample\nUcd [V]";
-        csvFile[csvColSampleUcdRev] = "sample\nUcd(rev) [V]";
-        csvFile[csvColSampleUda] = "sample\nUda [V]";
-        csvFile[csvColSampleUdaRev] = "sample\nUda(rev) [V]";
-
-        csvFile[csvColSampleI] = "sample\nI [A]";
-        csvFile[csvColCoilI] = "Coil\nI [A]";
         if (!csvFile.write())
             break;
     } while(false);
@@ -611,7 +653,7 @@ bool Experiment::open()
         goto err_pwr_pol_switch;
     }
 
-    if (!ps6220Dev.current(&_sampleI_)) {
+    if (!ps6220Dev.current(&measuredData.sampleI)) {
         emit fatalError("Failed to get current from Keithaly 6220",
                         ps6220Dev.errorString());
         goto err_ps6220dev;
@@ -689,44 +731,42 @@ double Experiment::readSingle()
 bool Experiment::reset()
 {
     measurementAbort();
+    hallData.clear();
 
-    dataB.resize(0);
-    if (!csvFile.write()) {
-        emit fatalError("Failed to write header into data file",
-                    csvFile.errorString());
-        return false;
-    }
+    do {
+        csvFile.resize(0);
+        if (!csvFile.write())
+            break;
 
-    dataHallU.resize(0);
-    dataResistivity.resize(0);
+        csvFile.resize(csvColEnd);
 
-    csvFile.resize(0);
-    csvFile.resize(csvColEnd);
+        csvFile[csvColHallProbeB] = "Hall probe\nB [T]";
+        csvFile[csvColSampleResistivity] = "sample\nR [ohm]";
+        csvFile[csvColSampleResSpec] = "sample\nRspec [ohm*m]";
+        csvFile[csvColSampleRHall] = "sample\nRhall [m^3*C^-1]";
+        csvFile[csvColSampleDrift] = "sample\ndrift [m^2*V^-1*s^-1]";
+        csvFile[csvColSamplecCarrier] = "carrier conc.\nN [cm^-3]";
 
-    csvFile[csvColHallProbeB] = "Hall probe\nB [T]";
-    csvFile[csvColSampleResistivity] = "sample\nR [ohm]";
-    csvFile[csvColSampleResSpec] = "sample\nRspec [ohm*m]";
-    csvFile[csvColSampleRHall] = "sample\nRhall [m^3*C^-1]";
-    csvFile[csvColSampleDrift] = "sample\ndrift [m^2*V^-1*s^-1]";
-    csvFile[csvColSamplecCarrier] = "carrier conc.\nN [cm^-3]";
+        csvFile[csvColResultsEnd] = "-";
 
-    csvFile[csvColResultsEnd] = "-";
+        csvFile[csvColTime] = "Time\n(UTC)";
+        csvFile[csvColTime].setDateTimeFormat("yyyy-MM-dd hh:mm:ss");
+        csvFile[csvColHallProbeU] = "Hall probe\nUhp [V]";
+        csvFile[csvColSampleUac] = "sample\nUac [V]";
+        csvFile[csvColSampleUacRev] = "sample\nUac(rev) [V]";
+        csvFile[csvColSampleUbd] = "sample\nUbd [V]";
+        csvFile[csvColSampleUbdRev] = "sample\nUbd(rev) [V]";
+        csvFile[csvColSampleUcd] = "sample\nUcd [V]";
+        csvFile[csvColSampleUcdRev] = "sample\nUcd(rev) [V]";
+        csvFile[csvColSampleUda] = "sample\nUda [V]";
+        csvFile[csvColSampleUdaRev] = "sample\nUda(rev) [V]";
 
-    csvFile[csvColTime] = "Time\n(UTC)";
-    csvFile[csvColTime].setDateTimeFormat("yyyy-MM-dd hh:mm:ss");
-    csvFile[csvColHallProbeU] = "Hall probe\nUhp [V]";
-    csvFile[csvColSampleUac] = "sample\nUac [V]";
-    csvFile[csvColSampleUacRev] = "sample\nUac(rev) [V]";
-    csvFile[csvColSampleUbd] = "sample\nUbd [V]";
-    csvFile[csvColSampleUbdRev] = "sample\nUbd(rev) [V]";
-    csvFile[csvColSampleUcd] = "sample\nUcd [V]";
-    csvFile[csvColSampleUcdRev] = "sample\nUcd(rev) [V]";
-    csvFile[csvColSampleUda] = "sample\nUda [V]";
-    csvFile[csvColSampleUdaRev] = "sample\nUda(rev) [V]";
+        csvFile[csvColSampleI] = "sample\nI [A]";
+        csvFile[csvColCoilI] = "Coil\nI [A]";
+        csvFile.write();
+    } while(false);
 
-    csvFile[csvColSampleI] = "sample\nI [A]";
-    csvFile[csvColCoilI] = "Coil\nI [A]";
-    if (!csvFile.write()) {
+    if (csvFile.error() != QFile::NoError) {
         emit fatalError("Failed to write header into data file",
                     csvFile.errorString());
         return false;
@@ -766,8 +806,7 @@ void Experiment::stepRestart(Experiment *this_)
 void Experiment::stepSampleMeas_cd(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUcd = val;
-    this_->csvFile[csvColSampleUcd] = val;
+    this_->measuredData.sampleUcd = val;
 
     this_->ps6220Dev.setOutput(false);
 }
@@ -775,8 +814,7 @@ void Experiment::stepSampleMeas_cd(Experiment *this_)
 void Experiment::stepSampleMeas_cdRev(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUcdRev = val;
-    this_->csvFile[csvColSampleUcdRev] = val;
+    this_->measuredData.sampleUcdRev = val;
 
     this_->ps6220Dev.setOutput(false);
 }
@@ -784,8 +822,7 @@ void Experiment::stepSampleMeas_cdRev(Experiment *this_)
 void Experiment::stepSampleMeas_da(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUda = val;
-    this_->csvFile[csvColSampleUda] = val;
+    this_->measuredData.sampleUda = val;
 
     this_->ps6220Dev.setOutput(false);
 }
@@ -793,8 +830,7 @@ void Experiment::stepSampleMeas_da(Experiment *this_)
 void Experiment::stepSampleMeas_daRev(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUdaRev = val;
-    this_->csvFile[csvColSampleUdaRev] = val;
+    this_->measuredData.sampleUdaRev = val;
 
     this_->ps6220Dev.setOutput(false);
 }
@@ -802,8 +838,7 @@ void Experiment::stepSampleMeas_daRev(Experiment *this_)
 void Experiment::stepSampleMeas_ac(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUac = val;
-    this_->csvFile[csvColSampleUac] = val;
+    this_->measuredData.sampleUac = val;
 
     this_->ps6220Dev.setOutput(false);
 }
@@ -811,8 +846,7 @@ void Experiment::stepSampleMeas_ac(Experiment *this_)
 void Experiment::stepSampleMeas_acRev(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUacRev = val;
-    this_->csvFile[csvColSampleUacRev] = val;
+    this_->measuredData.sampleUacRev = val;
 
     this_->ps6220Dev.setOutput(false);
 }
@@ -820,8 +854,7 @@ void Experiment::stepSampleMeas_acRev(Experiment *this_)
 void Experiment::stepSampleMeas_bd(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUbd = val;
-    this_->csvFile[csvColSampleUbd] = val;
+    this_->measuredData.sampleUbd = val;
 
     this_->ps6220Dev.setOutput(false);
 }
@@ -829,8 +862,7 @@ void Experiment::stepSampleMeas_bd(Experiment *this_)
 void Experiment::stepSampleMeas_bdRev(Experiment *this_)
 {
     double val(this_->readSingle());
-    this_->dataUbdRev = val;
-    this_->csvFile[csvColSampleUbdRev] = val;
+    this_->measuredData.sampleUbdRev = val;
 
     this_->ps6220Dev.setOutput(false);
 }
@@ -857,13 +889,12 @@ void Experiment::stepSampleMeasPrepare_bd(Experiment *this_)
 
 void Experiment::stepSamplePower_mp(Experiment *this_)
 {
-    this_->ps6220Dev.setCurrent(-(this_->_sampleI_));
+    this_->ps6220Dev.setCurrent(-(this_->measuredData.sampleI));
 }
 
 void Experiment::stepSamplePower_pm(Experiment *this_)
 {
-    this_->ps6220Dev.setCurrent(this_->_sampleI_);
-    this_->csvFile[csvColSampleI] = this_->_sampleI_;
+    this_->ps6220Dev.setCurrent(this_->measuredData.sampleI);
 }
 
 void Experiment::stepSamplePower_ba(Experiment *this_)
@@ -912,71 +943,18 @@ void Experiment::stepAbortIfTargetReached(Experiment *this_)
 
 void Experiment::stepFinish(Experiment *this_)
 {
-    // TODO: check B vs -B (B direction)
-
-    double Uac(this_->dataUac - this_->dataUacRev);
-    double Ubd(this_->dataUbd - this_->dataUbdRev);
-    double Ucd(this_->dataUcd - this_->dataUcdRev);
-    double Uda(this_->dataUdaRev - this_->dataUda);
-
-    double Rdc(Ucd / this_->_sampleI_ / 2.);
-    double Rad(Uda / this_->_sampleI_ / 2.);
-
-    std::pair<double, double> resisitivity(VanDerPauwSolver::solve(Rdc, Rad));
-    this_->_dataResistivity_ = resisitivity.first;
-    this_->_dataResSpec_ = resisitivity.first * this_->_sampleThickness_;
-
-    /* Uh = (Uac - Uca + (Ubd - Udb)) / 4    Uh - hall voltage,
-      this equation is a bit twinkle because B x I x U orientation in space. */
-    double hallU((Uac + Ubd) / 4);
-
-    this_->dataB.append(this_->_dataB_);
-    this_->dataHallU.append(hallU);
-    this_->dataResistivity.append(this_->_dataResistivity_);
-
-    /* Rhall = w * Uh / (B * I) */
-    this_->_dataRHall_ = this_->_sampleThickness_ * hallU / this_->_dataB_ / this_->_sampleI_;
-
-    // TODO: check this math
-    /* um = Rh / (Rs * w) */
-    this_->_dataDrift_ = fabs(this_->_dataRHall_ / (this_->_dataResistivity_ * this_->_sampleThickness_));
-
-    std::pair<double, double> a_b(linRegress(this_->dataHallU, this_->dataB));
-
-    double carrierConc = fabs(this_->_sampleI_ * a_b.first / (q * this_->_sampleThickness_));
-
-    this_->csvFile[csvColSampleResistivity] = this_->_dataResistivity_;
-    this_->csvFile[csvColSampleResSpec] = this_->_dataResSpec_;
-    this_->csvFile[csvColSampleRHall] = this_->_dataRHall_;
-    this_->csvFile[csvColSampleDrift] = this_->_dataDrift_;
-    this_->csvFile[csvColSamplecCarrier] = carrierConc * carriercUnits;
-
-    double errAsymetry, errShottky;
-
-    errAsymetry = fabs(Ucd - Uda) / (Ucd + Uda);
-    errShottky = std::max(fabs(this_->dataUac + this_->dataUacRev) / Uac,
-                          std::max(fabs(this_->dataUbd + this_->dataUbdRev) / Ubd,
-                                   std::max(fabs(this_->dataUcd + this_->dataUcdRev) / Ucd,
-                                            fabs(this_->dataUda + this_->dataUdaRev) / Uda)));
-    emit this_->measured(this_->_dataB_, hallU, this_->_dataResistivity_,
-                         this_->_dataResSpec_, carrierConc, this_->_dataDrift_, errAsymetry, errShottky);
-
-    this_->csvFile[csvColCoilI] = this_->_coilWantI_;
-    this_->csvFile.write();
+    this_->hallData.addMeasurement(this_->measuredData);
 }
 
 void Experiment::stepGetTime(Experiment *this_)
 {
-    this_->csvFile[csvColTime] = QDateTime::currentDateTimeUtc();
+    this_->measuredData.time = QDateTime::currentDateTimeUtc();
 }
 
 void Experiment::stepMeasHallProbe(Experiment *this_)
 {
     double val(this_->readSingle());
-
-    this_->csvFile[csvColHallProbeU] = val;
-    this_->_dataB_ = this_->computeB(val);
-    this_->csvFile[csvColHallProbeB] = this_->_dataB_;
+    this_->measuredData.hallProbeU = val;
 
     this_->ps6220Dev.setOutput(false);
 }

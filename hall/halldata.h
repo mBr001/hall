@@ -1,6 +1,7 @@
 #ifndef HALLDATA_H
 #define HALLDATA_H
 
+#include <QDateEdit>
 #include <QObject>
 #include <QVector>
 
@@ -12,11 +13,12 @@ public:
 
     class EvaluatedData {
     public:
-        EvaluatedData();
+        explicit EvaluatedData();
 
         double B;
         double carrierConcentration;
         double driftSpeed;
+        double errAsymetry, errShottky;
         double R;
         double Rhall;
         double Rspec;
@@ -25,25 +27,25 @@ public:
 
     class MeasuredData {
     public:
-        MeasuredData();
+        explicit MeasuredData();
 
-        double hallProbeI, hallProbeU;
+        double hallProbeU;
         double sampleI;
         double sampleUac, sampleUacRev;
         double sampleUbd, sampleUbdRev;
         double sampleUcd, sampleUcdRev;
         double sampleUda, sampleUdaRev;
+        QDateTime time;
     };
 
 private:
-    QVector<double> _hallProbeI_,
-        _hallProbeU_,
+    QVector<QDateTime> _time_;
+    QVector<double> _hallProbeU_,
         _sampleI_,
         _sampleUac_, _sampleUacRev_,
         _sampleUbd_, _sampleUbdRev_,
         _sampleUcd_, _sampleUcdRev_,
         _sampleUda_, _sampleUdaRev_;
-
     QVector<double> _B_,
         _carrierConcentration_,
         _driftSpeed_,
@@ -53,13 +55,20 @@ private:
         _Uhall_;
 
 signals:
-    void measurementAcquired(const MeasuredData &measuredData,
-                          EvaluatedData &evaluatedData);
-    void measurementAdded(const MeasuredData &measuredData,
-                          const EvaluatedData &evaluatedData);
+    void measurementAcquired(
+        const HallData::MeasuredData &measuredData,
+        HallData::EvaluatedData &evaluatedData);
+    void measurementAdded(
+        const HallData::MeasuredData &measuredData,
+        const HallData::EvaluatedData &evaluatedData);
 
 public slots:
     void addMeasurement(const MeasuredData &measurementData);
+    void clear();
+
+    const QVector<double> &B() const;
+    const QVector<double> &R() const;
+    const QVector<double> &Uhall() const;
 
 };
 

@@ -11,6 +11,7 @@
 - reset experiment (tabulky a dat) při open
 - reset čudlík experimentu???
 - umožnit udělat si nástřel a ten pak nezapočítávat do dat
+- kontrolovat že je nastaven nenulový měřící proud pro vzorek
 
 * experiment settings checking
 * check sign for B
