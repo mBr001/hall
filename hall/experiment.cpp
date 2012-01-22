@@ -458,9 +458,7 @@ void Experiment::on_hallData_measurementAdded(
 
     double carrierConc = fabs(measuredData.sampleI * a_b.first / (q * _sampleThickness_));
 
-    emit measured(evaluatedData.B, evaluatedData.Uhall, evaluatedData.R,
-                  evaluatedData.Rspec, carrierConc, evaluatedData.driftSpeed,
-                  evaluatedData.errAsymetry, evaluatedData.errShottky);
+    emit measured(measuredData, evaluatedData);
 
     csvFile[csvColTime] = measuredData.time;
 
@@ -485,7 +483,7 @@ void Experiment::on_hallData_measurementAdded(
 
     csvFile[csvColCoilI] = _coilWantI_;
 
-    if (!csvFile.write()) {
+    if (!csvFile.write() || !csvFile.flush()) {
         emit fatalError("Failed to write data into file.", csvFile.errorString());
     }
 }

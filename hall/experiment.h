@@ -247,10 +247,9 @@ signals:
       * before open and might be emited asynchronously by timmed operations.
       */
     void fatalError(const QString &errorShort, const QString &errorLong);
-    void measured(double B, double hallU, double resistivity,
-                  double resistivitySpec, double carrierConc,
-                  double drift,
-                  double errAsymetry, double errShottky);
+    void measured(
+        const HallData::MeasuredData &measuredData,
+        const HallData::EvaluatedData &evaluatedData);
     void measurementCompleted();
     void sweepingCompleted();
 

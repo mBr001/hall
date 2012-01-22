@@ -6,6 +6,7 @@
 
 #include "configui.h"
 #include "experiment.h"
+#include "halldata.h"
 
 namespace Ui {
     class MainWindow;
@@ -32,10 +33,9 @@ private slots:
     void on_coilCurrStepDoubleSpinBox_valueChanged(double );
     void on_coilPowerCheckBox_toggled(bool checked);
     void on_experiment_fatalError(const QString &errorShort, const QString &errorLong);
-    void on_experiment_measured(double B, double hallU, double resistivity,
-                                double resistivitySpec, double carrierConc,
-                                double drift,
-                                double errAsymetry, double errShottky);
+    void on_experiment_measured(
+        const HallData::MeasuredData &measuredData,
+        const HallData::EvaluatedData &evaluatedData);
     void on_experiment_measurementCompleted();
     void on_experiment_sweepingCompleted();
     void on_sampleCurrDoubleSpinBox_valueChanged(double );

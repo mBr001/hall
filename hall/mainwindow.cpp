@@ -168,37 +168,35 @@ void MainWindow::on_experiment_fatalError(const QString &errorShort, const QStri
     close();
 }
 
-void MainWindow::on_experiment_measured(double B, double hallU, double resistivity,
-                                        double resistivitySpec, double carrierConc,
-                                        double drift,
-                                        double errAsymentry, double errShottky)
+void MainWindow::on_experiment_measured(const HallData::MeasuredData &,
+                                        const HallData::EvaluatedData &evaluatedData)
 {
     ui->dataTableWidget->insertRow(0);
 
     ui->dataTableWidget->setItem(
-                0, 0, new QTableWidgetItem(doubleToString(B)));
+                0, 0, new QTableWidgetItem(doubleToString(evaluatedData.B)));
     ui->dataTableWidget->setItem(
-                0, 1, new QTableWidgetItem(doubleToString(hallU)));
+                0, 1, new QTableWidgetItem(doubleToString(evaluatedData.Uhall)));
     ui->dataTableWidget->setItem(
                 0, 2, new QTableWidgetItem(doubleToString(config.sampleI() / sampleIUnit)));
     ui->dataTableWidget->setItem(
-                0, 3, new QTableWidgetItem(doubleToString(resistivity)));
+                0, 3, new QTableWidgetItem(doubleToString(evaluatedData.R)));
     ui->dataTableWidget->setItem(
-                0, 4, new QTableWidgetItem(doubleToString(resistivitySpec / resistivitySpecUnit)));
+                0, 4, new QTableWidgetItem(doubleToString(evaluatedData.Rspec / resistivitySpecUnit)));
     ui->dataTableWidget->setItem(
-                0, 5, new QTableWidgetItem(doubleToString(carrierConc / carriercUnit)));
+                0, 5, new QTableWidgetItem(doubleToString(evaluatedData.carrierConcentration / carriercUnit)));
     ui->dataTableWidget->setItem(
-                0, 6, new QTableWidgetItem(doubleToString(drift)));
+                0, 6, new QTableWidgetItem(doubleToString(evaluatedData.driftSpeed)));
     ui->dataTableWidget->setItem(
-                0, 7, new QTableWidgetItem(QVariant(round(errAsymentry * 1000.) / 10.).toString()));
+                0, 7, new QTableWidgetItem(QVariant(round(evaluatedData.errAsymetry * 1000.) / 10.).toString()));
     ui->dataTableWidget->setItem(
-                0, 8, new QTableWidgetItem(QVariant(round(errShottky * 1000.) / 10.).toString()));
+                0, 8, new QTableWidgetItem(QVariant(round(evaluatedData.errShottky * 1000.) / 10.).toString()));
     ui->dataTableWidget->resizeColumnsToContents();
 
     //ui->carriercLineEdit->setText(doubleToString(carrierConc / carriercUnit));
 
-    if (isfinite(B)) {
-        ui->coilBDoubleSpinBox->setValue(B);
+    if (isfinite(evaluatedData.B)) {
+        ui->coilBDoubleSpinBox->setValue(evaluatedData.B);
 
         // TODO: skip NAN data from ploting
 
@@ -211,8 +209,7 @@ void MainWindow::on_experiment_measured(double B, double hallU, double resistivi
         ui->qwtPlot->replot();
     }
     else {
-        ui->coilBDoubleSpinBox->setValue(
-                    ui->coilBDoubleSpinBox->minimum());
+        ui->coilBDoubleSpinBox->setValue(ui->coilBDoubleSpinBox->minimum());
         ui->statusBar->showMessage("Warning: NAN in data found! ", 5000);
     }
 }
