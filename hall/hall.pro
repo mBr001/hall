@@ -20,14 +20,16 @@ SOURCES += main.cpp\
     powpolwitch.cpp \
     config.cpp \
     experiment.cpp \
-    vanderpauwsolver.cpp
+    vanderpauwsolver.cpp \
+    halldata.cpp
 
 HEADERS  += mainwindow.h \
     configui.h \
     powpolswitch.h \
     config.h \
     experiment.h \
-    vanderpauwsolver.h
+    vanderpauwsolver.h \
+    halldata.h
 
 FORMS    += configui.ui \
     mainwindow.ui

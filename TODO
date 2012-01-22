@@ -1,6 +1,6 @@
 - přidat do tabulky:
-  - pohyblivostb
- - přidat průměry do výstupních dat (výsledn é hodnoty)
+  - pohyblivost
+ - přidat průměry do výstupních dat (výsledné hodnoty)
    resitivita plošná
    carrier conc
    driftová rychlost (vynechat hodnoty při nulovém poli)
