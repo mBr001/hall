@@ -125,7 +125,8 @@ Experiment::Experiment(Config *config, QObject *parent) :
     _coilWantI_(NAN),
     measTimer(this),
     _measuring_(false),
-    _sweeping_(false)
+    _sweeping_(false),
+    _repeats_(1)
 {
     this->config = config;
 
@@ -243,7 +244,7 @@ void Experiment::measure(bool single)
         const double eps = 0.0001;
         _measuringRange_.append(_coilIRangeBottom_);
 
-        for (int n(1); n; --n) {
+        for (int repeats(_repeats_); repeats; --repeats) {
             double I;
 
             for (I = _coilIRangeBottom_ + _coilIStep_;
@@ -702,6 +703,16 @@ double Experiment::readSingle()
     return val;
 }
 
+void Experiment::setRepeats(int repeats)
+{
+    _repeats_ = repeats;
+}
+
+int Experiment::repeats()
+{
+    return _repeats_;
+}
+
 bool Experiment::reset()
 {
     measurementAbort();
@@ -751,6 +762,8 @@ bool Experiment::reset()
 
 void Experiment::setCoilI(double value)
 {
+    if (value == _coilWantI_)
+        return;
     _coilWantI_ = value;
     _sweeping_ = true;
 }

@@ -37,7 +37,6 @@ private slots:
         const HallData::EvaluatedData &evaluatedData);
     void on_experiment_measurementCompleted();
     void on_experiment_sweepingCompleted();
-    void on_sampleCurrDoubleSpinBox_valueChanged(double );
     void on_resetExperimentPushButton_clicked();
     void on_startAutomaticPushButton_clicked();
     void on_startManualPushButton_clicked();

@@ -132,6 +132,8 @@ public:
     const QVector<double> &getDataResistivity();
     void setCoilI(double value);
     void setCoilIRange(double val1, double val2);
+    void setRepeats(int repeats);
+    int repeats();
 
     /** Lenght of side for square sample [m]. */
     double sampleSize() const;
@@ -272,6 +274,8 @@ private:
     static const double hallProbeI;
     /** Elementar charge, charge of single electron. */
     static const double q;
+    /** Number of automatic measurement cycles. */
+    int _repeats_;
     double _sampleThickness_;
 
     /** Create path to new file to store measurement data. */

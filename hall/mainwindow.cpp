@@ -27,27 +27,41 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->qwtPlot->enableAxis(QwtPlot::yRight, true);
     QString titleTpl("<html><body><span style=\"font-family:'Sans Serif'; font-size:14pt; font-weight:600; font-style:bold;\"><span style=\"%1\">%2</span> %3</span></body></html>");
-    QwtText titleR(titleTpl.arg("color: lime;").arg("*").arg("Resistivity [Ω]"));
-    ui->qwtPlot->setAxisTitle(QwtPlot::yRight, titleR);
 
     QwtText titleHall(titleTpl.arg("color: red;").arg("×").arg("hall U [V]"));
+    QwtText titleR(titleTpl.arg("color: lime;").arg("*").arg("Resistivity [Ω]"));
+
     ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, titleHall);
+    ui->qwtPlot->setAxisTitle(QwtPlot::yRight, titleR);
     ui->qwtPlot->setAxisTitle(QwtPlot::xBottom, "B [T]");
+
     qwtPlotCurveHallU.attach(ui->qwtPlot);
-    qwtPlotCurveHallU.setStyle(QwtPlotCurve::NoCurve);
-
-    QwtSymbol *qwtPlotHallUSymbol = new QwtSymbol(QwtSymbol::XCross);
-    qwtPlotHallUSymbol->setColor(QColor(255, 0, 0));
-    qwtPlotHallUSymbol->setSize(QSize(12, 12));
-    qwtPlotCurveHallU.setSymbol(qwtPlotHallUSymbol);
-
-    qwtPlotCurveResistivity.setYAxis(QwtPlot::yRight);
     qwtPlotCurveResistivity.attach(ui->qwtPlot);
+
+    qwtPlotCurveHallU.setStyle(QwtPlotCurve::NoCurve);
     qwtPlotCurveResistivity.setStyle(QwtPlotCurve::NoCurve);
 
+    QwtSymbol *qwtPlotHallUSymbol = new QwtSymbol(QwtSymbol::XCross);
     QwtSymbol *qwtPlotResistivitySymbol = new QwtSymbol(QwtSymbol::Star1);
+
+    qwtPlotHallUSymbol->setColor(QColor(255, 0, 0));
     qwtPlotResistivitySymbol->setColor(QColor(0, 255, 0));
+
+    qwtPlotHallUSymbol->setSize(QSize(12, 12));
     qwtPlotResistivitySymbol->setSize(QSize(12, 12));
+
+    QPen hallSymbolPen(qwtPlotHallUSymbol->pen());
+    QPen resistivitySymbolPen(qwtPlotResistivitySymbol->pen());
+
+    hallSymbolPen.setWidth(2);
+    resistivitySymbolPen.setWidth(2);
+
+    qwtPlotHallUSymbol->setPen(hallSymbolPen);
+    qwtPlotResistivitySymbol->setPen(resistivitySymbolPen);
+
+    qwtPlotCurveResistivity.setYAxis(QwtPlot::yRight);
+
+    qwtPlotCurveHallU.setSymbol(qwtPlotHallUSymbol);
     qwtPlotCurveResistivity.setSymbol(qwtPlotResistivitySymbol);
 
     ui->dataTableWidget->resizeColumnsToContents();
@@ -64,7 +78,6 @@ void MainWindow::close()
     config.setCoilIRangeMax(ui->coilCurrMaxDoubleSpinBox->value());
     config.setCoilIRangeMin(ui->coilCurrMinDoubleSpinBox->value());
     config.setCoilIRangeStep(ui->coilCurrStepDoubleSpinBox->value());
-    config.setSampleI(UnitConv::fromDisplay(ui->sampleCurrDoubleSpinBox->value(), sampleIUnits));
     hide();
     configUI.show();
 }
@@ -74,15 +87,21 @@ void MainWindow::closeEvent(QCloseEvent *event)
     if (configUI.isHidden() && configUI.result() == QDialog::Accepted) {
         event->ignore();
         if (experiment.coilI() != 0.) {
-            if (QMessageBox::warning(
+            QMessageBox::StandardButton button =
+                    QMessageBox::warning(
                         this, "Power is still on!",
                         "Power is still on and should be turned (slowly!) "
                         "off before end of experiment.\n\n"
-                        "Exit experiment withought shutdown?",
-                        QMessageBox::Yes, QMessageBox::No) != QMessageBox::Yes) {
-                // TODO: Offer shut down.
+                        "Close experiment withought shutdown?",
+                        QMessageBox::Cancel | QMessageBox::Close | QMessageBox::RestoreDefaults,
+                        QMessageBox::Cancel);
+            if (button == QMessageBox::RestoreDefaults)
+            {
+                ui->coilPowerCheckBox->setChecked(false);
                 return;
             }
+            if (button != QMessageBox::Close)
+                return;
         }
         close();
         return;
@@ -98,10 +117,14 @@ QString MainWindow::doubleToString(double x)
 
 void MainWindow::doStartMeasure(bool single)
 {
+    config.setCoilIRangeStep(ui->coilCurrStepDoubleSpinBox->value());
+    config.setSampleI(UnitConv::fromDisplay(
+                          ui->sampleCurrDoubleSpinBox->value(), sampleIUnits));
+    experiment.setRepeats(ui->measRepeatSpinBox->value());
+
     experiment.measure(single);
 
     ui->startStopStackedWidget->setCurrentIndex(STOP_STACK);
-
     ui->automaticGroupBox->setEnabled(false);
     ui->coilGroupBox->setEnabled(false);
     ui->manualGroupBox->setEnabled(false);
@@ -224,17 +247,10 @@ void MainWindow::on_startManualPushButton_clicked()
         doStartMeasure(true);
 }
 
-void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
-{
-    config.setSampleI(UnitConv::fromDisplay(value, sampleIUnits));
-}
-
 void MainWindow::on_startAutomaticPushButton_clicked()
 {
-    if (!experiment.isMeasuring()) {
-        config.setCoilIRangeStep(ui->coilCurrStepDoubleSpinBox->value());
+    if (!experiment.isMeasuring())
         doStartMeasure(false);
-    }
 }
 
 void MainWindow::reset()
