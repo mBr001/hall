@@ -417,14 +417,14 @@ void Experiment::on_hallData_measurementAcquired(
     double Uac(measuredData.sampleUac - measuredData.sampleUacRev);
     double Ubd(measuredData.sampleUbd - measuredData.sampleUbdRev);
     double Ucd(measuredData.sampleUcd - measuredData.sampleUcdRev);
-    double Uda(measuredData.sampleUda - measuredData.sampleUdaRev);
+    double Uad(measuredData.sampleUdaRev - measuredData.sampleUda);
 
     /* Uh = (Uac - Uca + (Ubd - Udb)) / 4    Uh - hall voltage,
       this equation is a bit twinkle because B x I x U orientation in space. */
     evaluatedData.Uhall = (Uac + Ubd) / 4;
 
     double Rdc(Ucd / measuredData.sampleI / 2.);
-    double Rad(Uda / measuredData.sampleI / 2.);
+    double Rad(Uad / measuredData.sampleI / 2.);
 
     std::pair<double, double> resisitivity(VanDerPauwSolver::solve(Rdc, Rad));
     evaluatedData.R = resisitivity.first;
@@ -440,14 +440,14 @@ void Experiment::on_hallData_measurementAcquired(
     /* um = Rh / (Rs * w) */
     evaluatedData.driftSpeed = fabs(evaluatedData.Rhall / (evaluatedData.R * _sampleThickness_));
 
-    evaluatedData.errAsymetry = fabs(Ucd - Uda) / (Ucd + Uda);
+    evaluatedData.errAsymetry = fabs(Ucd - Uad) / (Ucd + Uad);
     double dUac(measuredData.sampleUac + measuredData.sampleUacRev);
     double dUbd(measuredData.sampleUbd + measuredData.sampleUbdRev);
     double dUcd(measuredData.sampleUcd + measuredData.sampleUcdRev);
     double dUda(measuredData.sampleUda + measuredData.sampleUdaRev);
     evaluatedData.errShottky = std::max(fabs(dUac / Uac),
                                         std::max(fabs(dUbd) / Ubd,
-                                                 std::max(fabs(dUcd) / Ucd, fabs(dUda) / Uda)));
+                                                 std::max(fabs(dUcd) / Ucd, fabs(dUda) / Uad)));
 }
 
 void Experiment::on_hallData_measurementAdded(
