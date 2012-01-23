@@ -123,8 +123,6 @@ public:
     bool checkSettings();
     void close();
     const HallData &data() const;
-    /** Estimated time of arrival, time remaining to end of experiment. */
-    int ETA();
     bool open();
 
     double coilI();
@@ -134,7 +132,6 @@ public:
     const QVector<double> &getDataResistivity();
     void setCoilI(double value);
     void setCoilIRange(double val1, double val2);
-    void setCoilIStep(double val);
 
     /** Lenght of side for square sample [m]. */
     double sampleSize() const;

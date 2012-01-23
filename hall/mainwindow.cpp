@@ -133,15 +133,6 @@ void MainWindow::on_coilCurrMinDoubleSpinBox_valueChanged(double val1)
 {
     double val2(ui->coilCurrMaxDoubleSpinBox->value());
     experiment.setCoilIRange(val1, val2);
-
-    int t(experiment.ETA());
-    QTime qt;
-    ui->remainsTimeEdit->setTime(qt.addSecs(t));
-}
-
-void MainWindow::on_coilCurrStepDoubleSpinBox_valueChanged(double val)
-{
-    experiment.setCoilIStep(val);
 }
 
 void MainWindow::on_coilPowerCheckBox_toggled(bool checked)
@@ -240,8 +231,10 @@ void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
 
 void MainWindow::on_startAutomaticPushButton_clicked()
 {
-    if (!experiment.isMeasuring())
+    if (!experiment.isMeasuring()) {
+        config.setCoilIRangeStep(ui->coilCurrStepDoubleSpinBox->value());
         doStartMeasure(false);
+    }
 }
 
 void MainWindow::reset()
@@ -282,12 +275,12 @@ void MainWindow::show()
     ui->coilCurrMaxDoubleSpinBox->setValue(config.coilIRangeMax());
     ui->coilCurrMinDoubleSpinBox->setValue(config.coilIRangeMin());
     ui->coilCurrStepDoubleSpinBox->setValue(config.coilIRangeStep());
-    experiment.setCoilIStep(config.coilIRangeStep());
 
     setWindowTitle(QString("Hall - ") + config.sampleName());
     ui->sampleNameLineEdit->setText(config.sampleName());
     ui->sampleThicknessDoubleSpinBox->setValue(UnitConv::toDisplay(config.sampleThickness(), sampleThicknessUnits));
     ui->sampleHolderLineEdit->setText(config.selectedSampleHolderName());
+    ui->notePlainTextEdit->clear();
 
     reset();
 
@@ -297,4 +290,9 @@ void MainWindow::show()
 void MainWindow::startApp()
 {
     configUI.show();
+}
+
+void MainWindow::on_resetExperimentPushButton_clicked()
+{
+    reset();
 }

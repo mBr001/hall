@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>792</width>
-    <height>542</height>
+    <width>818</width>
+    <height>504</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -121,7 +121,7 @@
            <item row="1" column="0">
             <widget class="QLabel" name="label_5">
              <property name="text">
-              <string>I</string>
+              <string>I:</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -131,7 +131,7 @@
            <item row="2" column="0">
             <widget class="QLabel" name="label_6">
              <property name="text">
-              <string>U</string>
+              <string>U:</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -141,7 +141,7 @@
            <item row="3" column="0">
             <widget class="QLabel" name="label_7">
              <property name="text">
-              <string>B</string>
+              <string>B:</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -192,13 +192,13 @@
         <item>
          <widget class="QGroupBox" name="coilGroupBox">
           <property name="title">
-           <string>Sample status (mean)</string>
+           <string>Sample status (means)</string>
           </property>
           <layout class="QGridLayout" name="gridLayout">
            <item row="0" column="0">
             <widget class="QLabel" name="label_4">
              <property name="text">
-              <string>Carrier c.</string>
+              <string>Carrier c.:</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -226,7 +226,7 @@ p, li { white-space: pre-wrap; }
            <item row="1" column="0">
             <widget class="QLabel" name="label_14">
              <property name="text">
-              <string>R</string>
+              <string>R:</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -236,7 +236,7 @@ p, li { white-space: pre-wrap; }
            <item row="2" column="0">
             <widget class="QLabel" name="label_15">
              <property name="text">
-              <string>R Spec.</string>
+              <string>R Spec.:</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -246,7 +246,7 @@ p, li { white-space: pre-wrap; }
            <item row="3" column="0">
             <widget class="QLabel" name="label_18">
              <property name="text">
-              <string>Drift</string>
+              <string>Drift:</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -303,28 +303,7 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <item>
-           <widget class="QLabel" name="label_28">
-            <property name="text">
-             <string>Remaining time</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QTimeEdit" name="remainsTimeEdit">
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-            <property name="buttonSymbols">
-             <enum>QAbstractSpinBox::NoButtons</enum>
-            </property>
-            <property name="displayFormat">
-             <string>hh:mm</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <layout class="QHBoxLayout" name="horizontalLayout_2"/>
         </item>
         <item>
          <spacer name="verticalSpacer_2">
@@ -419,20 +398,7 @@ p, li { white-space: pre-wrap; }
           <string>Experiment settings</string>
          </attribute>
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="2" column="0">
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="1" column="0">
+          <item row="0" column="0" rowspan="4">
            <widget class="QGroupBox" name="automaticGroupBox">
             <property name="title">
              <string>Automatic</string>
@@ -461,7 +427,7 @@ p, li { white-space: pre-wrap; }
              <item row="0" column="0">
               <widget class="QLabel" name="label_17">
                <property name="text">
-                <string>Coil I - from</string>
+                <string>Coil I - from:</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -471,7 +437,7 @@ p, li { white-space: pre-wrap; }
              <item row="1" column="0">
               <widget class="QLabel" name="label_16">
                <property name="text">
-                <string>Coil I - to</string>
+                <string>Coil I - to:</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -501,7 +467,7 @@ p, li { white-space: pre-wrap; }
              <item row="2" column="0">
               <widget class="QLabel" name="label_11">
                <property name="text">
-                <string>Step</string>
+                <string>Coil I Step:</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -537,7 +503,7 @@ p, li { white-space: pre-wrap; }
              <item row="4" column="0">
               <widget class="QLabel" name="label_23">
                <property name="text">
-                <string>Sample Testing I</string>
+                <string>Sample Testing I:</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -564,7 +530,7 @@ p, li { white-space: pre-wrap; }
              <item row="3" column="0">
               <widget class="QLabel" name="label_10">
                <property name="text">
-                <string>Repeat</string>
+                <string>Repeat:</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -587,7 +553,42 @@ p, li { white-space: pre-wrap; }
             </layout>
            </widget>
           </item>
-          <item row="0" column="0">
+          <item row="4" column="0" colspan="2">
+           <widget class="QGroupBox" name="groupBox_3">
+            <property name="title">
+             <string>Note:</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_13">
+             <item row="0" column="0" colspan="2">
+              <widget class="QPlainTextEdit" name="notePlainTextEdit"/>
+             </item>
+             <item row="1" column="1">
+              <widget class="QPushButton" name="resetExperimentPushButton">
+               <property name="toolTip">
+                <string>Write nota and evaluated data into file and begins new experiment - clear all data.</string>
+               </property>
+               <property name="text">
+                <string>Write and Reset</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="1">
            <widget class="QGroupBox" name="manualGroupBox">
             <property name="title">
              <string>Manual</string>
@@ -599,7 +600,7 @@ p, li { white-space: pre-wrap; }
                 <string>Power on coil and set up current at wanted walue.</string>
                </property>
                <property name="text">
-                <string>Coil On/Off</string>
+                <string>Coil On/Off:</string>
                </property>
               </widget>
              </item>
@@ -629,39 +630,16 @@ p, li { white-space: pre-wrap; }
             </layout>
            </widget>
           </item>
-          <item row="0" column="1" rowspan="2">
+          <item row="1" column="1" rowspan="3">
            <widget class="QGroupBox" name="groupBox">
             <property name="title">
              <string>Experiment setup</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_10">
-             <item row="3" column="0" colspan="3">
-              <spacer name="horizontalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>245</width>
-                 <height>155</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="0" column="0">
+             <item row="1" column="0">
               <widget class="QLabel" name="label_25">
                <property name="text">
-                <string>Sample ID (name)</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_26">
-               <property name="text">
-                <string>Sample thickness</string>
+                <string>Sample ID (name):</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -669,37 +647,30 @@ p, li { white-space: pre-wrap; }
               </widget>
              </item>
              <item row="2" column="0">
-              <widget class="QLabel" name="label_27">
+              <widget class="QLabel" name="label_26">
                <property name="text">
-                <string>Sample holder</string>
+                <string>Sample thickness:</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
+             <item row="1" column="1">
               <widget class="QLineEdit" name="sampleNameLineEdit">
                <property name="readOnly">
                 <bool>true</bool>
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
-              <widget class="QLineEdit" name="sampleHolderLineEdit">
-               <property name="readOnly">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="2">
+             <item row="2" column="2">
               <widget class="QLabel" name="label_32">
                <property name="text">
                 <string>μm</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
+             <item row="2" column="1">
               <widget class="QDoubleSpinBox" name="sampleThicknessDoubleSpinBox">
                <property name="toolTip">
                 <string>Measured value of current passing trought coil.</string>
@@ -715,6 +686,23 @@ p, li { white-space: pre-wrap; }
                </property>
                <property name="maximum">
                 <double>9999.989999999999782</double>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_27">
+               <property name="text">
+                <string>Sample holder:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="sampleHolderLineEdit">
+               <property name="readOnly">
+                <bool>true</bool>
                </property>
               </widget>
              </item>

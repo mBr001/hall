@@ -30,7 +30,6 @@ private slots:
     void on_coilCurrDoubleSpinBox_valueChanged(double );
     void on_coilCurrMaxDoubleSpinBox_valueChanged(double );
     void on_coilCurrMinDoubleSpinBox_valueChanged(double );
-    void on_coilCurrStepDoubleSpinBox_valueChanged(double );
     void on_coilPowerCheckBox_toggled(bool checked);
     void on_experiment_fatalError(const QString &errorShort, const QString &errorLong);
     void on_experiment_measured(
@@ -39,6 +38,7 @@ private slots:
     void on_experiment_measurementCompleted();
     void on_experiment_sweepingCompleted();
     void on_sampleCurrDoubleSpinBox_valueChanged(double );
+    void on_resetExperimentPushButton_clicked();
     void on_startAutomaticPushButton_clicked();
     void on_startManualPushButton_clicked();
 

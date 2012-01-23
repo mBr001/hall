@@ -192,28 +192,6 @@ const HallData &Experiment::data() const
     return hallData;
 }
 
-int Experiment::ETA()
-{
-    if (isMeasuring()) {
-        return -1;
-    }
-    // Coil current range pass trought
-    double t_coil_swepping = (_coilIRangeTop_ > 0 ? (2 * _coilIRangeTop_) : 0) +
-            (_coilIRangeBottom_ < 0 ? (2 * -_coilIRangeBottom_) : 0);
-    // Coil swepping time from current range
-    t_coil_swepping /= currentSlope;
-
-    // crossing 0.0V takes 3 steps???
-    if (_coilIRangeTop_ > 0)
-        t_coil_swepping += 6 * currentDwell / 1000;
-    if (_coilIRangeBottom_ < 0)
-        t_coil_swepping += 6 * currentDwell / 1000;
-
-    int t_sample = 0;
-    // TODO
-    return t_coil_swepping + t_sample;
-}
-
 QString Experiment::filePath()
 {
     QString dateStr(QDateTime::currentDateTimeUtc()
@@ -258,6 +236,7 @@ void Experiment::measure(bool single)
 {
     _measuring_ = true;
     measuredData.sampleI = config->sampleI();
+    _coilIStep_ = config->coilIRangeStep();
 
     _measuringRange_.clear();
     if (!single) {
@@ -785,11 +764,6 @@ void Experiment::setCoilIRange(double val1, double val2)
         _coilIRangeBottom_ = val2;
         _coilIRangeTop_ = val1;
     }
-}
-
-void Experiment::setCoilIStep(double val)
-{
-    _coilIStep_ = val;
 }
 
 void Experiment::stepRestart(Experiment *this_)
