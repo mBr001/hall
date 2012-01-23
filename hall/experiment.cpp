@@ -27,10 +27,6 @@ const int Experiment::_34903A_pwr_sw1_pwr_p = _34903A + 6;
 const int Experiment::_34903A_hall_probe_1_pwr_m = _34903A + 9;
 const int Experiment::_34903A_hall_probe_2_pwr_p = _34903A + 10;
 
-const double Experiment::carriercUnits = 1e6; // cm^-3
-const double Experiment::hallProbeIUnits = 1e-3; // mA
-const double Experiment::sampleThicknessUnits = 1e-6; // um
-
 const double Experiment::hallProbeI = 0.001; // 1 mA
 const double Experiment::q = 1.602176565e-19; // e- [C]
 
@@ -476,7 +472,7 @@ void Experiment::on_hallData_measurementAdded(
     csvFile[csvColHallProbeB] = evaluatedData.B;
     csvFile[csvColHallProbeU] = measuredData.hallProbeU;
 
-    csvFile[csvColSamplecCarrier] = carrierConc * carriercUnits;
+    csvFile[csvColSamplecCarrier] = UnitConv::toDisplay(carrierConc, carriercUnits);
     csvFile[csvColSampleDrift] = evaluatedData.driftSpeed;
     csvFile[csvColSampleResistivity] = evaluatedData.R;
     csvFile[csvColSampleResSpec] = evaluatedData.Rspec;
@@ -615,12 +611,12 @@ bool Experiment::open()
             break;
 
         csvFile[0] = "Sample thickness [μm]";
-        csvFile[1] = _sampleThickness_ / sampleThicknessUnits;
+        csvFile[1] = UnitConv::toDisplay(_sampleThickness_, sampleThicknessUnits);
         if (!csvFile.write())
             break;
 
         csvFile[0] = "Hall probe I [mA]";
-        csvFile[1] = hallProbeI / hallProbeIUnits;
+        csvFile[1] = UnitConv::toDisplay(hallProbeI, hallProbeIUnits);
         if (!csvFile.write())
             break;
     } while(false);

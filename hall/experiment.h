@@ -8,6 +8,7 @@
 #include "config.h"
 #include "halldata.h"
 #include "powpolswitch.h"
+#include "unitconv.h"
 #include "../QCSVWriter/qcsvwriter.h"
 #include "../QSCPIDev/qscpidev.h"
 
@@ -272,12 +273,9 @@ private:
     Config *config;
     /** I for hall probe to measure B. */
     static const double hallProbeI;
-    static const double hallProbeIUnits;
     /** Elementar charge, charge of single electron. */
     static const double q;
     double _sampleThickness_;
-    static const double carriercUnits;
-    static const double sampleThicknessUnits;
 
     /** Create path to new file to store measurement data. */
     QString filePath();
