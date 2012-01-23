@@ -28,10 +28,11 @@ const int Experiment::_34903A_hall_probe_1_pwr_m = _34903A + 9;
 const int Experiment::_34903A_hall_probe_2_pwr_p = _34903A + 10;
 
 const double Experiment::carriercUnits = 1e6; // cm^-3
-const double Experiment::hallProbeI = 0.001; // 1 mA
 const double Experiment::hallProbeIUnits = 1e-3; // mA
-const double Experiment::q = 1.602176565e-19; // e- [C]
 const double Experiment::sampleThicknessUnits = 1e-6; // um
+
+const double Experiment::hallProbeI = 0.001; // 1 mA
+const double Experiment::q = 1.602176565e-19; // e- [C]
 
 const QString Experiment::eqationBScript(
                  "I=%1;\n"

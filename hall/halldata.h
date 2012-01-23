@@ -1,6 +1,7 @@
 #ifndef HALLDATA_H
 #define HALLDATA_H
 
+//#include <boost/units/systems/si/io.hpp>
 #include <QDateEdit>
 #include <QObject>
 #include <QVector>

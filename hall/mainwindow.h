@@ -70,11 +70,6 @@ private:
     /** Start prepared measurement steps. */
     void doStartMeasure(bool single);
     void reset();
-
-    static const double carriercUnit;
-    static const double resistivitySpecUnit;
-    static const double sampleIUnit;
-    static const double sampleThicknessUnit;
 };
 
 #endif // MAINWINDOW_H

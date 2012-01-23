@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     config.cpp \
     experiment.cpp \
     vanderpauwsolver.cpp \
-    halldata.cpp
+    halldata.cpp \
+    unitconv.cpp
 
 HEADERS  += mainwindow.h \
     configui.h \
@@ -29,7 +30,8 @@ HEADERS  += mainwindow.h \
     config.h \
     experiment.h \
     vanderpauwsolver.h \
-    halldata.h
+    halldata.h \
+    unitconv.h
 
 FORMS    += configui.ui \
     mainwindow.ui

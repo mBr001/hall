@@ -4,11 +4,7 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
-const double MainWindow::carriercUnit = 1e6;
-const double MainWindow::resistivitySpecUnit = 1e-2;
-const double MainWindow::sampleIUnit = .001;
-const double MainWindow::sampleThicknessUnit = 1e-6;
+#include "unitconv.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -68,7 +64,7 @@ void MainWindow::close()
     config.setCoilIRangeMax(ui->coilCurrMaxDoubleSpinBox->value());
     config.setCoilIRangeMin(ui->coilCurrMinDoubleSpinBox->value());
     config.setCoilIRangeStep(ui->coilCurrStepDoubleSpinBox->value());
-    config.setSampleI(ui->sampleCurrDoubleSpinBox->value() * sampleIUnit);
+    config.setSampleI(UnitConv::fromDisplay(ui->sampleCurrDoubleSpinBox->value(), sampleIUnits));
     hide();
     configUI.show();
 }
@@ -178,13 +174,13 @@ void MainWindow::on_experiment_measured(const HallData::MeasuredData &,
     ui->dataTableWidget->setItem(
                 0, 1, new QTableWidgetItem(doubleToString(evaluatedData.Uhall)));
     ui->dataTableWidget->setItem(
-                0, 2, new QTableWidgetItem(doubleToString(config.sampleI() / sampleIUnit)));
+                0, 2, new QTableWidgetItem(doubleToString(UnitConv::toDisplay(config.sampleI(), sampleIUnits))));
     ui->dataTableWidget->setItem(
                 0, 3, new QTableWidgetItem(doubleToString(evaluatedData.R)));
     ui->dataTableWidget->setItem(
-                0, 4, new QTableWidgetItem(doubleToString(evaluatedData.Rspec / resistivitySpecUnit)));
+                0, 4, new QTableWidgetItem(doubleToString(UnitConv::toDisplay(evaluatedData.Rspec, resistivitySpecUnits))));
     ui->dataTableWidget->setItem(
-                0, 5, new QTableWidgetItem(doubleToString(evaluatedData.carrierConcentration / carriercUnit)));
+                0, 5, new QTableWidgetItem(doubleToString(UnitConv::toDisplay(evaluatedData.carrierConcentration, carriercUnits))));
     ui->dataTableWidget->setItem(
                 0, 6, new QTableWidgetItem(doubleToString(evaluatedData.driftSpeed)));
     ui->dataTableWidget->setItem(
@@ -239,7 +235,7 @@ void MainWindow::on_startManualPushButton_clicked()
 
 void MainWindow::on_sampleCurrDoubleSpinBox_valueChanged(double value)
 {
-    config.setSampleI(value * sampleIUnit);
+    config.setSampleI(UnitConv::fromDisplay(value, sampleIUnits));
 }
 
 void MainWindow::on_startAutomaticPushButton_clicked()
@@ -272,7 +268,7 @@ void MainWindow::show()
     ui->coilCurrDoubleSpinBox->setValue(val);
     ui->coilPowerCheckBox->setChecked(val != 0);
 
-    ui->sampleCurrDoubleSpinBox->setValue(config.sampleI() / sampleIUnit);
+    ui->sampleCurrDoubleSpinBox->setValue(UnitConv::toDisplay(config.sampleI(), sampleIUnits));
 
     val = experiment.coilMaxI();
     ui->coilCurrDoubleSpinBox->setMaximum(val);
@@ -290,7 +286,7 @@ void MainWindow::show()
 
     setWindowTitle(QString("Hall - ") + config.sampleName());
     ui->sampleNameLineEdit->setText(config.sampleName());
-    ui->sampleThicknessDoubleSpinBox->setValue(config.sampleThickness() / sampleThicknessUnit);
+    ui->sampleThicknessDoubleSpinBox->setValue(UnitConv::toDisplay(config.sampleThickness(), sampleThicknessUnits));
     ui->sampleHolderLineEdit->setText(config.selectedSampleHolderName());
 
     reset();
