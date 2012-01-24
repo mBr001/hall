@@ -12,6 +12,11 @@
 - umožnit udělat si nástřel a ten pak nezapočítávat do dat
 - kontrolovat že je nastaven nenulový měřící proud pro vzorek
 
+- zobrazovat typ polovidiče N/P
+- zkontrolovat znaménko pro hallovu konstantu
+- šířka políček - automaticky podle šířky čísla
+- přejmenovat drift na mobilitu?
+
 * experiment settings checking
 * check sign for B
 * read power status from parallel port ???
