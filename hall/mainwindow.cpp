@@ -74,6 +74,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::close()
 {
+    if (experiment.data().B().size() > 0)
+        experiment.writeSummary();
     experiment.close();
     config.setCoilIRangeMax(ui->coilCurrMaxDoubleSpinBox->value());
     config.setCoilIRangeMin(ui->coilCurrMinDoubleSpinBox->value());

@@ -126,6 +126,7 @@ Experiment::Experiment(Config *config, QObject *parent) :
     measTimer(this),
     _measuring_(false),
     _sweeping_(false),
+    needHeader(false),
     _repeats_(1)
 {
     this->config = config;
@@ -431,6 +432,9 @@ void Experiment::on_hallData_measurementAdded(
     const HallData::MeasuredData &measuredData,
     const HallData::EvaluatedData &evaluatedData)
 {
+    if (!writeHeader())
+        return;
+
     csvFile[csvColTime] = measuredData.time;
 
     csvFile[csvColSampleI] = measuredData.sampleI;
@@ -735,53 +739,8 @@ int Experiment::repeats()
 bool Experiment::reset()
 {
     measurementAbort();
-    if (hallData.B().size() == 0)
-        return true;
-
+    needHeader = true;
     hallData.clear();
-
-    do {
-        csvFile.resize(0);
-        if (!csvFile.write())
-            break;
-
-        csvFile.resize(csvColEnd);
-
-        csvFile[csvColHallProbeB] = "Hall probe\nB [T]";
-        csvFile[csvColSampleResistivity] = "sample\nR [Ω]";
-        csvFile[csvColSampleResSpec] =
-                QString("sample\nRspec [%1]").arg(resistivitySpecUnits.unitText);
-        csvFile[csvColSampleRHall] =
-                QString("sample\nRhall [%1]").arg(RHallUnits.unitText);
-        csvFile[csvColSampleDrift] =
-                QString("sample\ndrift [%1]").arg(driftUnits.unitText);
-        csvFile[csvColSamplecCarrier] =
-                QString("carrier conc.\nN [%1]").arg(carriercUnits.unitText);
-
-        csvFile[csvColResultsEnd] = "-";
-
-        csvFile[csvColTime] = "Time\n(UTC)";
-        csvFile[csvColTime].setDateTimeFormat("yyyy-MM-dd hh:mm:ss");
-        csvFile[csvColHallProbeU] = "Hall probe\nUhp [V]";
-        csvFile[csvColSampleUac] = "sample\nUac [V]";
-        csvFile[csvColSampleUacRev] = "sample\nUac(rev) [V]";
-        csvFile[csvColSampleUbd] = "sample\nUbd [V]";
-        csvFile[csvColSampleUbdRev] = "sample\nUbd(rev) [V]";
-        csvFile[csvColSampleUcd] = "sample\nUcd [V]";
-        csvFile[csvColSampleUcdRev] = "sample\nUcd(rev) [V]";
-        csvFile[csvColSampleUda] = "sample\nUda [V]";
-        csvFile[csvColSampleUdaRev] = "sample\nUda(rev) [V]";
-
-        csvFile[csvColSampleI] = "sample\nI [%1]";
-        csvFile[csvColCoilI] = "Coil\nI [A]";
-        csvFile.write();
-    } while(false);
-
-    if (csvFile.error() != QFile::NoError) {
-        emit fatalError("Failed to write header into data file",
-                    csvFile.errorString());
-        return false;
-    }
 
     return true;
 }
@@ -997,6 +956,59 @@ void Experiment::stepSweeping(Experiment *this_)
     }
 }
 
+bool Experiment::writeHeader()
+{
+    if (!needHeader)
+        return true;
+
+    needHeader = false;
+
+    do {
+        csvFile.resize(0);
+        if (!csvFile.write())
+            break;
+
+        csvFile.resize(csvColEnd);
+
+        csvFile[csvColHallProbeB] = "Hall probe\nB [T]";
+        csvFile[csvColSampleResistivity] = "sample\nR [Ω]";
+        csvFile[csvColSampleResSpec] =
+                QString("sample\nRspec [%1]").arg(resistivitySpecUnits.unitText);
+        csvFile[csvColSampleRHall] =
+                QString("sample\nRhall [%1]").arg(RHallUnits.unitText);
+        csvFile[csvColSampleDrift] =
+                QString("sample\ndrift [%1]").arg(driftUnits.unitText);
+        csvFile[csvColSamplecCarrier] =
+                QString("carrier conc.\nN [%1]").arg(carriercUnits.unitText);
+
+        csvFile[csvColResultsEnd] = "-";
+
+        csvFile[csvColTime] = "Time\n(UTC)";
+        csvFile[csvColTime].setDateTimeFormat("yyyy-MM-dd hh:mm:ss");
+        csvFile[csvColHallProbeU] = "Hall probe\nUhp [V]";
+        csvFile[csvColSampleUac] = "sample\nUac [V]";
+        csvFile[csvColSampleUacRev] = "sample\nUac(rev) [V]";
+        csvFile[csvColSampleUbd] = "sample\nUbd [V]";
+        csvFile[csvColSampleUbdRev] = "sample\nUbd(rev) [V]";
+        csvFile[csvColSampleUcd] = "sample\nUcd [V]";
+        csvFile[csvColSampleUcdRev] = "sample\nUcd(rev) [V]";
+        csvFile[csvColSampleUda] = "sample\nUda [V]";
+        csvFile[csvColSampleUdaRev] = "sample\nUda(rev) [V]";
+
+        csvFile[csvColSampleI] = "sample\nI [%1]";
+        csvFile[csvColCoilI] = "Coil\nI [A]";
+        csvFile.write();
+    } while(false);
+
+    if (csvFile.error() != QFile::NoError) {
+        emit fatalError("Failed to write header into data file",
+                    csvFile.errorString());
+        return false;
+    }
+
+    return true;
+}
+
 bool Experiment::writeSummary(const QString &note)
 {
     do {
@@ -1019,6 +1031,11 @@ bool Experiment::writeSummary(const QString &note)
             csvSumColEnd
         };
         csvFile.resize(csvSumColEnd);
+        csvFile[csvSumColcCarrier] = QString("Carrier conc. [%1]").arg(
+                    carriercUnits.unitText);
+        if (!csvFile.write())
+            break;
+
         csvFile[csvSumColcCarrier] = hallData.summaryData.carrierc;
         if (!csvFile.write())
             break;

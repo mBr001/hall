@@ -146,8 +146,8 @@ public:
 
     /** Reset experiment status, clear all cached data. */
     bool reset();
-
-    bool writeSummary(const QString &note);
+    bool writeHeader();
+    bool writeSummary(const QString &note = QString(""));
 
     QString HP34970Port();
     void setHP34970Port(QString port);
@@ -277,6 +277,8 @@ private:
 
     /** I for hall probe to measure B. */
     static const double hallProbeI;
+
+    bool needHeader;
 
     /** Elementar charge, charge of single electron. */
     static const double q;
