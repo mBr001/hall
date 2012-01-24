@@ -31,6 +31,14 @@ HallData::SummaryData::SummaryData() :
 {
 }
 
+void HallData::SummaryData::clear()
+{
+    carrierc = NAN;
+    driftSpeed = NAN;
+    R = NAN;
+    RSpec = NAN;
+}
+
 HallData::HallData(QObject *parent) :
     QObject(parent)
 {

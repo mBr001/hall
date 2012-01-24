@@ -131,21 +131,23 @@ public:
     const QVector<double> &getDataB();
     const QVector<double> &getDataHallU();
     const QVector<double> &getDataResistivity();
+    int repeats();
     void setCoilI(double value);
     void setCoilIRange(double val1, double val2);
     void setRepeats(int repeats);
-    int repeats();
-
-    /** Lenght of side for square sample [m]. */
-    double sampleSize() const;
 
     bool isMeasuring();
+
     /** Start single or multiple measurements for defined coilWantI (<min, max>). */
     void measure(bool single = true);
+
     /** Stop measurement imediately. */
     void measurementAbort();
+
     /** Reset experiment status, clear all cached data. */
     bool reset();
+
+    bool writeSummary(const QString &note);
 
     QString HP34970Port();
     void setHP34970Port(QString port);
@@ -272,10 +274,13 @@ private:
     double _coilIRangeBottom_, _coilIRangeTop_;
     double _coilMaxI_;
     Config *config;
+
     /** I for hall probe to measure B. */
     static const double hallProbeI;
+
     /** Elementar charge, charge of single electron. */
     static const double q;
+
     /** Number of automatic measurement cycles. */
     int _repeats_;
     double _sampleThickness_;

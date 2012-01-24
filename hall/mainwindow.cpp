@@ -265,7 +265,10 @@ void MainWindow::reset()
     ui->resistivityLineEdit->setText("N/A");
     ui->resistivitySpecLineEdit->setText("N/A");
     ui->driftLineEdit->setText("N/A");
-    ui->dataTableWidget->clearContents();
+    ui->dataTableWidget->setRowCount(0);
+
+    experiment.writeSummary(ui->notePlainTextEdit->toPlainText());
+    experiment.reset();
 }
 
 void MainWindow::show()

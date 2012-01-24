@@ -457,7 +457,8 @@ void Experiment::on_hallData_measurementAdded(
         emit fatalError("Failed to write data into file.", csvFile.errorString());
     }
 
-    HallData::SummaryData summaryData;
+    HallData::SummaryData &summaryData(hallData.summaryData);
+    summaryData.clear();
 
     std::pair<double, double> a_b(linRegress(hallData.Uhall(), hallData.B()));
     summaryData.carrierc = fabs(measuredData.sampleI * a_b.first / (q * _sampleThickness_));
@@ -602,12 +603,18 @@ bool Experiment::open()
         if (!csvFile.write())
             break;
 
-        csvFile[0] = "Sample thickness [μm]";
+        csvFile[0] = "Sample holder name";
+        csvFile[1] = config->selectedSampleHolderName();
+        if (!csvFile.write())
+            break;
+
+        csvFile[0] = QString("Sample thickness [%1]").arg(
+                    sampleThicknessUnits.unitText);
         csvFile[1] = UnitConv::toDisplay(_sampleThickness_, sampleThicknessUnits);
         if (!csvFile.write())
             break;
 
-        csvFile[0] = "Hall probe I [mA]";
+        csvFile[0] = QString("Hall probe I [%1]").arg(hallProbeIUnits.unitText);
         csvFile[1] = UnitConv::toDisplay(hallProbeI, hallProbeIUnits);
         if (!csvFile.write())
             break;
@@ -728,6 +735,9 @@ int Experiment::repeats()
 bool Experiment::reset()
 {
     measurementAbort();
+    if (hallData.B().size() == 0)
+        return true;
+
     hallData.clear();
 
     do {
@@ -985,4 +995,40 @@ void Experiment::stepSweeping(Experiment *this_)
     if (this_->_sweeping_) {
         --this_->stepCurrent;
     }
+}
+
+bool Experiment::writeSummary(const QString &note)
+{
+    do {
+        csvFile.resize(0);
+        if (!csvFile.write())
+            break;
+
+        QString s(note.trimmed());
+        if (!s.isEmpty()) {
+            csvFile.resize(1);
+            csvFile[0] = s;
+            if (!csvFile.write())
+                break;
+        }
+
+        enum {
+            csvSumColcCarrier = 0,
+            //csvSumCol
+            //csvSumCol
+            csvSumColEnd
+        };
+        csvFile.resize(csvSumColEnd);
+        csvFile[csvSumColcCarrier] = hallData.summaryData.carrierc;
+        if (!csvFile.write())
+            break;
+    } while(false);
+
+    if (csvFile.error() != QFile::NoError) {
+        emit fatalError("Failed to write summary into file.",
+                        csvFile.errorString());
+        return false;
+    }
+
+    return true;
 }

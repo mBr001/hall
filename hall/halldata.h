@@ -41,9 +41,12 @@ public:
     class SummaryData {
     public:
         explicit SummaryData();
+        void clear();
 
         double carrierc, driftSpeed, R, RSpec;
     };
+
+    SummaryData summaryData;
 
 private:
     QVector<QDateTime> _time_;
