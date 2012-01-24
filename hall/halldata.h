@@ -17,7 +17,6 @@ public:
         explicit EvaluatedData();
 
         double B;
-        double carrierConcentration;
         double driftSpeed;
         double errAsymetry, errShottky;
         double R;
@@ -39,6 +38,13 @@ public:
         QDateTime time;
     };
 
+    class SummaryData {
+    public:
+        explicit SummaryData();
+
+        double carrierc, driftSpeed, R, RSpec;
+    };
+
 private:
     QVector<QDateTime> _time_;
     QVector<double> _hallProbeU_,
@@ -48,7 +54,6 @@ private:
         _sampleUcd_, _sampleUcdRev_,
         _sampleUda_, _sampleUdaRev_;
     QVector<double> _B_,
-        _carrierConcentration_,
         _driftSpeed_,
         _R_,
         _Rhall_,
@@ -68,7 +73,9 @@ public slots:
     void clear();
 
     const QVector<double> &B() const;
+    const QVector<double> &driftSpeed() const;
     const QVector<double> &R() const;
+    const QVector<double> &RSpec() const;
     const QVector<double> &Uhall() const;
 
 };

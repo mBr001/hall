@@ -53,7 +53,8 @@ protected:
 public:
     /** Indexes of columns in CSV file with data from experiment. */
     enum {
-        csvColHallProbeB = 0,
+        csvColNotes = 0,
+        csvColHallProbeB,
         csvColSampleResistivity,
         csvColSampleResSpec,
         csvColSampleRHall,
@@ -249,7 +250,8 @@ signals:
     void fatalError(const QString &errorShort, const QString &errorLong);
     void measured(
         const HallData::MeasuredData &measuredData,
-        const HallData::EvaluatedData &evaluatedData);
+        const HallData::EvaluatedData &evaluatedData,
+        const HallData::SummaryData &summaryData);
     void measurementCompleted();
     void sweepingCompleted();
 

@@ -14,13 +14,20 @@ HallData::MeasuredData::MeasuredData() :
 
 HallData::EvaluatedData::EvaluatedData() :
     B(NAN),
-    carrierConcentration(NAN),
     driftSpeed(NAN),
     errAsymetry(NAN), errShottky(NAN),
     R(NAN),
     Rhall(NAN),
     Rspec(NAN),
     Uhall(NAN)
+{
+}
+
+HallData::SummaryData::SummaryData() :
+    carrierc(NAN),
+    driftSpeed(NAN),
+    R(NAN),
+    RSpec(NAN)
 {
 }
 
@@ -48,7 +55,6 @@ void HallData::addMeasurement(const MeasuredData &measuredData)
     _sampleUdaRev_.append(measuredData.sampleUdaRev);
 
     _B_.append(evaluatedData.B);
-    _carrierConcentration_.append(evaluatedData.carrierConcentration);
     _driftSpeed_.append(evaluatedData.driftSpeed);
     _R_.append(evaluatedData.R);
     _Rhall_.append(evaluatedData.Rhall);
@@ -79,7 +85,6 @@ void HallData::clear()
     _sampleUdaRev_.clear();
 
     _B_.clear();
-    _carrierConcentration_.clear();
     _driftSpeed_.clear();
     _R_.clear();
     _Rhall_.clear();
@@ -87,9 +92,19 @@ void HallData::clear()
     _Uhall_.clear();
 }
 
+const QVector<double> &HallData::driftSpeed() const
+{
+    return _driftSpeed_;
+}
+
 const QVector<double> &HallData::R() const
 {
     return _R_;
+}
+
+const QVector<double> &HallData::RSpec() const
+{
+    return _Rspec_;
 }
 
 const QVector<double> &HallData::Uhall() const

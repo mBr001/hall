@@ -179,7 +179,8 @@ void MainWindow::on_experiment_fatalError(const QString &errorShort, const QStri
 }
 
 void MainWindow::on_experiment_measured(const HallData::MeasuredData &,
-                                        const HallData::EvaluatedData &evaluatedData)
+                                        const HallData::EvaluatedData &evaluatedData,
+                                        const HallData::SummaryData &summaryData)
 {
     ui->dataTableWidget->insertRow(0);
 
@@ -194,16 +195,17 @@ void MainWindow::on_experiment_measured(const HallData::MeasuredData &,
     ui->dataTableWidget->setItem(
                 0, 4, new QTableWidgetItem(doubleToString(UnitConv::toDisplay(evaluatedData.Rspec, resistivitySpecUnits))));
     ui->dataTableWidget->setItem(
-                0, 5, new QTableWidgetItem(doubleToString(UnitConv::toDisplay(evaluatedData.carrierConcentration, carriercUnits))));
+                0, 5, new QTableWidgetItem(doubleToString(evaluatedData.driftSpeed)));
     ui->dataTableWidget->setItem(
-                0, 6, new QTableWidgetItem(doubleToString(evaluatedData.driftSpeed)));
+                0, 6, new QTableWidgetItem(QVariant(round(evaluatedData.errAsymetry * 1000.) / 10.).toString()));
     ui->dataTableWidget->setItem(
-                0, 7, new QTableWidgetItem(QVariant(round(evaluatedData.errAsymetry * 1000.) / 10.).toString()));
-    ui->dataTableWidget->setItem(
-                0, 8, new QTableWidgetItem(QVariant(round(evaluatedData.errShottky * 1000.) / 10.).toString()));
+                0, 7, new QTableWidgetItem(QVariant(round(evaluatedData.errShottky * 1000.) / 10.).toString()));
     ui->dataTableWidget->resizeColumnsToContents();
 
-    //ui->carriercLineEdit->setText(doubleToString(carrierConc / carriercUnit));
+    ui->carriercLineEdit->setText(doubleToString(UnitConv::toDisplay(summaryData.carrierc, carriercUnits)));
+    ui->driftLineEdit->setText(doubleToString(UnitConv::toDisplay(summaryData.driftSpeed, driftUnits)));
+    ui->resistivityLineEdit->setText(doubleToString(summaryData.R));
+    ui->resistivitySpecLineEdit->setText(doubleToString(UnitConv::toDisplay(summaryData.RSpec, resistivitySpecUnits)));
 
     if (isfinite(evaluatedData.B)) {
         ui->coilBDoubleSpinBox->setValue(evaluatedData.B);

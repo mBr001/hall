@@ -431,12 +431,6 @@ void Experiment::on_hallData_measurementAdded(
     const HallData::MeasuredData &measuredData,
     const HallData::EvaluatedData &evaluatedData)
 {
-    std::pair<double, double> a_b(linRegress(hallData.Uhall(), hallData.B()));
-
-    double carrierConc = fabs(measuredData.sampleI * a_b.first / (q * _sampleThickness_));
-
-    emit measured(measuredData, evaluatedData);
-
     csvFile[csvColTime] = measuredData.time;
 
     csvFile[csvColSampleI] = measuredData.sampleI;
@@ -452,7 +446,6 @@ void Experiment::on_hallData_measurementAdded(
     csvFile[csvColHallProbeB] = evaluatedData.B;
     csvFile[csvColHallProbeU] = measuredData.hallProbeU;
 
-    csvFile[csvColSamplecCarrier] = UnitConv::toDisplay(carrierConc, carriercUnits);
     csvFile[csvColSampleDrift] = evaluatedData.driftSpeed;
     csvFile[csvColSampleResistivity] = evaluatedData.R;
     csvFile[csvColSampleResSpec] = evaluatedData.Rspec;
@@ -463,6 +456,25 @@ void Experiment::on_hallData_measurementAdded(
     if (!csvFile.write() || !csvFile.flush()) {
         emit fatalError("Failed to write data into file.", csvFile.errorString());
     }
+
+    HallData::SummaryData summaryData;
+
+    std::pair<double, double> a_b(linRegress(hallData.Uhall(), hallData.B()));
+    summaryData.carrierc = fabs(measuredData.sampleI * a_b.first / (q * _sampleThickness_));
+
+    summaryData.driftSpeed = 0;
+    foreach(double x, hallData.driftSpeed()) { summaryData.driftSpeed += x; }
+    summaryData.driftSpeed /= hallData.driftSpeed().size();
+
+    summaryData.R = 0;
+    foreach(double x, hallData.R()) { summaryData.R += x; }
+    summaryData.R /= hallData.R().size();
+
+    summaryData.RSpec = 0;
+    foreach(double x, hallData.RSpec()) { summaryData.RSpec += x; }
+    summaryData.RSpec /= hallData.RSpec().size();
+
+    emit measured(measuredData, evaluatedData, summaryData);
 }
 
 void Experiment::on_measTimer_timeout()
@@ -726,11 +738,15 @@ bool Experiment::reset()
         csvFile.resize(csvColEnd);
 
         csvFile[csvColHallProbeB] = "Hall probe\nB [T]";
-        csvFile[csvColSampleResistivity] = "sample\nR [ohm]";
-        csvFile[csvColSampleResSpec] = "sample\nRspec [ohm*m]";
-        csvFile[csvColSampleRHall] = "sample\nRhall [m^3*C^-1]";
-        csvFile[csvColSampleDrift] = "sample\ndrift [m^2*V^-1*s^-1]";
-        csvFile[csvColSamplecCarrier] = "carrier conc.\nN [cm^-3]";
+        csvFile[csvColSampleResistivity] = "sample\nR [Ω]";
+        csvFile[csvColSampleResSpec] =
+                QString("sample\nRspec [%1]").arg(resistivitySpecUnits.unitText);
+        csvFile[csvColSampleRHall] =
+                QString("sample\nRhall [%1]").arg(RHallUnits.unitText);
+        csvFile[csvColSampleDrift] =
+                QString("sample\ndrift [%1]").arg(driftUnits.unitText);
+        csvFile[csvColSamplecCarrier] =
+                QString("carrier conc.\nN [%1]").arg(carriercUnits.unitText);
 
         csvFile[csvColResultsEnd] = "-";
 
@@ -746,7 +762,7 @@ bool Experiment::reset()
         csvFile[csvColSampleUda] = "sample\nUda [V]";
         csvFile[csvColSampleUdaRev] = "sample\nUda(rev) [V]";
 
-        csvFile[csvColSampleI] = "sample\nI [A]";
+        csvFile[csvColSampleI] = "sample\nI [%1]";
         csvFile[csvColCoilI] = "Coil\nI [A]";
         csvFile.write();
     } while(false);

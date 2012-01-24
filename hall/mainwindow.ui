@@ -744,7 +744,7 @@ p, li { white-space: pre-wrap; }
             </column>
             <column>
              <property name="text">
-              <string>R. [Ω]</string>
+              <string>R [Ω]</string>
              </property>
              <property name="toolTip">
               <string>Sample resistivity</string>
@@ -752,17 +752,12 @@ p, li { white-space: pre-wrap; }
             </column>
             <column>
              <property name="text">
-              <string>R Spec. [Ω*cm]</string>
+              <string>R Spec. [Ω·cm]</string>
              </property>
             </column>
             <column>
              <property name="text">
-              <string>Carrier c. [cm^-3]</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Drift [m^2*V^-1*s^-1]</string>
+              <string>Drift [m^2·V^-1·s^-1]</string>
              </property>
             </column>
             <column>

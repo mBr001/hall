@@ -34,7 +34,8 @@ private slots:
     void on_experiment_fatalError(const QString &errorShort, const QString &errorLong);
     void on_experiment_measured(
         const HallData::MeasuredData &measuredData,
-        const HallData::EvaluatedData &evaluatedData);
+        const HallData::EvaluatedData &evaluatedData,
+        const HallData::SummaryData &summaryData);
     void on_experiment_measurementCompleted();
     void on_experiment_sweepingCompleted();
     void on_resetExperimentPushButton_clicked();
