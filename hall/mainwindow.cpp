@@ -197,7 +197,7 @@ void MainWindow::on_experiment_measured(const HallData::MeasuredData &,
     ui->dataTableWidget->setItem(
                 0, 4, new QTableWidgetItem(doubleToString(UnitConv::toDisplay(evaluatedData.Rspec, resistivitySpecUnits))));
     ui->dataTableWidget->setItem(
-                0, 5, new QTableWidgetItem(doubleToString(evaluatedData.driftSpeed)));
+                0, 5, new QTableWidgetItem(doubleToString(UnitConv::toDisplay(evaluatedData.driftSpeed, driftUnits))));
     ui->dataTableWidget->setItem(
                 0, 6, new QTableWidgetItem(QVariant(round(evaluatedData.errAsymetry * 1000.) / 10.).toString()));
     ui->dataTableWidget->setItem(
