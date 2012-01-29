@@ -243,21 +243,20 @@ void Experiment::measure(bool single)
     _measuringRange_.clear();
     if (!single) {
         const double eps = 0.0001;
-        _measuringRange_.append(_coilIRangeBottom_);
+        const bool crossesZero = _coilIRangeBottom_ <= eps && _coilIRangeTop_ >= -eps;
+        const double startI = crossesZero ? 0. : _coilIRangeBottom_;
+        const double range = _coilIRangeTop_ - _coilIRangeBottom_;
+        const int n = (2 * range * _repeats_) / _coilIStep_ + 1;
+        double I(0.);
 
-        for (int repeats(_repeats_); repeats; --repeats) {
-            double I;
-
-            for (I = _coilIRangeBottom_ + _coilIStep_;
-                    I - _coilIRangeTop_<= eps;
-                    I += _coilIStep_)
-                _measuringRange_.append(I);
-
-            for (I = _coilIRangeTop_ - _coilIStep_;
-                    I - _coilIRangeBottom_ >= -eps;
-                    I -= _coilIStep_)
-                _measuringRange_.append(I);
+        // generate list of current values for coil:
+        for (int i(0); i < n; ++i) {
+            I = fmod(i * _coilIStep_ + startI - _coilIRangeBottom_, range) + _coilIRangeBottom_;
+            _measuringRange_.append(I);
         }
+
+        if (fabs(I) > eps && crossesZero)
+            _measuringRange_.append(0.);
     }
     stepsRunning = Steps_t(
                 stepsMeasure,
