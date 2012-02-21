@@ -27,7 +27,6 @@ const int Experiment::_34903A_pwr_sw1_pwr_p = _34903A + 6;
 const int Experiment::_34903A_hall_probe_1_pwr_m = _34903A + 9;
 const int Experiment::_34903A_hall_probe_2_pwr_p = _34903A + 10;
 
-const double Experiment::hallProbeI = 0.001; // 1 mA
 const double Experiment::q = 1.602176565e-19; // e- [C]
 
 const QString Experiment::eqationBScript(
@@ -504,7 +503,10 @@ bool Experiment::open()
     int err;
     QString port;
 
-    _equationB_ = config->hallProbeEquationB(config->selectedSampleHolderName());
+    const QString &hallProbeName(config->selectedSampleHolderName());
+    _equationB_ = config->hallProbeEquationB(hallProbeName);
+    hallProbeI = config->hallProbeCurrent(hallProbeName);
+
     // just hack to check validity of equation, suppose that for at least one of
     // { -1, 0, 1 } must provide valid result
     if (!isfinite(computeB(0.001, -1)) &&
@@ -928,7 +930,7 @@ void Experiment::stepMeasHallProbe(Experiment *this_)
 void Experiment::stepMeasHallProbePrepare(Experiment *this_)
 {
     /* Set current to 1mA, open hall probe current source. */
-    this_->ps6220Dev.setCurrent(hallProbeI);
+    this_->ps6220Dev.setCurrent(this_->hallProbeI);
 
     QSCPIDev::Channels_t closeChannels;
     closeChannels.append(_34903A_hall_probe_1_pwr_m);

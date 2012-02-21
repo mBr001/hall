@@ -13,6 +13,7 @@ public:
     double coilIRangeStep();
     QString dataDirPath();
     void deleteSampleHolder(const QString &sampleHolderName);
+    double hallProbeCurrent(const QString &sampleHolderName);
     QString hallProbeEquationB(const QString &sampleHolderName);
     QStringList sampleHolders();
     QString hp34970Port();
@@ -27,6 +28,7 @@ public:
     void setCoilIRangeMin(double IMin);
     void setCoilIRangeStep(double IStep);
     void setDataDirPath(const QString &dirPath);
+    void setHallProbeCurrent(const QString &sampleHolderName, double I);
     void setHallProbeEquationB(const QString &sampleHolderName, const QString &eqation);
     void setHp34970Port(const QString &port);
     void setMsdpPort(const QString &port);
@@ -43,7 +45,8 @@ private:
     static const char cfg_coilIRangeMin[];
     static const char cfg_coilIRangeStep[];
     static const char cfg_dataDirPath[];
-    static const char cfg_hallProbe_equationB[];
+    static const char cfg_hallProbe_current_suffix[];
+    static const char cfg_hallProbe_equationB_suffix[];
     static const char cfg_hp34970Port[];
     static const char cfg_msdpPort[];
     static const char cfg_ps6220Port[];

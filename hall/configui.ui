@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>702</width>
-    <height>340</height>
+    <width>701</width>
+    <height>371</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -110,7 +110,7 @@
      </item>
     </layout>
    </item>
-   <item row="9" column="0" colspan="6">
+   <item row="10" column="0" colspan="6">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
@@ -196,14 +196,14 @@
      </property>
     </widget>
    </item>
-   <item row="8" column="0">
+   <item row="9" column="0">
     <widget class="QLabel" name="label_9">
      <property name="text">
       <string>B equation</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="2" colspan="4">
+   <item row="9" column="2" colspan="4">
     <widget class="QLineEdit" name="hallProbeBEquationLineEdit"/>
    </item>
    <item row="1" column="5" rowspan="7">
@@ -231,6 +231,27 @@ p, li { white-space: pre-wrap; }
     <widget class="QLabel" name="label_10">
      <property name="text">
       <string>Sample ID (name)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>B mes. current</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="2">
+    <widget class="QDoubleSpinBox" name="hallProbeCurrentDoubleSpinBox">
+     <property name="decimals">
+      <number>3</number>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="3">
+    <widget class="QLabel" name="label_12">
+     <property name="text">
+      <string>mA</string>
      </property>
     </widget>
    </item>

@@ -276,7 +276,7 @@ private:
     Config *config;
 
     /** I for hall probe to measure B. */
-    static const double hallProbeI;
+    double hallProbeI;
 
     bool needHeader;
 

@@ -5,7 +5,8 @@ const char Config::cfg_coilIRangeMax[] = "coil I range max";
 const char Config::cfg_coilIRangeMin[] = "coil I range min";
 const char Config::cfg_coilIRangeStep[] = "coil I range step";
 const char Config::cfg_dataDirPath[] = "experiment/data dir path";
-const char Config::cfg_hallProbe_equationB[] = "equation B";
+const char Config::cfg_hallProbe_current_suffix[] = "I";
+const char Config::cfg_hallProbe_equationB_suffix[] = "equation B";
 const char Config::cfg_hp34970Port[] = "experiment/HP34970 port";
 const char Config::cfg_msdpPort[] = "experiment/coil PS port";
 const char Config::cfg_polSwitchPort[] = "experiment/polarity switch port";
@@ -59,10 +60,19 @@ void Config::deleteSampleHolder(const QString &sampleHolderName)
     }
 }
 
+double Config::hallProbeCurrent(const QString &sampleHolderName)
+{
+    settings.beginGroup(buildSampleHolderKeyPrefix(sampleHolderName, false));
+    double I = settings.value(cfg_hallProbe_current_suffix, "").toDouble();
+    settings.endGroup();
+
+    return I;
+}
+
 QString Config::hallProbeEquationB(const QString &sampleHolderName)
 {
     settings.beginGroup(buildSampleHolderKeyPrefix(sampleHolderName, false));
-    QString equation(settings.value(cfg_hallProbe_equationB, "").toString());
+    QString equation(settings.value(cfg_hallProbe_equationB_suffix, "").toString());
     settings.endGroup();
 
     return equation;
@@ -143,10 +153,17 @@ void Config::setDataDirPath(const QString &dirPath)
     settings.setValue(cfg_dataDirPath, dirPath);
 }
 
+void Config::setHallProbeCurrent(const QString &sampleHolderName, double I)
+{
+    settings.beginGroup(buildSampleHolderKeyPrefix(sampleHolderName));
+    settings.setValue(cfg_hallProbe_current_suffix, I);
+    settings.endGroup();
+}
+
 void Config::setHallProbeEquationB(const QString &sampleHolderName, const QString &equation)
 {
     settings.beginGroup(buildSampleHolderKeyPrefix(sampleHolderName));
-    settings.setValue(cfg_hallProbe_equationB, equation);
+    settings.setValue(cfg_hallProbe_equationB_suffix, equation);
     settings.endGroup();
 }
 

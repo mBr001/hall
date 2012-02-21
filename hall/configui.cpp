@@ -5,6 +5,7 @@
 #include "../QSCPIDev/qserial.h"
 #include "ui_configui.h"
 
+const double ConfigUI::sampleHolderCurrentUnit = 1./1000.;
 const double ConfigUI::sampleThicknessUnit = 1./1000000.;
 const double ConfigUI::sampleIUnit = 1./1000.;
 
@@ -31,6 +32,8 @@ ConfigUI::ConfigUI(Config *config, QWidget *parent) :
     ui->sampleHolderComboBox->addItems(config->sampleHolders());
     QString sampleHolderName(config->selectedSampleHolderName());
     ui->sampleHolderComboBox->setEditText(sampleHolderName);
+    ui->hallProbeCurrentDoubleSpinBox->setValue(
+                config->hallProbeCurrent(sampleHolderName) / sampleHolderCurrentUnit);
     ui->hallProbeBEquationLineEdit->setText(
                 config->hallProbeEquationB(sampleHolderName));
     ui->sampleNameLineEdit->setText(config->sampleName());
@@ -83,6 +86,8 @@ void ConfigUI::on_buttonBox_accepted()
     config->setSampleThickness(
                 ui->sampleThicknessDoubleSpinBox->value() * sampleThicknessUnit);
     QString hallProbeName(ui->sampleHolderComboBox->currentText());
+    config->setHallProbeCurrent(hallProbeName,
+                                ui->hallProbeCurrentDoubleSpinBox->value() * sampleHolderCurrentUnit);
     config->setHallProbeEquationB(hallProbeName,
                                  ui->hallProbeBEquationLineEdit->text());
     config->setSelectedSampleHolderName(hallProbeName);
@@ -107,10 +112,12 @@ void ConfigUI::on_dirPathToolButton_clicked()
 void ConfigUI::on_sampleHolderAddToolButton_clicked()
 {
     QString sampleHolderName(ui->sampleHolderComboBox->currentText());
+    config->setHallProbeCurrent(sampleHolderName,
+                                ui->hallProbeCurrentDoubleSpinBox->value() * sampleHolderCurrentUnit);
     config->setHallProbeEquationB(sampleHolderName,
                                  ui->hallProbeBEquationLineEdit->text());
     int idx(ui->sampleHolderComboBox->findText(
-                sampleHolderName, Qt::MatchStartsWith | Qt::MatchCaseSensitive));
+                sampleHolderName, Qt::MatchExactly | Qt::MatchCaseSensitive));
     if (idx == -1 || ui->sampleHolderComboBox->itemText(idx) != sampleHolderName)
         ui->sampleHolderComboBox->addItem(sampleHolderName);
 
@@ -134,4 +141,5 @@ void ConfigUI::on_sampleHolderDeleteToolButton_clicked()
 void ConfigUI::on_sampleHolderComboBox_currentIndexChanged(const QString &arg1)
 {
     ui->hallProbeBEquationLineEdit->setText(config->hallProbeEquationB(arg1));
+    ui->hallProbeCurrentDoubleSpinBox->setValue(config->hallProbeCurrent(arg1) / sampleHolderCurrentUnit);
 }

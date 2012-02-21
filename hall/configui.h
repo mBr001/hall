@@ -34,6 +34,7 @@ private:
 
     static const double sampleThicknessUnit;
     static const double sampleIUnit;
+    static const double sampleHolderCurrentUnit;
 };
 
 #endif // CONFIGUI_H
