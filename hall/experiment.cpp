@@ -645,7 +645,7 @@ bool Experiment::open()
     }
 
     // Open sample power source
-    if (!ps6220Dev.open(config->ps6220Port(), QSerial::Baude19200))
+    if (!ps6220Dev.open(config->ps6220Port(), QSerial::BAUDE19200))
     {
         emit fatalError("Failed to open sample power supply (Keithaly 6220)",
                         ps6220Dev.errorString());
