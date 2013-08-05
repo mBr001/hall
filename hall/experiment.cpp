@@ -971,33 +971,33 @@ bool Experiment::writeHeader()
 
         csvFile.resize(csvColEnd);
 
-        csvFile[csvColHallProbeB] = "Hall probe\nB [T]";
-        csvFile[csvColSampleResistivity] = "sample\nR [Ω]";
+        csvFile[csvColHallProbeB] = "B [T]";
+        csvFile[csvColSampleResistivity] = "R [Ω]";
         csvFile[csvColSampleResSpec] =
-                QString("sample\nRspec [%1]").arg(resistivitySpecUnits.unitText);
+                QString("Rspec [%1]").arg(resistivitySpecUnits.unitText);
         csvFile[csvColSampleRHall] =
-                QString("sample\nRhall [%1]").arg(RHallUnits.unitText);
+                QString("Rhall [%1]").arg(RHallUnits.unitText);
         csvFile[csvColSampleDrift] =
-                QString("sample\ndrift [%1]").arg(driftUnits.unitText);
+                QString("drift [%1]").arg(driftUnits.unitText);
         csvFile[csvColSamplecCarrier] =
-                QString("carrier conc.\nN [%1]").arg(carriercUnits.unitText);
+                QString("carrier conc. N [%1]").arg(carriercUnits.unitText);
 
         csvFile[csvColResultsEnd] = "-";
 
-        csvFile[csvColTime] = "Time\n(UTC)";
+        csvFile[csvColTime] = "Time (UTC)";
         csvFile[csvColTime].setDateTimeFormat("yyyy-MM-dd hh:mm:ss");
-        csvFile[csvColHallProbeU] = "Hall probe\nUhp [V]";
-        csvFile[csvColSampleUac] = "sample\nUac [V]";
-        csvFile[csvColSampleUacRev] = "sample\nUac(rev) [V]";
-        csvFile[csvColSampleUbd] = "sample\nUbd [V]";
-        csvFile[csvColSampleUbdRev] = "sample\nUbd(rev) [V]";
-        csvFile[csvColSampleUcd] = "sample\nUcd [V]";
-        csvFile[csvColSampleUcdRev] = "sample\nUcd(rev) [V]";
-        csvFile[csvColSampleUda] = "sample\nUda [V]";
-        csvFile[csvColSampleUdaRev] = "sample\nUda(rev) [V]";
+        csvFile[csvColHallProbeU] = "Hall probe Uhp [V]";
+        csvFile[csvColSampleUac] = "sample Uac [V]";
+        csvFile[csvColSampleUacRev] = "sample Uac(rev) [V]";
+        csvFile[csvColSampleUbd] = "sample Ubd [V]";
+        csvFile[csvColSampleUbdRev] = "sample Ubd(rev) [V]";
+        csvFile[csvColSampleUcd] = "sample Ucd [V]";
+        csvFile[csvColSampleUcdRev] = "sample Ucd(rev) [V]";
+        csvFile[csvColSampleUda] = "sample Uda [V]";
+        csvFile[csvColSampleUdaRev] = "sample Uda(rev) [V]";
 
-        csvFile[csvColSampleI] = "sample\nI [%1]";
-        csvFile[csvColCoilI] = "Coil\nI [A]";
+        csvFile[csvColSampleI] = "sample I [%1]";
+        csvFile[csvColCoilI] = "Coil I [A]";
         csvFile.write();
     } while(false);
 
